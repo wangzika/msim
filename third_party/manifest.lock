@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "components": {
+    "signalsim": {
+      "status": "disabled_pending_license_and_spike",
+      "url": "https://github.com/globsky/SignalSim",
+      "commit": "baba9deb68ed193efb9fd9a362b431ae8c491fa4"
+    },
+    "rtklib": {
+      "status": "candidate_not_built",
+      "url": "https://github.com/tomojitakasu/RTKLIB",
+      "tag": "v2.4.3-b34",
+      "commit": "180043ee24b6d2b168f98b64be15f69d50046b1a"
+    }
+  }
+}

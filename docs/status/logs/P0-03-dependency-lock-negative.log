@@ -1,0 +1,58 @@
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 707B done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/ubuntu:24.04@sha256:fe81560990fae86dc4743202b2cb4d3df98d0bcf949173cecef15ce1127ef852
+#2 DONE 0.0s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [1/5] FROM docker.io/library/ubuntu:24.04@sha256:fe81560990fae86dc4743202b2cb4d3df98d0bcf949173cecef15ce1127ef852
+#4 resolve docker.io/library/ubuntu:24.04@sha256:fe81560990fae86dc4743202b2cb4d3df98d0bcf949173cecef15ce1127ef852 done
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 6.98kB done
+#5 DONE 0.0s
+
+#6 [2/5] RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends     build-essential cmake python3 git clang-format clang-tidy ca-certificates     && rm -rf /var/lib/apt/lists/*
+#6 CACHED
+
+#7 [3/5] WORKDIR /work
+#7 CACHED
+
+#8 [4/5] COPY containers/core.packages.lock /tmp/msim-packages.lock
+#8 DONE 0.0s
+
+#9 [5/5] RUN dpkg-query -W '-f=${binary:Package} ${Version}\n' > /tmp/msim-packages.actual     && diff -u /tmp/msim-packages.lock /tmp/msim-packages.actual     && rm /tmp/msim-packages.lock /tmp/msim-packages.actual
+#9 1.287 --- /tmp/msim-packages.lock	2026-10-29 05:56:59.755437788 +0000
+#9 1.287 +++ /tmp/msim-packages.actual	2026-10-29 05:57:01.191443648 +0000
+#9 1.287 @@ -205,4 +205,3 @@
+#9 1.287  util-linux 2.39.3-9ubuntu6.6
+#9 1.287  xz-utils 5.6.1+really5.4.5-1ubuntu0.4
+#9 1.287  zlib1g:amd64 1:1.3.dfsg-3.1ubuntu2.3
+#9 1.287 -nonexistent-package 0
+#9 ERROR: process "/bin/sh -c dpkg-query -W '-f=${binary:Package} ${Version}\\n' > /tmp/msim-packages.actual     && diff -u /tmp/msim-packages.lock /tmp/msim-packages.actual     && rm /tmp/msim-packages.lock /tmp/msim-packages.actual" did not complete successfully: exit code: 1
+------
+ > [5/5] RUN dpkg-query -W '-f=${binary:Package} ${Version}\n' > /tmp/msim-packages.actual     && diff -u /tmp/msim-packages.lock /tmp/msim-packages.actual     && rm /tmp/msim-packages.lock /tmp/msim-packages.actual:
+1.287 --- /tmp/msim-packages.lock	2026-10-29 05:56:59.755437788 +0000
+1.287 +++ /tmp/msim-packages.actual	2026-10-29 05:57:01.191443648 +0000
+1.287 @@ -205,4 +205,3 @@
+1.287  util-linux 2.39.3-9ubuntu6.6
+1.287  xz-utils 5.6.1+really5.4.5-1ubuntu0.4
+1.287  zlib1g:amd64 1:1.3.dfsg-3.1ubuntu2.3
+1.287 -nonexistent-package 0
+------
+Dockerfile:8
+--------------------
+   7 |     COPY containers/core.packages.lock /tmp/msim-packages.lock
+   8 | >>> RUN dpkg-query -W '-f=${binary:Package} ${Version}\n' > /tmp/msim-packages.actual \
+   9 | >>>     && diff -u /tmp/msim-packages.lock /tmp/msim-packages.actual \
+  10 | >>>     && rm /tmp/msim-packages.lock /tmp/msim-packages.actual
+  11 |     
+--------------------
+ERROR: failed to build: failed to solve: process "/bin/sh -c dpkg-query -W '-f=${binary:Package} ${Version}\\n' > /tmp/msim-packages.actual     && diff -u /tmp/msim-packages.lock /tmp/msim-packages.actual     && rm /tmp/msim-packages.lock /tmp/msim-packages.actual" did not complete successfully: exit code: 1

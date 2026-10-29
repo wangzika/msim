@@ -1,0 +1,62 @@
+Get:1 http://security.ubuntu.com/ubuntu noble-security InRelease [126 kB]
+Ign:2 https://snapshot.ubuntu.com/ubuntu/20261029T040000Z noble InRelease
+Get:3 http://archive.ubuntu.com/ubuntu noble InRelease [256 kB]
+Get:4 http://security.ubuntu.com/ubuntu noble-security/restricted amd64 Packages [2122 kB]
+Ign:5 https://snapshot.ubuntu.com/ubuntu/20261029T040000Z noble-updates InRelease
+Get:6 http://archive.ubuntu.com/ubuntu noble-updates InRelease [126 kB]
+Get:7 http://archive.ubuntu.com/ubuntu noble-backports InRelease [126 kB]
+Ign:8 https://snapshot.ubuntu.com/ubuntu/20261029T040000Z noble-backports InRelease
+Get:9 http://archive.ubuntu.com/ubuntu noble/multiverse amd64 Packages [331 kB]
+Get:10 http://security.ubuntu.com/ubuntu noble-security/multiverse amd64 Packages [55.6 kB]
+Get:11 http://security.ubuntu.com/ubuntu noble-security/universe amd64 Packages [1550 kB]
+Get:12 http://archive.ubuntu.com/ubuntu noble/restricted amd64 Packages [117 kB]
+Get:13 http://security.ubuntu.com/ubuntu noble-security/main amd64 Packages [1412 kB]
+Get:14 http://archive.ubuntu.com/ubuntu noble/universe amd64 Packages [19.3 MB]
+Ign:15 https://snapshot.ubuntu.com/ubuntu/20261029T040000Z noble-security InRelease
+Ign:2 https://snapshot.ubuntu.com/ubuntu/20261029T040000Z noble InRelease
+Ign:5 https://snapshot.ubuntu.com/ubuntu/20261029T040000Z noble-updates InRelease
+Ign:8 https://snapshot.ubuntu.com/ubuntu/20261029T040000Z noble-backports InRelease
+Get:16 http://archive.ubuntu.com/ubuntu noble/main amd64 Packages [1808 kB]
+Get:17 http://archive.ubuntu.com/ubuntu noble-updates/multiverse amd64 Packages [61.7 kB]
+Get:18 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 Packages [1740 kB]
+Get:19 http://archive.ubuntu.com/ubuntu noble-updates/universe amd64 Packages [2172 kB]
+Ign:15 https://snapshot.ubuntu.com/ubuntu/20261029T040000Z noble-security InRelease
+Get:20 http://archive.ubuntu.com/ubuntu noble-updates/restricted amd64 Packages [2235 kB]
+Get:21 http://archive.ubuntu.com/ubuntu noble-backports/universe amd64 Packages [36.0 kB]
+Get:22 http://archive.ubuntu.com/ubuntu noble-backports/multiverse amd64 Packages [669 B]
+Get:23 http://archive.ubuntu.com/ubuntu noble-backports/main amd64 Packages [49.0 kB]
+Ign:2 https://snapshot.ubuntu.com/ubuntu/20261029T040000Z noble InRelease
+Ign:5 https://snapshot.ubuntu.com/ubuntu/20261029T040000Z noble-updates InRelease
+Ign:8 https://snapshot.ubuntu.com/ubuntu/20261029T040000Z noble-backports InRelease
+Ign:15 https://snapshot.ubuntu.com/ubuntu/20261029T040000Z noble-security InRelease
+Err:2 https://snapshot.ubuntu.com/ubuntu/20261029T040000Z noble InRelease
+  Certificate verification failed: The certificate is NOT trusted. The certificate issuer is unknown.  Could not handshake: Error in the certificate verification. [IP: 185.125.189.36 443]
+Err:5 https://snapshot.ubuntu.com/ubuntu/20261029T040000Z noble-updates InRelease
+  Certificate verification failed: The certificate is NOT trusted. The certificate issuer is unknown.  Could not handshake: Error in the certificate verification. [IP: 185.125.189.36 443]
+Err:8 https://snapshot.ubuntu.com/ubuntu/20261029T040000Z noble-backports InRelease
+  Certificate verification failed: The certificate is NOT trusted. The certificate issuer is unknown.  Could not handshake: Error in the certificate verification. [IP: 185.125.189.36 443]
+Err:15 https://snapshot.ubuntu.com/ubuntu/20261029T040000Z noble-security InRelease
+  Certificate verification failed: The certificate is NOT trusted. The certificate issuer is unknown.  Could not handshake: Error in the certificate verification. [IP: 185.125.189.36 443]
+Fetched 33.6 MB in 13s (2578 kB/s)
+Reading package lists...
+W: https://snapshot.ubuntu.com/ubuntu/20261029T040000Z/dists/noble/InRelease: No system certificates available. Try installing ca-certificates.
+W: https://snapshot.ubuntu.com/ubuntu/20261029T040000Z/dists/noble-updates/InRelease: No system certificates available. Try installing ca-certificates.
+W: https://snapshot.ubuntu.com/ubuntu/20261029T040000Z/dists/noble-backports/InRelease: No system certificates available. Try installing ca-certificates.
+W: https://snapshot.ubuntu.com/ubuntu/20261029T040000Z/dists/noble-security/InRelease: No system certificates available. Try installing ca-certificates.
+W: https://snapshot.ubuntu.com/ubuntu/20261029T040000Z/dists/noble/InRelease: No system certificates available. Try installing ca-certificates.
+W: https://snapshot.ubuntu.com/ubuntu/20261029T040000Z/dists/noble-updates/InRelease: No system certificates available. Try installing ca-certificates.
+W: https://snapshot.ubuntu.com/ubuntu/20261029T040000Z/dists/noble-backports/InRelease: No system certificates available. Try installing ca-certificates.
+W: https://snapshot.ubuntu.com/ubuntu/20261029T040000Z/dists/noble-security/InRelease: No system certificates available. Try installing ca-certificates.
+W: https://snapshot.ubuntu.com/ubuntu/20261029T040000Z/dists/noble/InRelease: No system certificates available. Try installing ca-certificates.
+W: https://snapshot.ubuntu.com/ubuntu/20261029T040000Z/dists/noble-updates/InRelease: No system certificates available. Try installing ca-certificates.
+W: https://snapshot.ubuntu.com/ubuntu/20261029T040000Z/dists/noble-backports/InRelease: No system certificates available. Try installing ca-certificates.
+W: https://snapshot.ubuntu.com/ubuntu/20261029T040000Z/dists/noble-security/InRelease: No system certificates available. Try installing ca-certificates.
+W: https://snapshot.ubuntu.com/ubuntu/20261029T040000Z/dists/noble/InRelease: No system certificates available. Try installing ca-certificates.
+W: https://snapshot.ubuntu.com/ubuntu/20261029T040000Z/dists/noble-updates/InRelease: No system certificates available. Try installing ca-certificates.
+W: https://snapshot.ubuntu.com/ubuntu/20261029T040000Z/dists/noble-backports/InRelease: No system certificates available. Try installing ca-certificates.
+W: https://snapshot.ubuntu.com/ubuntu/20261029T040000Z/dists/noble-security/InRelease: No system certificates available. Try installing ca-certificates.
+W: Failed to fetch https://snapshot.ubuntu.com/ubuntu/20261029T040000Z/dists/noble/InRelease  Certificate verification failed: The certificate is NOT trusted. The certificate issuer is unknown.  Could not handshake: Error in the certificate verification. [IP: 185.125.189.36 443]
+W: Failed to fetch https://snapshot.ubuntu.com/ubuntu/20261029T040000Z/dists/noble-updates/InRelease  Certificate verification failed: The certificate is NOT trusted. The certificate issuer is unknown.  Could not handshake: Error in the certificate verification. [IP: 185.125.189.36 443]
+W: Failed to fetch https://snapshot.ubuntu.com/ubuntu/20261029T040000Z/dists/noble-backports/InRelease  Certificate verification failed: The certificate is NOT trusted. The certificate issuer is unknown.  Could not handshake: Error in the certificate verification. [IP: 185.125.189.36 443]
+W: Failed to fetch https://snapshot.ubuntu.com/ubuntu/20261029T040000Z/dists/noble-security/InRelease  Certificate verification failed: The certificate is NOT trusted. The certificate issuer is unknown.  Could not handshake: Error in the certificate verification. [IP: 185.125.189.36 443]
+W: Some index files failed to download. They have been ignored, or old ones used instead.

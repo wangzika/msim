@@ -1,0 +1,177 @@
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 437B done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/ubuntu:24.04@sha256:fe81560990fae86dc4743202b2cb4d3df98d0bcf949173cecef15ce1127ef852
+#2 DONE 0.0s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 56B done
+#3 DONE 0.0s
+
+#4 [1/3] FROM docker.io/library/ubuntu:24.04@sha256:fe81560990fae86dc4743202b2cb4d3df98d0bcf949173cecef15ce1127ef852
+#4 resolve docker.io/library/ubuntu:24.04@sha256:fe81560990fae86dc4743202b2cb4d3df98d0bcf949173cecef15ce1127ef852 done
+#4 DONE 0.0s
+
+#5 [2/3] RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends     build-essential cmake python3 git clang-format clang-tidy ca-certificates     && rm -rf /var/lib/apt/lists/*
+#5 CACHED
+
+#6 [3/3] WORKDIR /work
+#6 CACHED
+
+#7 exporting to image
+#7 exporting layers done
+#7 exporting manifest sha256:5da54c1d483d364798f40df0025eaee518b7cc71db9b58d30037c108dad6e0e2 done
+#7 exporting config sha256:024ddeee9eab639a35d0e9f59bd9fca915c621e727d59073c2207b36394b3c13 done
+#7 exporting attestation manifest sha256:63b7832d1cfeae4ea1026a618409a2894c4d4fb01dc38814591c2eec4e267ec8 done
+#7 exporting manifest list sha256:361d193628972372a4ebe545e8288f6526017f1f3a6938e9df1fd21bb526dc84 done
+#7 naming to docker.io/library/msim-core:p0 done
+#7 unpacking to docker.io/library/msim-core:p0 done
+#7 DONE 0.0s
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 214B done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/ros:jazzy-ros-base-noble@sha256:8eed0a4669bbf43ee331878a4c39bd8ebddea8e3312a58b4fae8edb14526b617
+#2 DONE 0.0s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 56B done
+#3 DONE 0.0s
+
+#4 [1/1] FROM docker.io/library/ros:jazzy-ros-base-noble@sha256:8eed0a4669bbf43ee331878a4c39bd8ebddea8e3312a58b4fae8edb14526b617
+#4 resolve docker.io/library/ros:jazzy-ros-base-noble@sha256:8eed0a4669bbf43ee331878a4c39bd8ebddea8e3312a58b4fae8edb14526b617 done
+#4 CACHED
+
+#5 exporting to image
+#5 exporting layers done
+#5 exporting manifest sha256:1ad0b09d9ee2487988355c1113d878cd6814d1aff53544631ec285db86dcb59f done
+#5 exporting config sha256:3e1ba97a2cda53301c6ba7e831e2c8506e54631f911c0bd26cfbc976479810c7 done
+#5 exporting attestation manifest sha256:29771e77ff98041145b4d9b8e6b6a476a184beb0cb9f339e608585359b803c58 done
+#5 exporting manifest list sha256:d98698584e8cd114144bfd661666ce69b4f77f9faeab32f3da7933dc6566bed3 done
+#5 naming to docker.io/library/msim-ros2:p0 done
+#5 unpacking to docker.io/library/msim-ros2:p0 done
+#5 DONE 0.0s
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 140B done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/ros:noetic-ros-base-focal@sha256:72b8bc59035dc0a5b8e07aae28c16caa84192971d72d207c72ed734fb1d5e97d
+#2 DONE 0.0s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 56B done
+#3 DONE 0.0s
+
+#4 [1/1] FROM docker.io/library/ros:noetic-ros-base-focal@sha256:72b8bc59035dc0a5b8e07aae28c16caa84192971d72d207c72ed734fb1d5e97d
+#4 resolve docker.io/library/ros:noetic-ros-base-focal@sha256:72b8bc59035dc0a5b8e07aae28c16caa84192971d72d207c72ed734fb1d5e97d done
+#4 CACHED
+
+#5 exporting to image
+#5 exporting layers done
+#5 exporting manifest sha256:892ff7408f3f9eb7485a7750c0f585c77dd8f33b098e23aa7a92fc889709ae3d done
+#5 exporting config sha256:607ca0f020489b85d74ef5ae2f0ce8e901813af48008b0a622fc06cd41bf0d1b done
+#5 exporting attestation manifest sha256:85f9f109619a22428d02e8bf77fd9cda9aa3edc8f03b58bed8cfb9aa09226523 0.0s done
+#5 exporting manifest list sha256:88439f2b5f711ecdeab4840134c6cb5f3cd3dddaecfec652a6f11216006dbca2 done
+#5 naming to docker.io/library/msim-ros1:p0 done
+#5 unpacking to docker.io/library/msim-ros1:p0 done
+#5 DONE 0.0s
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Found Python3: /usr/bin/python3 (found version "3.12.3") found components: Interpreter 
+-- Configuring done (0.2s)
+-- Generating done (0.0s)
+-- Build files have been written to: /tmp/msim/build
+[ 25%] Building CXX object CMakeFiles/msim_core.dir/core/src/version.cpp.o
+[ 50%] Linking CXX static library libmsim_core.a
+[ 50%] Built target msim_core
+[ 75%] Building CXX object CMakeFiles/msim_core_smoke_test.dir/tests/unit/core_smoke_test.cpp.o
+[100%] Linking CXX executable msim_core_smoke_test
+[100%] Built target msim_core_smoke_test
+Internal ctest changing into directory: /tmp/msim/build
+Test project /tmp/msim/build
+    Start 1: core_smoke
+1/2 Test #1: core_smoke .......................   Passed    0.00 sec
+    Start 2: manifest_contract
+2/2 Test #2: manifest_contract ................   Passed    0.12 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Total Test time (real) =   0.12 sec
+-- Configuring done (0.1s)
+-- Generating done (0.0s)
+-- Build files have been written to: /tmp/msim/build
+[1/2] Processing file /tmp/msim/core/src/version.cpp.
+[2/2] Processing file /tmp/msim/tests/unit/core_smoke_test.cpp.
+5365 warnings generated.
+Suppressed 5365 warnings (5365 in non-user code).
+Use -header-filter=.* to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+Starting >>> msim_msgs
+Finished <<< msim_msgs [0.39s]
+
+Summary: 1 package finished [0.44s]
+-- The C compiler identification is GNU 9.4.0
+-- The CXX compiler identification is GNU 9.4.0
+-- Check for working C compiler: /usr/bin/cc
+-- Check for working C compiler: /usr/bin/cc -- works
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Check for working CXX compiler: /usr/bin/c++
+-- Check for working CXX compiler: /usr/bin/c++ -- works
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Using CATKIN_DEVEL_PREFIX: /tmp/ws/devel
+-- Using CMAKE_PREFIX_PATH: /opt/ros/noetic
+-- This workspace overlays: /opt/ros/noetic
+-- Found PythonInterp: /usr/bin/python3 (found suitable version "3.8.10", minimum required is "3") 
+-- Using PYTHON_EXECUTABLE: /usr/bin/python3
+-- Using Debian Python package layout
+-- Found PY_em: /usr/lib/python3/dist-packages/em.py  
+-- Using empy: /usr/lib/python3/dist-packages/em.py
+-- Using CATKIN_ENABLE_TESTING: ON
+-- Call enable_testing()
+-- Using CATKIN_TEST_RESULTS_DIR: /tmp/ws/build/test_results
+-- Forcing gtest/gmock from source, though one was otherwise available.
+-- Found gtest sources under '/usr/src/googletest': gtests will be built
+-- Found gmock sources under '/usr/src/googletest': gmock will be built
+-- Found PythonInterp: /usr/bin/python3 (found version "3.8.10") 
+-- Found Threads: TRUE  
+-- Using Python nosetests: /usr/bin/nosetests3
+-- catkin 0.8.12
+-- BUILD_SHARED_LIBS is on
+-- BUILD_SHARED_LIBS is on
+-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-- ~~  traversing 1 packages in topological order:
+-- ~~  - msim_msgs
+-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-- +++ processing catkin package: 'msim_msgs'
+-- ==> add_subdirectory(msim_msgs)
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /tmp/ws/build
+Base path: /tmp/ws
+Source space: /tmp/ws/src
+Build space: /tmp/ws/build
+Devel space: /tmp/ws/devel
+Install space: /tmp/ws/install
+Creating symlink "/tmp/ws/src/CMakeLists.txt" pointing to "/opt/ros/noetic/share/catkin/cmake/toplevel.cmake"
+####
+#### Running command: "cmake /tmp/ws/src -DCATKIN_DEVEL_PREFIX=/tmp/ws/devel -DCMAKE_INSTALL_PREFIX=/tmp/ws/install -G Unix Makefiles" in "/tmp/ws/build"
+####
+####
+#### Running command: "make -j24 -l24" in "/tmp/ws/build"
+####
