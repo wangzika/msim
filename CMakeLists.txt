@@ -23,3 +23,8 @@ if(BUILD_TESTING)
   add_test(NAME manifest_contract
     COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/contract/test_manifest.py)
 endif()
+
+if(BUILD_TESTING)
+  add_test(NAME recorded_run_contract
+    COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/contract/test_recorded_run.py)
+endif()

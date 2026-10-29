@@ -18,8 +18,19 @@ ctest --test-dir build --output-on-failure
 
 ## Phase 0 进度
 
-[任务状态](docs/status/) 和 [架构决策草案](docs/architecture/) 记录了实际验证及未完成门禁。`tools/ci/phase0.sh` 是本地容器检查入口；两个 ROS 消息包目前仅为不含消息定义的构建占位包。核心容器使用 Ubuntu 固定时间快照并校验包锁；Jazzy/Harmonic 的软件源快照仍待固定。
+[任务状态](docs/status/) 和 [架构决策草案](docs/architecture/) 记录了实际验证及未完成门禁。`tools/ci/phase0.sh` 是本地容器检查入口；两个 ROS 消息包目前仅为不含消息定义的构建占位包。核心容器使用 Ubuntu 固定时间快照并校验包锁；Jazzy/Harmonic 使用固定 Ubuntu 与 ROS 快照并校验包锁。
 
 `tools/validation/create_manifest.py --scenario <文件> --seed <整数> --output <新文件>` 可创建初步来源记录，要求当前仓库有 Git commit；它尚不是完整 run manifest。SignalSim 默认禁用，其许可证仍待人工确认。
 
 初步来源记录还支持 `--resolved-scenario`、可重复的 `--artifact` 和 `--dependency-lock` 文件，以及可重复的 `--image-digest name@sha256:<64位摘要>`。文件内容按 SHA-256 记录；这些参数由调用者提供，工具不会自动发现所有运行输入或保证清单完整。
+
+记录子进程运行证据的最小样例（仅验证包装器，不生成仿真数据；输出目录必须不存在）：
+
+```sh
+python3 apps/orchestrator/recorded_run.py \
+  --scenario tests/fixtures/recorded_run/scenario.yaml --seed 42 \
+  --output /tmp/msim-example-run --lock third_party/manifest.lock -- \
+  python3 tests/fixtures/recorded_run/worker.py
+```
+
+包装器向子进程追加 `--scenario`、`--seed` 和 `--output` 参数，收集日志、输入副本、产物哈希和 Git 状态。场景由调用者先行解析，镜像引用由调用者显式提供；它不能证明子进程使用了 seed，也不能重现未提交的 Git 修改。真实仿真运行器和自动完整清单仍待实现。
