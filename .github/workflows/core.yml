@@ -1,0 +1,12 @@
+name: FAST_GLIO SignalSim geometry
+on: [push, pull_request]
+jobs:
+  geometry:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - run: cmake -S . -B build/core -DCMAKE_BUILD_TYPE=Release
+      - run: cmake --build build/core
+      - run: ctest --test-dir build/core --output-on-failure
+      - run: python3 -m unittest discover -s tests/fastglio -p 'test_*.py'
+      - run: python3 tests/fastglio/test_rtklib_runner.py tools/rtklib/rtklib_runner.py

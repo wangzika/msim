@@ -1,9 +1,5 @@
-# RTKLIB 版本和许可证核查
+# RTKLIB 来源
 
-状态：候选，尚未构建、未形成完整许可证/NOTICE 审核。来源：[上游发布页](https://github.com/tomojitakasu/RTKLIB/releases)、[上游许可说明](https://rtklib.com/?lang=en)。上游描述 BSD 两条款许可及附加条款；必须逐项检查所用源码和第三方组件的许可证。候选 v2.4.3-b34 尚待固定完整提交和校验；[上游 issue 566](https://github.com/tomojitakasu/RTKLIB/issues/566) 记录该发布的自动源码归档与实际版本存在差异，不应仅凭标签宣称二进制版本。构建环境、二进制校验和和样例结果尚不存在；RINEX 兼容及 RTK Fixed 待实测。
+本机相对定位使用 `/home/wzb/FAST_GLIO/rtklib` 的 `demo5 b34c` 版本。锁定的源码提交和 Pixi 文件哈希见 `third_party/manifest.lock`，已构建二进制及读取探针的 SHA-256 见 `docs/rtklib/build-manifest.json`。构建入口为 `tools/rtklib/build_rtklib.py`，解算入口为 `tools/rtklib/rtklib_runner.py`。
 
-2026-10-29：`git ls-remote` 显示 `v2.4.3-b34` 指向 `180043ee24b6d2b168f98b64be15f69d50046b1a`。该提交 `LICENSE.txt` 允许满足版权、条件及免责声明保留要求下再分发，并说明附带库适用各自许可；需要针对实际分发内容逐项审计。标签的版本歧义尚待 P4 构建核验。
-
-固定提交 `LICENSE.txt` SHA-256：`219747832d49ee958457b2934080ab8d94bd9d8e45fcb1c36f89776fd2c5ed8a`。
-
-补充核对：2026-10-29 上游 `rtklib_2.4.3` 分支和 `v2.4.3-b34` 标签均指向上述提交；该提交 `readme.txt` 的更新记录包含 2020-12-30 的 2.4.3 b34。此证据缩小了标签源码版本疑点，但不验证上游发布归档的内容或二进制，也不替代固定源码构建与许可证审计。
+上游授权范围尚未完成独立审查。本仓库不复制 RTKLIB 源码，构建脚本从指定 FAST_GLIO 提交创建本机快照。

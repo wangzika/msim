@@ -1,0 +1,58 @@
+common:
+    lid_topic:  "/velodyne_points"
+    imu_topic:  "/imu/data"
+    time_sync_en: false
+    time_offset_lidar_to_imu: 0.0
+
+preprocess:
+    lidar_type: 4
+    scan_line: 16
+    scan_rate: 10
+    timestamp_unit: 0
+    blind: 0.5
+
+mapping:
+    acc_cov: 0.01
+    gyr_cov: 0.001
+    b_acc_cov: 0.0001
+    b_gyr_cov: 0.0000001
+    fov_degree: 360
+    det_range: 100.0
+    extrinsic_est_en: false
+    bias_freeze_en: true
+    lidar_meas_cov: 0.001
+    extrinsic_T: [0.0, 0.0, 0.15]
+    extrinsic_R: [1, 0, 0,
+                  0, 1, 0,
+                  0, 0, 1]
+
+publish:
+    path_en: true
+    scan_publish_en: true
+    dense_publish_en: false
+    scan_bodyframe_pub_en: true
+
+gnss_loose:
+    enable: true
+    odom_topic: "/rtklib_odom"
+    raw_subscribe_enable: true
+    raw_topic: "/gnss_raw"
+    input_coord: "ecef"
+    init_samples: 5
+    init_min_motion: 2.0
+    max_time_diff: 0.1
+    raw_max_time_diff: 0.1
+    max_interp_interval: 1.1
+    max_position_var: 100.0
+    min_position_var: 0.01
+    default_position_var: 0.5
+    gate_chi2: 16.27
+    correction_gain: 0.3
+    max_correction_step: 0.5
+    correct_z: true
+    map_use_loose: false
+    feedback_to_lio: false
+    diag_log_enable: false
+    use_initial_heading: true
+    initial_heading_deg: 0.0
+    lever_arm_body: [0.05, 0.0, 0.04]

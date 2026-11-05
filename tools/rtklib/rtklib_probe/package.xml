@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>msim_rtklib_probe</name><version>0.1.0</version>
+  <description>Read-only RINEX probe for the locked FAST_GLIO RTKLIB.</description>
+  <maintainer email="582796566@qq.com">wangzika</maintainer>
+  <license>NOASSERTION</license>
+  <buildtool_depend>catkin</buildtool_depend>
+  <depend>rtklib</depend>
+</package>

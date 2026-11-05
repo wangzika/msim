@@ -1,0 +1,24 @@
+<launch>
+  <arg name="gui" default="false"/>
+  <arg name="flight_mode" default="patrol_s"/>
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(find uav_simulator)/worlds/urban_canyon.world"/>
+    <arg name="paused" value="false"/>
+    <arg name="use_sim_time" value="true"/>
+    <arg name="gui" value="$(arg gui)"/>
+  </include>
+  <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find uav_simulator)/urdf/quadrotor.urdf.xacro'"/>
+  <node name="spawn_quadrotor" pkg="gazebo_ros" type="spawn_model" output="screen"
+        args="-urdf -param robot_description -model quadrotor -x 0.0 -y -20.0 -z 1.0"/>
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
+  <node pkg="tf" type="static_transform_publisher" name="world_to_camera_init_tf"
+        args="0 0 0 0 0 0 world camera_init 100"/>
+  <node pkg="uav_simulator" type="point_cloud_converter" name="point_cloud_converter" output="screen"/>
+  <node pkg="uav_simulator" type="uav_flight_controller.py" name="uav_flight_controller" output="screen">
+    <param name="model_name" value="quadrotor"/>
+    <param name="mode" value="$(arg flight_mode)"/>
+    <param name="speed" value="2.0"/>
+    <param name="hover_height" value="3.0"/>
+    <param name="height" value="8.0"/>
+  </node>
+</launch>

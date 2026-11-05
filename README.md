@@ -1,36 +1,98 @@
-# msim
+# msim：FAST_GLIO 无人机与 SignalSim GNSS
 
-多传感器仿真平台的早期基础工程。当前仅有独立 C++17 核心的构建和测试骨架，尚不能生成仿真数据。开发状态见 [P0-01](docs/status/P0-01.md)。
+本仓库以 **ROS 1 Noetic 的 FAST_GLIO 无人机城市仿真**为唯一运行主线。FAST_GLIO 的 Gazebo 场景和预设航线提供真值、IMU、LiDAR、`/clock`；本仓库根据真值轨迹驱动 SignalSim 生成四星座双频基站与无人机观测，写出 RINEX，合并为 ROS 1 bag，并用 RTKLIB 离线解算。无人机模型目前没有相机话题。
 
-## 本机构建和测试
+PX4 SITL 现可作为这条 ROS 1 城市仿真流程的飞控与动力学选项，使用同一 Gazebo world 并通过 MAVLink 预设航线飞行。`--online-gnss` 可停用 Gazebo GPS 插件，改由实时真值加可控偏移向 PX4 注入 `HIL_GPS`；SignalSim 观测仍在采集后离线生成。安装、采集命令及输入边界见 [PX4 接入说明](docs/px4/README.md)。
 
-需要 CMake 3.16 或更新版本和 C++17 编译器：
-
-```sh
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
-cmake --build build
-ctest --test-dir build --output-on-failure
+```mermaid
+flowchart LR
+    A[FAST_GLIO Gazebo<br/>无人机、城市、预设航线] --> B[sensors.bag<br/>真值、IMU、LiDAR、clock]
+    B --> C[轨迹提取<br/>trajectory.json]
+    C --> D[SignalSim 适配器<br/>建筑遮挡与反射]
+    D --> E[双站 RINEX<br/>rover.obs、base.obs、navigation.nav]
+    D --> F[GNSS 历元]
+    B --> G[ROS 1 合包与同步验收]
+    F --> G
+    G --> H[combined-signalsim.bag]
+    E --> I[RTKLIB 相对定位]
+    I --> J[.pos、.pos.stat、summary.json]
 ```
 
-格式与静态检查分别运行 `tools/ci/check-format.sh` 和 `tools/ci/check-tidy.sh`，需要安装 clang-format 和 clang-tidy。缺少工具时检查会失败，不会静默跳过。
+## 目录
 
-实施方案中的 GNSS、RINEX、RTKLIB、Gazebo、ROS 和融合能力尚未实现或验证；SignalSim 集成、RINEX 兼容性和正确的 RTK Fixed 均待实测。
+| 路径 | 内容 |
+| --- | --- |
+| `adapters/ros1_noetic/fast_glio_uav/` | Gazebo 启动、ROS 1 录制、轨迹提取、合包和同步检查。 |
+| `adapters/signalsim/`、`core/` | SignalSim C++ 适配器、坐标变换和建筑传播几何。 |
+| `apps/fastglio/` | 轨迹插值、SignalSim 观测生成及 RINEX/清单校验。 |
+| `scenarios/fastglio_signalsim.json` | 默认 GNSS 场景、地理原点、基站与建筑参数。 |
+| `tools/` | 一键采集、SignalSim 构建、RTKLIB 解算和绘图真值导出。 |
+| `runs/`、`build/` | 本机采集结果与构建产物，不纳入版本控制。 |
 
-## Phase 0 进度
+## 准备环境
 
-[任务状态](docs/status/) 和 [架构决策草案](docs/architecture/) 记录了实际验证及未完成门禁。`tools/ci/phase0.sh` 是本地容器检查入口；两个 ROS 消息包目前仅为不含消息定义的构建占位包。核心容器使用 Ubuntu 固定时间快照并校验包锁；Jazzy/Harmonic 使用固定 Ubuntu 与 ROS 快照并校验包锁。
+需要已构建的 `/home/wzb/FAST_GLIO/devel/setup.bash`、其中的 Pixi ROS Noetic 环境、C++17 编译器和本机的 SignalSim 固定版本：
 
-`tools/validation/create_manifest.py --scenario <文件> --seed <整数> --output <新文件>` 可创建初步来源记录，要求当前仓库有 Git commit；它尚不是完整 run manifest。SignalSim 默认禁用，其许可证仍待人工确认。
-
-初步来源记录还支持 `--resolved-scenario`、可重复的 `--artifact` 和 `--dependency-lock` 文件，以及可重复的 `--image-digest name@sha256:<64位摘要>`。文件内容按 SHA-256 记录；这些参数由调用者提供，工具不会自动发现所有运行输入或保证清单完整。
-
-记录子进程运行证据的最小样例（仅验证包装器，不生成仿真数据；输出目录必须不存在）：
-
-```sh
-python3 apps/orchestrator/recorded_run.py \
-  --scenario tests/fixtures/recorded_run/scenario.yaml --seed 42 \
-  --output /tmp/msim-example-run --lock third_party/manifest.lock -- \
-  python3 tests/fixtures/recorded_run/worker.py
+```bash
+cd /home/wzb/msim
+git clone https://github.com/globsky/SignalSim.git build/deps/SignalSim
+git -C build/deps/SignalSim checkout baba9deb68ed193efb9fd9a362b431ae8c491fa4
+./tools/build-signalsim-adapter.sh
 ```
 
-包装器向子进程追加 `--scenario`、`--seed` 和 `--output` 参数，收集日志、输入副本、产物哈希和 Git 状态。场景由调用者先行解析，镜像引用由调用者显式提供；它不能证明子进程使用了 seed，也不能重现未提交的 Git 修改。真实仿真运行器和自动完整清单仍待实现。
+若 `build/deps/SignalSim` 已存在，只需检查其提交并构建。SignalSim 上游源码仅放在本机 `build/deps/`，不在本仓库复制。RTKLIB 构建指纹在 `docs/rtklib/build-manifest.json`；重建命令见 [SignalSim 集成指南](docs/gnss/SIGNALSIM-FASTGLIO.md)。
+
+## 采集与验收
+
+```bash
+cd /home/wzb/msim
+./tools/fastglio-uav-capture.sh --duration-s 300 --flight-mode patrol_s --gui
+```
+
+默认结果位于 `runs/uav-fastglio-时间戳/`。脚本完成后检查 `verification-signalsim.json` 中的 `pass_quality_gate`。它核对 1500 个 5 Hz GNSS 历元、GPST 与仿真时钟映射、IMU/LiDAR 最近时间差、消息数和真值误差。已有原始采集可按以下命令继续处理：
+
+```bash
+./tools/fastglio-uav-capture.sh --postprocess-only \
+  --run /home/wzb/msim/runs/你的采集目录 --duration-s 300
+```
+
+`--flight-mode` 可选 `patrol_s`、`patrol_8`、`patrol_boustrophedon`、`patrol_sprint`、`patrol_spiral`。`--scenario` 指定场景 JSON；`--retain-nlos` 保留仅反射信号用于压力测试。详情与既有 300 秒结果见 [SignalSim 集成指南](docs/gnss/SIGNALSIM-FASTGLIO.md)。
+
+## RTKLIB 解算与绘图
+
+```bash
+cd /home/wzb/msim
+RUN=$PWD/runs/你的采集目录
+OUT=$RUN/rtklib-$(date +%Y%m%d-%H%M%S)
+/usr/bin/python3 tools/rtklib/rtklib_runner.py \
+  --rinex-dir "$RUN/signalsim" --output-dir "$OUT" \
+  --build-manifest docs/rtklib/build-manifest.json \
+  --mode relative_fixed --navsys 45 --with-stat --timeout 300
+cat "$OUT/summary.json"
+/usr/bin/python3 tools/fastglio-export-plot-reference.py \
+  --rinex-dir "$RUN/signalsim" --output "$OUT/reference.csv"
+```
+
+把 `$OUT/relative_fixed.pos`、`$OUT/relative_fixed.pos.stat` 和 `$OUT/reference.csv` 导入 `/home/wzb/rtklib-plot-python`。bag 内 `/rtklib_odom` 是码差分辅助位置；RTK FIX/FLOAT 以离线 `.pos` 的状态码为准。
+
+## 查看 ROS 1 话题和回放
+
+```bash
+export PATH=/home/wzb/FAST_GLIO/.pixi/envs/default/bin:$PATH
+source /home/wzb/FAST_GLIO/devel/setup.bash
+rosbag info "$RUN/combined-signalsim.bag"
+roscore
+# 另一个已加载相同环境的终端：rosbag play --clock "$RUN/combined-signalsim.bag"
+# 第三个已加载相同环境的终端：rostopic list
+```
+
+城市反射参数尚未用实测材料和接收机标定；已有运行的高 FIX 率只证明此仿真设置的内部一致性。SignalSim 许可与 RTKLIB 来源记录见 `docs/third_party/`。
+
+## 本机代码检查
+
+```bash
+cmake -S . -B build/core -DCMAKE_BUILD_TYPE=Release
+cmake --build build/core
+ctest --test-dir build/core --output-on-failure
+/usr/bin/python3 -m unittest discover -s tests/fastglio -p 'test_*.py'
+```

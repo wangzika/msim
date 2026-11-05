@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "scenario_id": "uav_fastglio_signalsim",
+  "time": {
+    "utc_start": "2021-06-19T08:58:30Z",
+    "duration_s": 300,
+    "gnss_rate_hz": 5
+  },
+  "geodesy": {
+    "origin_lla_deg_m": [30.5312, 114.3601, 50.0]
+  },
+  "receivers": {
+    "base_id": "base",
+    "rover_id": "rover",
+    "base_enu_m": [0.0, -100.0, 10.0]
+  },
+  "gnss": {
+    "backend": "signalsim_observables",
+    "elevation_mask_deg": 10,
+    "urban_boxes_enu_m": [
+      [-21, 7.5, 0, -9, 32.5, 25],
+      [-21, -30, 0, -9, 0, 35],
+      [9, 5, 0, 21, 25, 30],
+      [9, -32.5, 0, 21, -7.5, 20],
+      [-10, 40, 0, 10, 50, 45]
+    ],
+    "urban_reflection_coefficient": 0.35
+  },
+  "outputs": {}
+}
