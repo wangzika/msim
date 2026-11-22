@@ -1,0 +1,86 @@
+Panels:
+  - Class: rviz/Displays
+    Name: Displays
+  - Class: rviz/Views
+    Name: Views
+Preferences:
+  PromptSaveOnExit: false
+Visualization Manager:
+  Class: ""
+  Global Options:
+    Background Color: 24; 29; 36
+    Fixed Frame: camera_init
+    Frame Rate: 30
+  Displays:
+    - Class: rviz/Grid
+      Name: 地面参考网格
+      Enabled: true
+      Cell Size: 5
+      Plane Cell Count: 40
+      Color: 70; 80; 90
+      Reference Frame: <Fixed Frame>
+    - Class: rviz/PointCloud2
+      Name: 累计 LiDAR IMU 地图
+      Enabled: true
+      Topic: /msim/lio_map
+      Queue Size: 1
+      Decay Time: 0
+      Position Transformer: XYZ
+      Color Transformer: AxisColor
+      Axis: Z
+      Style: Points
+      Size (Pixels): 2
+      Alpha: 0.85
+      Autocompute Value Bounds:
+        Value: true
+      Use Fixed Frame: true
+      Selectable: false
+    - Class: rviz/PointCloud2
+      Name: 当前配准点云
+      Enabled: true
+      Topic: /cloud_registered
+      Queue Size: 1
+      Decay Time: 0
+      Position Transformer: XYZ
+      Color Transformer: FlatColor
+      Color: 255; 100; 80
+      Style: Points
+      Size (Pixels): 3
+      Alpha: 1
+      Use Fixed Frame: true
+      Selectable: false
+    - Class: rviz/Path
+      Name: LiDAR IMU 轨迹
+      Enabled: true
+      Topic: /path
+      Queue Size: 1
+      Color: 40; 220; 255
+      Line Style: Lines
+      Line Width: 0.1
+      Buffer Length: 1
+    - Class: rviz/Odometry
+      Name: 当前估计位姿
+      Enabled: true
+      Topic: /Odometry
+      Keep: 1
+      Shape:
+        Value: Axes
+        Axes Length: 1
+        Axes Radius: 0.1
+  Tools:
+    - Class: rviz/Interact
+    - Class: rviz/MoveCamera
+    - Class: rviz/Select
+  Views:
+    Current:
+      Class: rviz/Orbit
+      Distance: 100
+      Pitch: 0.65
+      Yaw: 0.8
+      Target Frame: camera_init
+      Focal Point: {X: 0, Y: 0, Z: 2}
+Window Geometry:
+  Width: 1500
+  Height: 1000
+  Hide Left Dock: false
+  Hide Right Dock: false

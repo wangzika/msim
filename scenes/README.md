@@ -2,6 +2,8 @@
 
 本目录是在线 LiDAR / PX4 / FASTGLIO 的几何场景，与 `scenarios/` 中 SignalSim 的 GNSS 传播配置分开。
 
+自由飞行采集和 RViz 实时建图可用 `./tools/px4-uav-capture.sh --teleop --scene 场景名`；详细按键和地图保存方式见 [手动采集建图](../docs/px4/TELEOP_MAPPING.md)。
+
 | 选择项 | 内容 | 来源 |
 | --- | --- | --- |
 | `simple` | 5 个箱体组成的原始城市走廊 | 本机 FAST_GLIO 的 `urban_canyon.world` |

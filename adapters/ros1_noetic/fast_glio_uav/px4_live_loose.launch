@@ -3,6 +3,7 @@
   <arg name="rviz_config" />
   <arg name="rviz" default="true" />
   <arg name="point_filter_num" default="2" />
+  <arg name="mapping_only" default="false" />
   <param name="/use_sim_time" value="true" />
   <rosparam command="load" file="$(arg config_file)" />
   <param name="/point_filter_num" type="int" value="$(arg point_filter_num)" />
@@ -18,7 +19,7 @@
     <param name="filter_size_surf" type="double" value="0.5" />
     <param name="filter_size_map" type="double" value="0.5" />
     <param name="lidar_update/enable" value="true" />
-    <param name="gnss_loose/enable" value="true" />
+    <param name="gnss_loose/enable" value="$(eval not arg('mapping_only'))" />
     <param name="gnss_tight/enable" value="false" />
     <param name="gnss_raw_tight/enable" value="false" />
     <param name="gnss_loose/odom_topic" value="/msim/spoofed_gnss_odom" />

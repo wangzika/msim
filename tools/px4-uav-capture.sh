@@ -14,6 +14,10 @@ point_filter_num=auto
 fusion_delay_s=0.65
 route_clock=wall
 duration=300
+duration_supplied=false
+teleop=false
+teleop_speed=2.0
+teleop_height=5.0
 gui=false
 gazebo_viz=false
 fastglio_live=false
@@ -32,7 +36,10 @@ spoof_east_rate=0
 spoof_north_rate=0
 while (($#)); do
   case "$1" in
-    --duration-s) duration="$2"; shift 2;;
+    --duration-s) duration="$2"; duration_supplied=true; shift 2;;
+    --teleop) teleop=true; shift;;
+    --teleop-speed-mps) teleop_speed="$2"; shift 2;;
+    --teleop-height-m) teleop_height="$2"; shift 2;;
     --gui) gui=true; shift;;
     --gazebo-viz) gazebo_viz=true; shift;;
     --fastglio-live) fastglio_live=true; shift;;
@@ -43,7 +50,7 @@ while (($#)); do
     --scene-profile) scene_profile="$2"; shift 2;;
     --list-sensors) /usr/bin/python3 "$MSIM_ROOT/tools/sensor-config.py" --list; exit 0;;
     --lidar-model|--imu-model|--gps-model|--lidar-timing) sensor_args+=("$1" "$2"); shift 2;;
-    --help) echo 'px4-uav-capture.sh --fastglio-live --duration-s 60 [--scene simple|complex_urban|industrial_yard|ksql_airport] [--scene-profile file.json] [--lidar-model vlp16|hdl32|os1-64|mid360] [--imu-model mems-baseline|low-noise] [--gps-model standalone|native|ideal] [--lidar-timing rolling|snapshot] [--list-sensors]'; exit 0;;
+    --help) echo 'px4-uav-capture.sh [--teleop [--teleop-speed-mps 2] [--teleop-height-m 5] | --fastglio-live --flight-pattern route] [--duration-s 60] [--scene simple|complex_urban|industrial_yard|ksql_airport] [--scene-profile file.json] [--lidar-model vlp16|hdl32|os1-64|mid360] [--imu-model mems-baseline|low-noise] [--gps-model standalone|native|ideal] [--lidar-timing rolling|snapshot] [--list-sensors]'; exit 0;;
     --scene) scene="$2"; shift 2;;
     --world) world_input="$2"; shift 2;;
     --fastglio-frontend) frontend="$2"; shift 2;;
@@ -62,6 +69,22 @@ while (($#)); do
     *) echo "Unknown argument: $1" >&2; exit 2;;
   esac
 done
+if $teleop; then
+  if $postprocess; then echo '--teleop 与 --postprocess-only 不能同时使用。' >&2; exit 2; fi
+  manual=true
+  fastglio_live=true
+  skip_signalsim=true
+  if ! $duration_supplied; then duration=0; fi
+  /usr/bin/python3 - "$teleop_speed" "$teleop_height" <<'PY'
+import math,sys
+speed,height=map(float,sys.argv[1:])
+if not math.isfinite(speed) or not .2<=speed<=8 or not math.isfinite(height) or not .5<=height<=30:
+    raise SystemExit('手动模式速度须为 0.2～8 m/s，起飞高度须为 0.5～30 m。')
+PY
+fi
+if [[ ! "$duration" =~ ^[0-9]+$ ]] || { ((duration<2)) && { ! $teleop || ((duration!=0)); }; }; then
+  echo '--duration-s 须为至少 2 秒的整数；手动操纵模式可用 0 表示持续采集。' >&2; exit 2
+fi
 /usr/bin/python3 - "$fusion_delay_s" "$spoof_start_s" "$spoof_east_rate" "$spoof_north_rate" "$gnss_east_bias" "$gnss_north_bias" <<'PY'
 import math,sys
 delay,start,east,north,be,bn=map(float,sys.argv[1:])
@@ -181,6 +204,14 @@ PY
   export MSIM_WORLD_SOURCE="$assets/urban_canyon_msim.world" MSIM_MODEL_SOURCE="$model"
   export MSIM_FASTGLIO_FRONTEND="$frontend"
   export MSIM_FUSION_DELAY_S="$fusion_delay_s"
+  if $teleop; then
+    export MSIM_TELEOP_RUN="$run" MSIM_TELEOP_STOP_FILE="$run/capture-stop.json"
+    export DISABLE_ROS1_EOL_WARNINGS=1
+    export MSIM_TELEOP_SPEED_MPS="$teleop_speed" MSIM_TELEOP_HEIGHT_M="$teleop_height"
+    export MSIM_TELEOP_HEADLESS=0
+    if $headless; then export MSIM_TELEOP_HEADLESS=1; fi
+    export MSIM_PX4_FLIGHT_PATTERN=teleop
+  fi
   capture=(--run "$run" --duration-s "$duration" \
     --launch-file "$MSIM_ROOT/adapters/ros1_noetic/fast_glio_uav/px4_world.launch" \
     --launch-arg "world:=$assets/urban_canyon_msim.world" \
@@ -227,8 +258,16 @@ PY
       capture+=(--tile-windows-script \
         "$MSIM_ROOT/adapters/ros1_noetic/fast_glio_uav/tile_live_windows.py")
     fi
+    if $teleop; then
+      capture+=(--interactive --mapping-only \
+        --map-script "$MSIM_ROOT/adapters/ros1_noetic/fast_glio_uav/lio_map_recorder.py")
+      capture+=(--fastglio-rviz-config \
+        "$MSIM_ROOT/adapters/ros1_noetic/fast_glio_uav/px4_teleop_mapping.rviz")
+    fi
   fi
-  if ! $manual; then
+  if $teleop; then
+    capture+=(--controller-script "$MSIM_ROOT/adapters/ros1_noetic/fast_glio_uav/px4_teleop.py")
+  elif ! $manual; then
     export MSIM_PX4_FLIGHT_PATTERN="$flight_pattern"
     export MSIM_ROUTE_CLOCK="$route_clock"
     capture+=(--controller-script \
@@ -236,9 +275,29 @@ PY
   fi
   if $gui; then capture+=(--gui); fi
   echo "PX4 SITL 城市无人机采集：$run"
+  if $teleop; then
+    if $headless; then
+      echo '后台手动采集：通过 /msim/teleop/command 控制；Ctrl+C 结束并保存。'
+    else
+      echo '手动采集：请在控制窗口起飞和操纵；点击“结束并保存”或 Ctrl+C 结束。'
+    fi
+    trap 'echo "正在结束采集并保存数据…"' INT
+  fi
   python "$MSIM_ROOT/adapters/ros1_noetic/fast_glio_uav/ros1_bag.py" capture "${capture[@]}"
+  if $teleop && [[ ! -s "$run/sensors.bag" ]]; then
+    echo '已结束启动，尚未生成传感器录包。'
+    exit 0
+  fi
+  if $teleop; then trap - INT; duration=0; fi
   python "$MSIM_ROOT/adapters/ros1_noetic/fast_glio_uav/ros1_bag.py" trajectory \
     --run "$run" --duration-s "$duration" --antenna-offset 0.05 0 0.04
+  if $teleop; then
+    duration=$(/usr/bin/python3 - "$run/capture-report.json" <<'PY'
+import json,sys
+print(json.load(open(sys.argv[1]))['duration_s'])
+PY
+)
+  fi
   if ! $manual; then
     verify=(--run "$run")
     if $online_gnss; then verify+=(--online-gnss --require-lidar-sync); fi
@@ -250,8 +309,12 @@ PY
   if $fastglio_live; then
     export MPLCONFIGDIR="$run/matplotlib-cache"
     mkdir -p "$MPLCONFIGDIR"
-    python "$MSIM_ROOT/tools/plot-fastglio-live.py" --run "$run"
-    python "$MSIM_ROOT/tools/plot-fastglio-enu-error.py" --run "$run"
+    if $teleop; then
+      python "$MSIM_ROOT/tools/plot-teleop-trajectory.py" --run "$run"
+    else
+      python "$MSIM_ROOT/tools/plot-fastglio-live.py" --run "$run"
+      python "$MSIM_ROOT/tools/plot-fastglio-enu-error.py" --run "$run"
+    fi
     python "$MSIM_ROOT/tools/evaluate-fastglio-replay.py" \
       --bag "$run/sensors.bag" \
       --output "$run/fastglio-live-lio-error.json"

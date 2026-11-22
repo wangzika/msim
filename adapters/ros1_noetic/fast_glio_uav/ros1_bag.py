@@ -21,6 +21,7 @@ from rosgraph_msgs.msg import Clock
 from rtklib.msg import GNSS_Info, GNSS_Info_ZD
 from std_msgs.msg import String
 from scene_profile import from_environment, load_scene_profile
+from teleop_controls import trajectory_window
 
 HERE = Path(__file__).resolve().parent
 TOPICS = ['/clock', '/ground_truth/state', '/imu/data', '/velodyne_points']
@@ -86,8 +87,11 @@ def capture(args):
         (run/'algorithm.yaml').write_bytes(args.fastglio_config.read_bytes())
     if args.fastglio_launch:
         (run/'algorithm.launch').write_bytes(args.fastglio_launch.read_bytes())
+    if args.fastglio_rviz_config:
+        (run/'algorithm.rviz').write_bytes(args.fastglio_rviz_config.read_bytes())
     (run/'capture-settings.json').write_text(json.dumps(dict(
         duration_s=args.duration_s,route_clock=os.environ.get('MSIM_ROUTE_CLOCK','wall'),
+        interactive=args.interactive, mapping_only=args.mapping_only,
         flight_pattern=os.environ.get('MSIM_PX4_FLIGHT_PATTERN'),
         frontend=os.environ.get('MSIM_FASTGLIO_FRONTEND','marsim'),
         gnss_source=os.environ.get('MSIM_GNSS_SOURCE','legacy'),
@@ -104,8 +108,17 @@ def capture(args):
         route_copy.write_bytes(Path(os.environ.get('MSIM_ROUTE_PLAN',str(HERE / 'route_plan.json'))).read_bytes())
         os.environ['MSIM_ROUTE_PLAN'] = str(route_copy)
     Path(os.environ.get('ROS_LOG_DIR', str(run / 'roslogs'))).mkdir(parents=True, exist_ok=True)
-    launch = record = controller = injector = visualizer = fastglio = None
+    launch = record = controller = injector = visualizer = fastglio = mapper = None
     state = dict(clock=None, counts=Counter(), truth=None)
+    stop_requested = dict(value=False, reason=None)
+    stop_file = run/'capture-stop.json'
+    previous_sigint = signal.getsignal(signal.SIGINT)
+    def request_stop(*_):
+        if record is None:
+            raise KeyboardInterrupt
+        stop_requested.update(value=True, reason='keyboard_interrupt')
+    if args.interactive:
+        signal.signal(signal.SIGINT, request_stop)
     launch_log = (run / 'launch.log').open('w')
     record_log = (run / 'record.log').open('w')
     controller_log = (run / 'controller.log').open('w')
@@ -113,6 +126,7 @@ def capture(args):
     visualizer_log = (run / 'gazebo-viz.log').open('w')
     fastglio_log = (run / 'fastglio-live.log').open('w')
     tile_log = (run / 'window-layout.log').open('w')
+    map_log = (run / 'mapping.log').open('w')
     try:
         launch_file = args.launch_file or HERE / 'uav_world.launch'
         launch_args = (args.launch_arg if args.launch_file else
@@ -199,12 +213,15 @@ def capture(args):
             else:
                 raise RuntimeError('Gazebo visualizer did not start; see gazebo-viz.log')
         if args.fastglio_launch:
-            fastglio = subprocess.Popen([
+            algorithm_args = [
                 'roslaunch', str(args.fastglio_launch),
                 'config_file:=' + str(args.fastglio_config),
                 'rviz_config:=' + str(args.fastglio_rviz_config),
                 'rviz:=' + ('true' if args.gui else 'false'),
-                'point_filter_num:=' + str(args.fastglio_point_filter_num)],
+                'point_filter_num:=' + str(args.fastglio_point_filter_num)]
+            if args.mapping_only:
+                algorithm_args.append('mapping_only:=true')
+            fastglio = subprocess.Popen(algorithm_args,
                 stdout=fastglio_log, stderr=subprocess.STDOUT,
                 start_new_session=True)
             fastglio_deadline = time.monotonic() + 45
@@ -221,15 +238,15 @@ def capture(args):
             else:
                 raise RuntimeError('FAST_GLIO did not subscribe to sensors; see fastglio-live.log')
             subprocess.run(['rosparam','dump',str(run/'parameters.yaml')],check=True)
+        if args.map_script:
+            mapper = subprocess.Popen([sys.executable, str(args.map_script)],
+                stdout=map_log, stderr=subprocess.STDOUT, start_new_session=True)
         if args.tile_windows_script:
             tiled = subprocess.run([sys.executable, str(args.tile_windows_script)],
                                    stdout=tile_log, stderr=subprocess.STDOUT,
                                    timeout=45, check=False)
             if tiled.returncode:
                 raise RuntimeError('Gazebo/RViz window layout failed; see window-layout.log')
-        if args.controller_script:
-            controller = subprocess.Popen([sys.executable, str(args.controller_script)],
-                stdout=controller_log, stderr=subprocess.STDOUT, start_new_session=True)
         record_topics = [*TOPICS]
         if args.injector_script:
             record_topics.extend(['/gnss/spoof_detection', '/msim/spoofed_gnss_odom',
@@ -240,12 +257,20 @@ def capture(args):
             record_topics.extend(['/Odometry', '/path', '/loose_odom', '/loose_path',
                                   '/rtk_path', '/gnss_loose/diagnostics'])
             record_topics.append('/msim/velodyne_points_annotated')
+        if args.interactive:
+            record_topics.extend(['/msim/teleop/command', '/msim/teleop/status',
+                                  '/cloud_registered', '/msim/lio_map/status'])
         record = subprocess.Popen(['rosbag', 'record', '-O', str(run / 'sensors.bag'), *record_topics],
             stdout=record_log, stderr=subprocess.STDOUT, start_new_session=True)
+        if args.controller_script:
+            controller = subprocess.Popen([sys.executable, str(args.controller_script)],
+                stdout=controller_log, stderr=subprocess.STDOUT, start_new_session=True)
         start = state['clock']
         deadline = time.monotonic() + max(120, args.duration_s * 8)
         next_report = 10
-        while (state['clock'] or 0) - start < (args.duration_s + 2) * 1_000_000_000:
+        while args.duration_s == 0 or (state['clock'] or 0) - start < (args.duration_s + 2) * 1_000_000_000:
+            if args.interactive and (stop_requested['value'] or stop_file.exists()):
+                break
             if launch.poll() is not None or record.poll() is not None:
                 raise RuntimeError('simulation or recorder exited; see logs')
             if controller is not None and controller.poll() is not None:
@@ -255,20 +280,30 @@ def capture(args):
             if visualizer is not None and visualizer.poll() is not None:
                 raise RuntimeError('Gazebo visualizer exited; see gazebo-viz.log')
             if fastglio is not None and fastglio.poll() is not None:
+                if args.interactive:
+                    stop_requested.update(value=True, reason='mapping_window_closed')
+                    break
                 raise RuntimeError('FAST_GLIO exited; see fastglio-live.log')
-            if time.monotonic() > deadline:
+            if mapper is not None and mapper.poll() is not None:
+                raise RuntimeError('map recorder exited; see mapping.log')
+            if not args.interactive and time.monotonic() > deadline:
                 raise RuntimeError('simulation clock stalled')
             elapsed = ((state['clock'] or start) - start) / 1e9
             if elapsed >= next_report:
-                print(f'仿真 {elapsed:.0f} / {args.duration_s} 秒', flush=True)
+                limit = str(args.duration_s) if args.duration_s else '手动结束'
+                print(f'仿真 {elapsed:.0f} / {limit} 秒', flush=True)
                 next_report += 10
             time.sleep(0.1)
         for sub in subs:
             sub.unregister()
     finally:
+        if args.interactive:
+            stop(controller)
         stop(record)
-        stop(controller)
+        if not args.interactive:
+            stop(controller)
         stop(fastglio)
+        stop(mapper)
         stop(visualizer)
         stop(injector)
         stop(launch)
@@ -279,13 +314,22 @@ def capture(args):
         visualizer_log.close()
         fastglio_log.close()
         tile_log.close()
+        map_log.close()
+        if args.interactive:
+            signal.signal(signal.SIGINT, previous_sigint)
     bag = run / 'sensors.bag'
     if not bag.is_file() or bag.stat().st_size == 0:
         raise RuntimeError('sensors.bag missing or empty')
+    if args.interactive:
+        reason = stop_requested['reason'] or ('teleop_finish' if stop_file.exists() else 'duration_limit')
+        (run/'capture-session.json').write_text(json.dumps(dict(
+            mode='teleop', stop_reason=reason, requested_duration_s=args.duration_s,
+            recording_complete=True, raw_bag=str(bag)), indent=2)+'\n')
     if args.fastglio_launch:
-        required = ('/msim/spoofed_gnss_odom', '/Odometry', '/path',
+        required = (('/Odometry', '/path', '/cloud_registered') if args.mapping_only else
+                    ('/msim/spoofed_gnss_odom', '/Odometry', '/path',
                     '/loose_odom', '/loose_path', '/rtk_path',
-                    '/gnss_loose/diagnostics')
+                    '/gnss_loose/diagnostics'))
         with rosbag.Bag(str(bag)) as recorded:
             info = recorded.get_type_and_topic_info().topics
             counts = {topic: info[topic].message_count if topic in info else 0
@@ -299,12 +343,17 @@ def capture(args):
                                                  for row in diagnostics),
                       gnss_updates_accepted=accepted)
         report['pass_live_loose_gate'] = (all(counts.values()) and
-                                          counts['/loose_odom'] >= 10 and
+                                          counts.get('/loose_odom',0) >= 10 and
                                           accepted >= 5)
+        if args.mapping_only:
+            report = dict(mode='lidar_imu_mapping', topic_counts=counts,
+                          pass_mapping_gate=bool(all(counts.values()) and counts['/Odometry'] >= 10))
         (run / 'fastglio-live-report.json').write_text(
             json.dumps(report, indent=2) + '\n')
         print(json.dumps(report, indent=2), flush=True)
-        if not report['pass_live_loose_gate']:
+        if args.mapping_only and not report['pass_mapping_gate']:
+            print('手动采集时间过短或建图数据不足；原始 bag 已保留。', flush=True)
+        elif not args.mapping_only and not report['pass_live_loose_gate']:
             raise RuntimeError('FAST_GLIO loose coupling did not produce accepted updates')
     print(str(bag), flush=True)
 
@@ -460,6 +509,8 @@ def trajectory(args):
     samples[0]['angular_velocity_body_radps'] = samples[1]['angular_velocity_body_radps']
     # Choose the first full 0.2 s epoch after a 1 s warmup; keep epochs inside bag.
     start = ((first + 1_000_000_000 + 199_999_999)//200_000_000)*200_000_000
+    if args.duration_s == 0:
+        start, args.duration_s = trajectory_window(first, last)
     if last < start + args.duration_s*1_000_000_000:
         raise ValueError('recorded truth does not cover requested duration')
     output = dict(schema_version=1, frame='map', antenna_offset_base_m=args.antenna_offset,
@@ -762,6 +813,9 @@ def main():
         cmd.add_argument('--run', type=Path, required=True)
         cmd.add_argument('--duration-s', type=int, default=300)
         if name == 'capture':
+            cmd.add_argument('--interactive', action='store_true')
+            cmd.add_argument('--mapping-only', action='store_true')
+            cmd.add_argument('--map-script', type=Path)
             cmd.add_argument('--gui', action='store_true')
             cmd.add_argument('--launch-file', type=Path,
                              help='ROS launch file for an alternate vehicle simulator')
@@ -799,9 +853,16 @@ def main():
     archived_profile = args.run/'scene-profile.json'
     if archived_profile.is_file():
         ORIGIN = load_scene_profile(archived_profile)['origin_lla_deg_m']
-    if args.duration_s < 2:
+    if args.duration_s < 2 and not (args.duration_s == 0 and
+            (args.command == 'trajectory' or args.command == 'capture' and args.interactive)):
         parser.error('duration must be at least 2 seconds')
-    globals()[args.command](args)
+    try:
+        globals()[args.command](args)
+    except KeyboardInterrupt:
+        if args.command == 'capture' and args.interactive:
+            print('已取消手动采集启动。', flush=True)
+        else:
+            raise
 
 
 if __name__ == '__main__':

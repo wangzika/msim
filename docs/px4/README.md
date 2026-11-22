@@ -59,6 +59,8 @@ cd /home/wzb/msim
 
 默认巡航高度 8 m；起点是城市走廊 `(东 0 m, 北 -20 m)`。巡航脚本通过 MAVLink 的 14540 UDP 端口持续发送 PX4 OFFBOARD 位置目标。若需要用其他 MAVLink 控制器驾驶，可加 `--manual`；采集计时仍从传感器话题就绪后开始。
 
+需要自由操纵并实时建图时，运行 `./tools/px4-uav-capture.sh --teleop --scene ksql_airport`。该模式打开 Gazebo、RViz 与键盘控制窗口，支持起飞、WASD 平移、R/F 升降、Q/E 转向、松键悬停和降落保存；默认持续录包并导出 `map.pcd`。[完整操作与数据说明](TELEOP_MAPPING.md)。
+
 每次运行目录位于 `/home/wzb/msim/runs/uav-px4-日期时间/`。`launch.log` 是 PX4/Gazebo 日志，`controller.log` 是巡航和解锁日志，`ros-home/log/` 保存 PX4 ULog，`sensors.bag` 是原始 ROS 1 数据，`trajectory.json`、`capture-report.json`、`px4-flight-report.json` 是轨迹和飞行验收结果，`signalsim/` 内是 RINEX 与原始观测，`combined-signalsim.bag` 是合包。自动巡航要求 ULog 证实已解锁、处于 OFFBOARD、爬升至少 3 m、移动至少 5 m、接收到 GPS；失败时先查 `launch.log` 与 `controller.log`。只重做后处理：
 
 ```bash
