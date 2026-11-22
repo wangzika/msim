@@ -1,0 +1,1870 @@
+{
+  "simple": {
+    "world": "/home/wzb/msim/scenes/simple.world",
+    "primitive_collision_objects": [
+      {
+        "name": "building_left_1",
+        "pose": [
+          -15.0,
+          20.0,
+          12.5,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "kind": "box",
+        "size": [
+          12.0,
+          25.0,
+          25.0
+        ]
+      },
+      {
+        "name": "building_left_2",
+        "pose": [
+          -15.0,
+          -15.0,
+          17.5,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "kind": "box",
+        "size": [
+          12.0,
+          30.0,
+          35.0
+        ]
+      },
+      {
+        "name": "building_right_1",
+        "pose": [
+          15.0,
+          15.0,
+          15.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "kind": "box",
+        "size": [
+          12.0,
+          20.0,
+          30.0
+        ]
+      },
+      {
+        "name": "building_right_2",
+        "pose": [
+          15.0,
+          -20.0,
+          10.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "kind": "box",
+        "size": [
+          12.0,
+          25.0,
+          20.0
+        ]
+      },
+      {
+        "name": "tower_north",
+        "pose": [
+          0.0,
+          45.0,
+          22.5,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "kind": "box",
+        "size": [
+          20.0,
+          10.0,
+          45.0
+        ]
+      }
+    ],
+    "imported_static_models": [],
+    "route_spawn_enu": [
+      0,
+      -20,
+      0
+    ],
+    "flight_height_m": 8,
+    "intended_clear_strip_enu": {
+      "east": [
+        -8,
+        4
+      ],
+      "north": [
+        -23,
+        16
+      ],
+      "up": [
+        0,
+        9.5
+      ]
+    },
+    "physics_step_s": 0.002,
+    "notes": "static geometry fixtures; ray LiDAR uses collision geometry; no GNSS multipath/rain/dynamic actors"
+  },
+  "complex_urban": {
+    "world": "/home/wzb/msim/scenes/complex_urban.world",
+    "primitive_collision_objects": [
+      {
+        "name": "urban_building_0",
+        "pose": [
+          -18,
+          -27,
+          6.0,
+          0,
+          0,
+          0
+        ],
+        "kind": "box",
+        "size": [
+          8,
+          10,
+          12
+        ]
+      },
+      {
+        "name": "roof_unit_0",
+        "pose": [
+          -17,
+          -27,
+          12.6,
+          0,
+          0,
+          0
+        ],
+        "kind": "box",
+        "size": [
+          2,
+          2,
+          1.2
+        ]
+      },
+      {
+        "name": "urban_building_1",
+        "pose": [
+          -17,
+          -11,
+          3.75,
+          0,
+          0,
+          0
+        ],
+        "kind": "box",
+        "size": [
+          8,
+          11,
+          7.5
+        ]
+      },
+      {
+        "name": "roof_unit_1",
+        "pose": [
+          -16,
+          -11,
+          8.1,
+          0,
+          0,
+          0
+        ],
+        "kind": "box",
+        "size": [
+          2,
+          2,
+          1.2
+        ]
+      },
+      {
+        "name": "urban_building_2",
+        "pose": [
+          -21,
+          6,
+          9.5,
+          0,
+          0,
+          0.12
+        ],
+        "kind": "box",
+        "size": [
+          12,
+          10,
+          19
+        ]
+      },
+      {
+        "name": "roof_unit_2",
+        "pose": [
+          -20,
+          6,
+          19.6,
+          0,
+          0,
+          0.12
+        ],
+        "kind": "box",
+        "size": [
+          2,
+          2,
+          1.2
+        ]
+      },
+      {
+        "name": "urban_building_3",
+        "pose": [
+          -18,
+          23,
+          5.0,
+          0,
+          0,
+          -0.18
+        ],
+        "kind": "box",
+        "size": [
+          9,
+          11,
+          10
+        ]
+      },
+      {
+        "name": "roof_unit_3",
+        "pose": [
+          -17,
+          23,
+          10.6,
+          0,
+          0,
+          -0.18
+        ],
+        "kind": "box",
+        "size": [
+          2,
+          2,
+          1.2
+        ]
+      },
+      {
+        "name": "urban_building_4",
+        "pose": [
+          12,
+          -27,
+          9.0,
+          0,
+          0,
+          0
+        ],
+        "kind": "box",
+        "size": [
+          10,
+          9,
+          18
+        ]
+      },
+      {
+        "name": "roof_unit_4",
+        "pose": [
+          13,
+          -27,
+          18.6,
+          0,
+          0,
+          0
+        ],
+        "kind": "box",
+        "size": [
+          2,
+          2,
+          1.2
+        ]
+      },
+      {
+        "name": "urban_building_5",
+        "pose": [
+          11,
+          -12,
+          3.25,
+          0,
+          0,
+          0
+        ],
+        "kind": "box",
+        "size": [
+          9,
+          10,
+          6.5
+        ]
+      },
+      {
+        "name": "roof_unit_5",
+        "pose": [
+          12,
+          -12,
+          7.1,
+          0,
+          0,
+          0
+        ],
+        "kind": "box",
+        "size": [
+          2,
+          2,
+          1.2
+        ]
+      },
+      {
+        "name": "urban_building_6",
+        "pose": [
+          16,
+          4,
+          7.0,
+          0,
+          0,
+          -0.2
+        ],
+        "kind": "box",
+        "size": [
+          12,
+          9,
+          14
+        ]
+      },
+      {
+        "name": "roof_unit_6",
+        "pose": [
+          17,
+          4,
+          14.6,
+          0,
+          0,
+          -0.2
+        ],
+        "kind": "box",
+        "size": [
+          2,
+          2,
+          1.2
+        ]
+      },
+      {
+        "name": "urban_building_7",
+        "pose": [
+          12,
+          22,
+          4.0,
+          0,
+          0,
+          0.15
+        ],
+        "kind": "box",
+        "size": [
+          10,
+          10,
+          8
+        ]
+      },
+      {
+        "name": "roof_unit_7",
+        "pose": [
+          13,
+          22,
+          8.6,
+          0,
+          0,
+          0.15
+        ],
+        "kind": "box",
+        "size": [
+          2,
+          2,
+          1.2
+        ]
+      },
+      {
+        "name": "urban_building_8",
+        "pose": [
+          -32,
+          -7,
+          12.0,
+          0,
+          0,
+          0.3
+        ],
+        "kind": "box",
+        "size": [
+          10,
+          13,
+          24
+        ]
+      },
+      {
+        "name": "roof_unit_8",
+        "pose": [
+          -31,
+          -7,
+          24.6,
+          0,
+          0,
+          0.3
+        ],
+        "kind": "box",
+        "size": [
+          2,
+          2,
+          1.2
+        ]
+      },
+      {
+        "name": "urban_building_9",
+        "pose": [
+          30,
+          9,
+          11.0,
+          0,
+          0,
+          -0.3
+        ],
+        "kind": "box",
+        "size": [
+          13,
+          12,
+          22
+        ]
+      },
+      {
+        "name": "roof_unit_9",
+        "pose": [
+          31,
+          9,
+          22.6,
+          0,
+          0,
+          -0.3
+        ],
+        "kind": "box",
+        "size": [
+          2,
+          2,
+          1.2
+        ]
+      },
+      {
+        "name": "urban_building_10",
+        "pose": [
+          -3,
+          35,
+          8.5,
+          0,
+          0,
+          0.15
+        ],
+        "kind": "box",
+        "size": [
+          14,
+          10,
+          17
+        ]
+      },
+      {
+        "name": "roof_unit_10",
+        "pose": [
+          -2,
+          35,
+          17.6,
+          0,
+          0,
+          0.15
+        ],
+        "kind": "box",
+        "size": [
+          2,
+          2,
+          1.2
+        ]
+      },
+      {
+        "name": "urban_column_0_0",
+        "pose": [
+          -12,
+          -25,
+          3.25,
+          0,
+          0,
+          0
+        ],
+        "kind": "cylinder",
+        "size": [
+          0.45,
+          6.5
+        ]
+      },
+      {
+        "name": "urban_column_0_1",
+        "pose": [
+          6,
+          -25,
+          3.25,
+          0,
+          0,
+          0
+        ],
+        "kind": "cylinder",
+        "size": [
+          0.45,
+          6.5
+        ]
+      },
+      {
+        "name": "urban_column_1_0",
+        "pose": [
+          -12,
+          -16,
+          4.25,
+          0,
+          0,
+          0
+        ],
+        "kind": "cylinder",
+        "size": [
+          0.45,
+          8.5
+        ]
+      },
+      {
+        "name": "urban_column_1_1",
+        "pose": [
+          6,
+          -16,
+          4.25,
+          0,
+          0,
+          0
+        ],
+        "kind": "cylinder",
+        "size": [
+          0.45,
+          8.5
+        ]
+      },
+      {
+        "name": "urban_column_2_0",
+        "pose": [
+          -12,
+          -5,
+          5.25,
+          0,
+          0,
+          0
+        ],
+        "kind": "cylinder",
+        "size": [
+          0.45,
+          10.5
+        ]
+      },
+      {
+        "name": "urban_column_2_1",
+        "pose": [
+          6,
+          -5,
+          5.25,
+          0,
+          0,
+          0
+        ],
+        "kind": "cylinder",
+        "size": [
+          0.45,
+          10.5
+        ]
+      },
+      {
+        "name": "urban_column_3_0",
+        "pose": [
+          -12,
+          6,
+          3.25,
+          0,
+          0,
+          0
+        ],
+        "kind": "cylinder",
+        "size": [
+          0.45,
+          6.5
+        ]
+      },
+      {
+        "name": "urban_column_3_1",
+        "pose": [
+          6,
+          6,
+          3.25,
+          0,
+          0,
+          0
+        ],
+        "kind": "cylinder",
+        "size": [
+          0.45,
+          6.5
+        ]
+      },
+      {
+        "name": "urban_column_4_0",
+        "pose": [
+          -12,
+          17,
+          4.25,
+          0,
+          0,
+          0
+        ],
+        "kind": "cylinder",
+        "size": [
+          0.45,
+          8.5
+        ]
+      },
+      {
+        "name": "urban_column_4_1",
+        "pose": [
+          6,
+          17,
+          4.25,
+          0,
+          0,
+          0
+        ],
+        "kind": "cylinder",
+        "size": [
+          0.45,
+          8.5
+        ]
+      },
+      {
+        "name": "urban_overpass",
+        "pose": [
+          -3,
+          4,
+          11.2,
+          0,
+          0,
+          0
+        ],
+        "kind": "box",
+        "size": [
+          30,
+          3,
+          0.5
+        ]
+      },
+      {
+        "name": "bridge_support_-17",
+        "pose": [
+          -17,
+          4,
+          5.5,
+          0,
+          0,
+          0
+        ],
+        "kind": "box",
+        "size": [
+          1.2,
+          1.5,
+          11
+        ]
+      },
+      {
+        "name": "bridge_support_11",
+        "pose": [
+          11,
+          4,
+          5.5,
+          0,
+          0,
+          0
+        ],
+        "kind": "box",
+        "size": [
+          1.2,
+          1.5,
+          11
+        ]
+      },
+      {
+        "name": "angled_facade_0",
+        "pose": [
+          9,
+          -2,
+          4,
+          0,
+          0,
+          0.45
+        ],
+        "kind": "box",
+        "size": [
+          2.5,
+          4,
+          8
+        ]
+      },
+      {
+        "name": "angled_facade_1",
+        "pose": [
+          -15,
+          13,
+          4,
+          0,
+          0,
+          -0.45
+        ],
+        "kind": "box",
+        "size": [
+          2.5,
+          4,
+          8
+        ]
+      },
+      {
+        "name": "angled_facade_2",
+        "pose": [
+          19,
+          -20,
+          4,
+          0,
+          0,
+          0.45
+        ],
+        "kind": "box",
+        "size": [
+          2.5,
+          4,
+          8
+        ]
+      },
+      {
+        "name": "angled_facade_3",
+        "pose": [
+          -26,
+          -20,
+          4,
+          0,
+          0,
+          -0.45
+        ],
+        "kind": "box",
+        "size": [
+          2.5,
+          4,
+          8
+        ]
+      }
+    ],
+    "imported_static_models": [],
+    "route_spawn_enu": [
+      0,
+      -20,
+      0
+    ],
+    "flight_height_m": 8,
+    "intended_clear_strip_enu": {
+      "east": [
+        -10,
+        4
+      ],
+      "north": [
+        -23,
+        16
+      ],
+      "up": [
+        0,
+        9.5
+      ]
+    },
+    "physics_step_s": 0.002,
+    "notes": "static geometry fixtures; ray LiDAR uses collision geometry; no GNSS multipath/rain/dynamic actors"
+  },
+  "industrial_yard": {
+    "world": "/home/wzb/msim/scenes/industrial_yard.world",
+    "primitive_collision_objects": [
+      {
+        "name": "warehouse_block_0",
+        "pose": [
+          -16,
+          -26,
+          4.5,
+          0,
+          0,
+          0.12
+        ],
+        "kind": "box",
+        "size": [
+          6,
+          7,
+          9
+        ]
+      },
+      {
+        "name": "warehouse_block_1",
+        "pose": [
+          -17,
+          -10,
+          6.0,
+          0,
+          0,
+          -0.12
+        ],
+        "kind": "box",
+        "size": [
+          6,
+          7,
+          12
+        ]
+      },
+      {
+        "name": "warehouse_block_2",
+        "pose": [
+          -16,
+          9,
+          3.5,
+          0,
+          0,
+          0.12
+        ],
+        "kind": "box",
+        "size": [
+          6,
+          7,
+          7
+        ]
+      },
+      {
+        "name": "warehouse_block_3",
+        "pose": [
+          13,
+          -24,
+          4.0,
+          0,
+          0,
+          -0.12
+        ],
+        "kind": "box",
+        "size": [
+          6,
+          7,
+          8
+        ]
+      },
+      {
+        "name": "warehouse_block_4",
+        "pose": [
+          13,
+          -5,
+          5.0,
+          0,
+          0,
+          0.12
+        ],
+        "kind": "box",
+        "size": [
+          6,
+          7,
+          10
+        ]
+      },
+      {
+        "name": "warehouse_block_5",
+        "pose": [
+          14,
+          14,
+          3.25,
+          0,
+          0,
+          -0.12
+        ],
+        "kind": "box",
+        "size": [
+          6,
+          7,
+          6.5
+        ]
+      },
+      {
+        "name": "yard_silo_0_0",
+        "pose": [
+          -12,
+          -24,
+          5,
+          0,
+          0,
+          0
+        ],
+        "kind": "cylinder",
+        "size": [
+          0.65,
+          10
+        ]
+      },
+      {
+        "name": "yard_silo_0_1",
+        "pose": [
+          -12,
+          -12,
+          6,
+          0,
+          0,
+          0
+        ],
+        "kind": "cylinder",
+        "size": [
+          0.65,
+          12
+        ]
+      },
+      {
+        "name": "yard_silo_0_2",
+        "pose": [
+          -12,
+          0,
+          5,
+          0,
+          0,
+          0
+        ],
+        "kind": "cylinder",
+        "size": [
+          0.65,
+          10
+        ]
+      },
+      {
+        "name": "yard_silo_0_3",
+        "pose": [
+          -12,
+          12,
+          6,
+          0,
+          0,
+          0
+        ],
+        "kind": "cylinder",
+        "size": [
+          0.65,
+          12
+        ]
+      },
+      {
+        "name": "yard_silo_0_4",
+        "pose": [
+          -12,
+          23,
+          5,
+          0,
+          0,
+          0
+        ],
+        "kind": "cylinder",
+        "size": [
+          0.65,
+          10
+        ]
+      },
+      {
+        "name": "yard_silo_1_0",
+        "pose": [
+          6.5,
+          -24,
+          5,
+          0,
+          0,
+          0
+        ],
+        "kind": "cylinder",
+        "size": [
+          0.65,
+          10
+        ]
+      },
+      {
+        "name": "yard_silo_1_1",
+        "pose": [
+          6.5,
+          -12,
+          6,
+          0,
+          0,
+          0
+        ],
+        "kind": "cylinder",
+        "size": [
+          0.65,
+          12
+        ]
+      },
+      {
+        "name": "yard_silo_1_2",
+        "pose": [
+          6.5,
+          0,
+          5,
+          0,
+          0,
+          0
+        ],
+        "kind": "cylinder",
+        "size": [
+          0.65,
+          10
+        ]
+      },
+      {
+        "name": "yard_silo_1_3",
+        "pose": [
+          6.5,
+          12,
+          6,
+          0,
+          0,
+          0
+        ],
+        "kind": "cylinder",
+        "size": [
+          0.65,
+          12
+        ]
+      },
+      {
+        "name": "yard_silo_1_4",
+        "pose": [
+          6.5,
+          23,
+          5,
+          0,
+          0,
+          0
+        ],
+        "kind": "cylinder",
+        "size": [
+          0.65,
+          10
+        ]
+      },
+      {
+        "name": "overhead_beam_0",
+        "pose": [
+          -3,
+          -8,
+          12,
+          0,
+          0,
+          0
+        ],
+        "kind": "box",
+        "size": [
+          30,
+          1.0,
+          0.5
+        ]
+      },
+      {
+        "name": "overhead_beam_1",
+        "pose": [
+          -3,
+          12,
+          12,
+          0,
+          0,
+          0
+        ],
+        "kind": "box",
+        "size": [
+          30,
+          1.0,
+          0.5
+        ]
+      },
+      {
+        "name": "yard_step_0_0",
+        "pose": [
+          10.0,
+          5.0,
+          0.5,
+          0,
+          0,
+          0.3
+        ],
+        "kind": "box",
+        "size": [
+          2,
+          1.0,
+          1.0
+        ]
+      },
+      {
+        "name": "yard_step_0_1",
+        "pose": [
+          10.4,
+          5.8,
+          0.95,
+          0,
+          0,
+          0.3
+        ],
+        "kind": "box",
+        "size": [
+          2,
+          1.0,
+          1.9
+        ]
+      },
+      {
+        "name": "yard_step_0_2",
+        "pose": [
+          10.8,
+          6.6,
+          1.4,
+          0,
+          0,
+          0.3
+        ],
+        "kind": "box",
+        "size": [
+          2,
+          1.0,
+          2.8
+        ]
+      },
+      {
+        "name": "yard_step_0_3",
+        "pose": [
+          11.2,
+          7.4,
+          1.85,
+          0,
+          0,
+          0.3
+        ],
+        "kind": "box",
+        "size": [
+          2,
+          1.0,
+          3.7
+        ]
+      },
+      {
+        "name": "yard_step_0_4",
+        "pose": [
+          11.6,
+          8.2,
+          2.3,
+          0,
+          0,
+          0.3
+        ],
+        "kind": "box",
+        "size": [
+          2,
+          1.0,
+          4.6
+        ]
+      },
+      {
+        "name": "yard_step_1_0",
+        "pose": [
+          -15.0,
+          -19.0,
+          0.5,
+          0,
+          0,
+          -0.3
+        ],
+        "kind": "box",
+        "size": [
+          2,
+          1.0,
+          1.0
+        ]
+      },
+      {
+        "name": "yard_step_1_1",
+        "pose": [
+          -14.6,
+          -18.2,
+          0.95,
+          0,
+          0,
+          -0.3
+        ],
+        "kind": "box",
+        "size": [
+          2,
+          1.0,
+          1.9
+        ]
+      },
+      {
+        "name": "yard_step_1_2",
+        "pose": [
+          -14.2,
+          -17.4,
+          1.4,
+          0,
+          0,
+          -0.3
+        ],
+        "kind": "box",
+        "size": [
+          2,
+          1.0,
+          2.8
+        ]
+      },
+      {
+        "name": "yard_step_1_3",
+        "pose": [
+          -13.8,
+          -16.6,
+          1.85,
+          0,
+          0,
+          -0.3
+        ],
+        "kind": "box",
+        "size": [
+          2,
+          1.0,
+          3.7
+        ]
+      },
+      {
+        "name": "yard_step_1_4",
+        "pose": [
+          -13.4,
+          -15.8,
+          2.3,
+          0,
+          0,
+          -0.3
+        ],
+        "kind": "box",
+        "size": [
+          2,
+          1.0,
+          4.6
+        ]
+      },
+      {
+        "name": "yard_step_2_0",
+        "pose": [
+          12.0,
+          -17.0,
+          0.5,
+          0,
+          0,
+          0.1
+        ],
+        "kind": "box",
+        "size": [
+          2,
+          1.0,
+          1.0
+        ]
+      },
+      {
+        "name": "yard_step_2_1",
+        "pose": [
+          12.4,
+          -16.2,
+          0.95,
+          0,
+          0,
+          0.1
+        ],
+        "kind": "box",
+        "size": [
+          2,
+          1.0,
+          1.9
+        ]
+      },
+      {
+        "name": "yard_step_2_2",
+        "pose": [
+          12.8,
+          -15.4,
+          1.4,
+          0,
+          0,
+          0.1
+        ],
+        "kind": "box",
+        "size": [
+          2,
+          1.0,
+          2.8
+        ]
+      },
+      {
+        "name": "yard_step_2_3",
+        "pose": [
+          13.2,
+          -14.6,
+          1.85,
+          0,
+          0,
+          0.1
+        ],
+        "kind": "box",
+        "size": [
+          2,
+          1.0,
+          3.7
+        ]
+      },
+      {
+        "name": "yard_step_2_4",
+        "pose": [
+          13.6,
+          -13.8,
+          2.3,
+          0,
+          0,
+          0.1
+        ],
+        "kind": "box",
+        "size": [
+          2,
+          1.0,
+          4.6
+        ]
+      }
+    ],
+    "imported_static_models": [
+      {
+        "name": "imported_west_0_shelves_high2",
+        "source": "/home/wzb/msim/build/deps/PX4-Autopilot/Tools/simulation/gazebo-classic/sitl_gazebo-classic/models/shelves_high2/model.sdf",
+        "pose": [
+          -17.0,
+          -2.6,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "collision_geometry": "source model collisions"
+      },
+      {
+        "name": "imported_east_1_shelves_high2",
+        "source": "/home/wzb/msim/build/deps/PX4-Autopilot/Tools/simulation/gazebo-classic/sitl_gazebo-classic/models/shelves_high2/model.sdf",
+        "pose": [
+          21.0,
+          -2.6,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "collision_geometry": "source model collisions"
+      },
+      {
+        "name": "imported_west_2_shelves_high2",
+        "source": "/home/wzb/msim/build/deps/PX4-Autopilot/Tools/simulation/gazebo-classic/sitl_gazebo-classic/models/shelves_high2/model.sdf",
+        "pose": [
+          -22.13394,
+          -2.6,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "collision_geometry": "source model collisions"
+      },
+      {
+        "name": "imported_east_3_shelves_high2",
+        "source": "/home/wzb/msim/build/deps/PX4-Autopilot/Tools/simulation/gazebo-classic/sitl_gazebo-classic/models/shelves_high2/model.sdf",
+        "pose": [
+          15.866060000000001,
+          -2.6,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "collision_geometry": "source model collisions"
+      },
+      {
+        "name": "imported_west_4_shelves_high2",
+        "source": "/home/wzb/msim/build/deps/PX4-Autopilot/Tools/simulation/gazebo-classic/sitl_gazebo-classic/models/shelves_high2/model.sdf",
+        "pose": [
+          -17.0,
+          -7.5,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "collision_geometry": "source model collisions"
+      },
+      {
+        "name": "imported_east_5_shelves_high2",
+        "source": "/home/wzb/msim/build/deps/PX4-Autopilot/Tools/simulation/gazebo-classic/sitl_gazebo-classic/models/shelves_high2/model.sdf",
+        "pose": [
+          21.0,
+          -7.5,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "collision_geometry": "source model collisions"
+      },
+      {
+        "name": "imported_west_6_shelves_high2",
+        "source": "/home/wzb/msim/build/deps/PX4-Autopilot/Tools/simulation/gazebo-classic/sitl_gazebo-classic/models/shelves_high2/model.sdf",
+        "pose": [
+          -17.0,
+          -13.8,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "collision_geometry": "source model collisions"
+      },
+      {
+        "name": "imported_east_7_shelves_high2",
+        "source": "/home/wzb/msim/build/deps/PX4-Autopilot/Tools/simulation/gazebo-classic/sitl_gazebo-classic/models/shelves_high2/model.sdf",
+        "pose": [
+          21.0,
+          -13.8,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "collision_geometry": "source model collisions"
+      },
+      {
+        "name": "imported_west_8_big_box3",
+        "source": "/home/wzb/msim/build/deps/PX4-Autopilot/Tools/simulation/gazebo-classic/sitl_gazebo-classic/models/big_box3/model.sdf",
+        "pose": [
+          -16.51374,
+          -2.609295,
+          0.760253,
+          0.0,
+          0.000143,
+          -1.57317
+        ],
+        "collision_geometry": "source model collisions"
+      },
+      {
+        "name": "imported_east_9_big_box3",
+        "source": "/home/wzb/msim/build/deps/PX4-Autopilot/Tools/simulation/gazebo-classic/sitl_gazebo-classic/models/big_box3/model.sdf",
+        "pose": [
+          21.48626,
+          -2.609295,
+          0.760253,
+          0.0,
+          0.000143,
+          -1.57317
+        ],
+        "collision_geometry": "source model collisions"
+      },
+      {
+        "name": "imported_west_10_europallet",
+        "source": "/home/wzb/msim/build/deps/PX4-Autopilot/Tools/simulation/gazebo-classic/sitl_gazebo-classic/models/europallet/model.sdf",
+        "pose": [
+          -16.51912,
+          -2.599056,
+          0.0635,
+          0.0,
+          0.0,
+          -1.56736
+        ],
+        "collision_geometry": "single bounding box"
+      },
+      {
+        "name": "imported_east_11_europallet",
+        "source": "/home/wzb/msim/build/deps/PX4-Autopilot/Tools/simulation/gazebo-classic/sitl_gazebo-classic/models/europallet/model.sdf",
+        "pose": [
+          21.48088,
+          -2.599056,
+          0.0635,
+          0.0,
+          0.0,
+          -1.56736
+        ],
+        "collision_geometry": "single bounding box"
+      },
+      {
+        "name": "imported_west_12_big_box3",
+        "source": "/home/wzb/msim/build/deps/PX4-Autopilot/Tools/simulation/gazebo-classic/sitl_gazebo-classic/models/big_box3/model.sdf",
+        "pose": [
+          -20.37439,
+          -2.559036,
+          0.776474,
+          0.0,
+          0.0,
+          -1.59804
+        ],
+        "collision_geometry": "source model collisions"
+      },
+      {
+        "name": "imported_east_13_big_box3",
+        "source": "/home/wzb/msim/build/deps/PX4-Autopilot/Tools/simulation/gazebo-classic/sitl_gazebo-classic/models/big_box3/model.sdf",
+        "pose": [
+          17.62561,
+          -2.559036,
+          0.776474,
+          0.0,
+          0.0,
+          -1.59804
+        ],
+        "collision_geometry": "source model collisions"
+      },
+      {
+        "name": "imported_west_14_big_box4",
+        "source": "/home/wzb/msim/build/deps/PX4-Autopilot/Tools/simulation/gazebo-classic/sitl_gazebo-classic/models/big_box4/model.sdf",
+        "pose": [
+          -15.38703,
+          -2.535409,
+          0.774725,
+          0.0,
+          0.0,
+          -1.59992
+        ],
+        "collision_geometry": "source model collisions"
+      },
+      {
+        "name": "imported_east_15_big_box4",
+        "source": "/home/wzb/msim/build/deps/PX4-Autopilot/Tools/simulation/gazebo-classic/sitl_gazebo-classic/models/big_box4/model.sdf",
+        "pose": [
+          22.61297,
+          -2.535409,
+          0.774725,
+          0.0,
+          0.0,
+          -1.59992
+        ],
+        "collision_geometry": "source model collisions"
+      },
+      {
+        "name": "imported_west_16_big_box3",
+        "source": "/home/wzb/msim/build/deps/PX4-Autopilot/Tools/simulation/gazebo-classic/sitl_gazebo-classic/models/big_box3/model.sdf",
+        "pose": [
+          -21.45548,
+          -2.650143,
+          0.774725,
+          0.0,
+          0.0,
+          -1.56894
+        ],
+        "collision_geometry": "source model collisions"
+      },
+      {
+        "name": "imported_east_17_big_box3",
+        "source": "/home/wzb/msim/build/deps/PX4-Autopilot/Tools/simulation/gazebo-classic/sitl_gazebo-classic/models/big_box3/model.sdf",
+        "pose": [
+          16.54452,
+          -2.650143,
+          0.774725,
+          0.0,
+          0.0,
+          -1.56894
+        ],
+        "collision_geometry": "source model collisions"
+      },
+      {
+        "name": "imported_west_18_big_box4",
+        "source": "/home/wzb/msim/build/deps/PX4-Autopilot/Tools/simulation/gazebo-classic/sitl_gazebo-classic/models/big_box4/model.sdf",
+        "pose": [
+          -22.67439,
+          -2.559036,
+          0.776474,
+          0.0,
+          0.0,
+          -1.59804
+        ],
+        "collision_geometry": "source model collisions"
+      },
+      {
+        "name": "imported_east_19_big_box4",
+        "source": "/home/wzb/msim/build/deps/PX4-Autopilot/Tools/simulation/gazebo-classic/sitl_gazebo-classic/models/big_box4/model.sdf",
+        "pose": [
+          15.325610000000001,
+          -2.559036,
+          0.776474,
+          0.0,
+          0.0,
+          -1.59804
+        ],
+        "collision_geometry": "source model collisions"
+      },
+      {
+        "name": "imported_west_20_europallet",
+        "source": "/home/wzb/msim/build/deps/PX4-Autopilot/Tools/simulation/gazebo-classic/sitl_gazebo-classic/models/europallet/model.sdf",
+        "pose": [
+          -22.70127,
+          -2.584254,
+          0.0635,
+          0.0,
+          0.0,
+          -1.5558
+        ],
+        "collision_geometry": "single bounding box"
+      },
+      {
+        "name": "imported_east_21_europallet",
+        "source": "/home/wzb/msim/build/deps/PX4-Autopilot/Tools/simulation/gazebo-classic/sitl_gazebo-classic/models/europallet/model.sdf",
+        "pose": [
+          15.298729999999999,
+          -2.584254,
+          0.0635,
+          0.0,
+          0.0,
+          -1.5558
+        ],
+        "collision_geometry": "single bounding box"
+      },
+      {
+        "name": "imported_west_22_big_box3",
+        "source": "/home/wzb/msim/build/deps/PX4-Autopilot/Tools/simulation/gazebo-classic/sitl_gazebo-classic/models/big_box3/model.sdf",
+        "pose": [
+          -23.95548,
+          -2.650143,
+          0.774725,
+          0.0,
+          0.0,
+          -1.56894
+        ],
+        "collision_geometry": "source model collisions"
+      },
+      {
+        "name": "imported_east_23_big_box3",
+        "source": "/home/wzb/msim/build/deps/PX4-Autopilot/Tools/simulation/gazebo-classic/sitl_gazebo-classic/models/big_box3/model.sdf",
+        "pose": [
+          14.04452,
+          -2.650143,
+          0.774725,
+          0.0,
+          0.0,
+          -1.56894
+        ],
+        "collision_geometry": "source model collisions"
+      },
+      {
+        "name": "imported_west_24_big_box3",
+        "source": "/home/wzb/msim/build/deps/PX4-Autopilot/Tools/simulation/gazebo-classic/sitl_gazebo-classic/models/big_box3/model.sdf",
+        "pose": [
+          -21.25548,
+          -2.650143,
+          2.3397,
+          0.0,
+          0.0,
+          -1.56894
+        ],
+        "collision_geometry": "source model collisions"
+      },
+      {
+        "name": "imported_east_25_big_box3",
+        "source": "/home/wzb/msim/build/deps/PX4-Autopilot/Tools/simulation/gazebo-classic/sitl_gazebo-classic/models/big_box3/model.sdf",
+        "pose": [
+          16.74452,
+          -2.650143,
+          2.3397,
+          0.0,
+          0.0,
+          -1.56894
+        ],
+        "collision_geometry": "source model collisions"
+      },
+      {
+        "name": "imported_west_26_europallet",
+        "source": "/home/wzb/msim/build/deps/PX4-Autopilot/Tools/simulation/gazebo-classic/sitl_gazebo-classic/models/europallet/model.sdf",
+        "pose": [
+          -21.21303,
+          -2.656261,
+          1.6373,
+          0.0,
+          0.0,
+          1.56536
+        ],
+        "collision_geometry": "single bounding box"
+      },
+      {
+        "name": "imported_east_27_europallet",
+        "source": "/home/wzb/msim/build/deps/PX4-Autopilot/Tools/simulation/gazebo-classic/sitl_gazebo-classic/models/europallet/model.sdf",
+        "pose": [
+          16.78697,
+          -2.656261,
+          1.6373,
+          0.0,
+          0.0,
+          1.56536
+        ],
+        "collision_geometry": "single bounding box"
+      },
+      {
+        "name": "imported_west_28_pallet_full",
+        "source": "/home/wzb/msim/build/deps/PX4-Autopilot/Tools/simulation/gazebo-classic/sitl_gazebo-classic/models/pallet_full/model.sdf",
+        "pose": [
+          -17.665014,
+          -2.662363,
+          1.63184,
+          0.0,
+          0.0,
+          -1.57575
+        ],
+        "collision_geometry": "source model collisions"
+      },
+      {
+        "name": "imported_east_29_pallet_full",
+        "source": "/home/wzb/msim/build/deps/PX4-Autopilot/Tools/simulation/gazebo-classic/sitl_gazebo-classic/models/pallet_full/model.sdf",
+        "pose": [
+          20.334986,
+          -2.662363,
+          1.63184,
+          0.0,
+          0.0,
+          -1.57575
+        ],
+        "collision_geometry": "source model collisions"
+      },
+      {
+        "name": "imported_west_30_pallet_full",
+        "source": "/home/wzb/msim/build/deps/PX4-Autopilot/Tools/simulation/gazebo-classic/sitl_gazebo-classic/models/pallet_full/model.sdf",
+        "pose": [
+          -17.665014,
+          -2.662363,
+          2.31,
+          0.0,
+          0.0,
+          -1.57575
+        ],
+        "collision_geometry": "source model collisions"
+      },
+      {
+        "name": "imported_east_31_pallet_full",
+        "source": "/home/wzb/msim/build/deps/PX4-Autopilot/Tools/simulation/gazebo-classic/sitl_gazebo-classic/models/pallet_full/model.sdf",
+        "pose": [
+          20.334986,
+          -2.662363,
+          2.31,
+          0.0,
+          0.0,
+          -1.57575
+        ],
+        "collision_geometry": "source model collisions"
+      },
+      {
+        "name": "imported_west_32_big_box4",
+        "source": "/home/wzb/msim/build/deps/PX4-Autopilot/Tools/simulation/gazebo-classic/sitl_gazebo-classic/models/big_box4/model.sdf",
+        "pose": [
+          -15.43082,
+          -2.678842,
+          2.35696,
+          0.0,
+          0.0,
+          -1.56652
+        ],
+        "collision_geometry": "source model collisions"
+      },
+      {
+        "name": "imported_east_33_big_box4",
+        "source": "/home/wzb/msim/build/deps/PX4-Autopilot/Tools/simulation/gazebo-classic/sitl_gazebo-classic/models/big_box4/model.sdf",
+        "pose": [
+          22.56918,
+          -2.678842,
+          2.35696,
+          0.0,
+          0.0,
+          -1.56652
+        ],
+        "collision_geometry": "source model collisions"
+      },
+      {
+        "name": "imported_west_34_big_box3",
+        "source": "/home/wzb/msim/build/deps/PX4-Autopilot/Tools/simulation/gazebo-classic/sitl_gazebo-classic/models/big_box3/model.sdf",
+        "pose": [
+          -22.67439,
+          -2.559036,
+          2.35696,
+          0.0,
+          0.0,
+          -1.59804
+        ],
+        "collision_geometry": "source model collisions"
+      },
+      {
+        "name": "imported_east_35_big_box3",
+        "source": "/home/wzb/msim/build/deps/PX4-Autopilot/Tools/simulation/gazebo-classic/sitl_gazebo-classic/models/big_box3/model.sdf",
+        "pose": [
+          15.325610000000001,
+          -2.559036,
+          2.35696,
+          0.0,
+          0.0,
+          -1.59804
+        ],
+        "collision_geometry": "source model collisions"
+      },
+      {
+        "name": "imported_west_36_europallet",
+        "source": "/home/wzb/msim/build/deps/PX4-Autopilot/Tools/simulation/gazebo-classic/sitl_gazebo-classic/models/europallet/model.sdf",
+        "pose": [
+          -23.91303,
+          -2.656261,
+          1.64676,
+          0.0,
+          0.0,
+          1.56536
+        ],
+        "collision_geometry": "single bounding box"
+      },
+      {
+        "name": "imported_east_37_europallet",
+        "source": "/home/wzb/msim/build/deps/PX4-Autopilot/Tools/simulation/gazebo-classic/sitl_gazebo-classic/models/europallet/model.sdf",
+        "pose": [
+          14.08697,
+          -2.656261,
+          1.64676,
+          0.0,
+          0.0,
+          1.56536
+        ],
+        "collision_geometry": "single bounding box"
+      }
+    ],
+    "route_spawn_enu": [
+      0,
+      -20,
+      0
+    ],
+    "flight_height_m": 8,
+    "intended_clear_strip_enu": {
+      "east": [
+        -10,
+        4
+      ],
+      "north": [
+        -23,
+        16
+      ],
+      "up": [
+        0,
+        9.5
+      ]
+    },
+    "physics_step_s": 0.002,
+    "notes": "static geometry fixtures; ray LiDAR uses collision geometry; no GNSS multipath/rain/dynamic actors"
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "name": "ksql_airport",
+  "origin_lla_deg_m": [
+    37.52364,
+    -122.255122,
+    1.7
+  ],
+  "origin_basis": "PX4 Gazebo Classic ksql_airport.world reference, not a surveyed calibration",
+  "spawn_enu_m": [
+    -210.0,
+    240.0,
+    -1.35
+  ],
+  "ground_at_spawn_m": -1.5,
+  "flight_height_m": 12.0,
+  "camera_pose": [
+    -255.0,
+    180.0,
+    43.5,
+    0.0,
+    0.5,
+    0.9
+  ],
+  "route_plan": "ksql_airport.route.json",
+  "asset_manifest": "../build/scenes/ksql-airport/asset-manifest.json",
+  "resource_path": "../build/scenes/ksql-airport/upstream/ksql_airport",
+  "test_region_enu_m": {
+    "east": [
+      -300.0,
+      700.0
+    ],
+    "north": [
+      0.0,
+      1000.0
+    ]
+  },
+  "model_scope": "Full original airport terrain is retained. The test region is 1 km by 1 km, not a cropped mesh."
+}

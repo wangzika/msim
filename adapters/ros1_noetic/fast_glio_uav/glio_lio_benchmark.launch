@@ -1,0 +1,8 @@
+<launch>
+  <param name="/use_sim_time" value="true" />
+  <arg name="config_file" default="$(find GLIO)/config/config_sim_velodyne.yaml" />
+  <rosparam command="load" file="$(arg config_file)" />
+  <!-- GLIO's pure LiDAR/IMU front end; the GNSS estimator is intentionally absent. -->
+  <node pkg="GLIO" type="Preprocessing" name="glio_preprocessing" output="screen" />
+  <node pkg="GLIO" type="LidarOdometry" name="glio_lidar_odometry" output="screen" />
+</launch>

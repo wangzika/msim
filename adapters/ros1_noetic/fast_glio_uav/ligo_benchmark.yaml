@@ -1,0 +1,105 @@
+common:
+    lid_topic: "/msim/velodyne_points_annotated"
+    imu_topic: "/imu/data"
+    con_frame: false
+    con_frame_num: 1
+    scan_rate: 10
+
+preprocess:
+    lidar_type: 2             # 2 = VELO16
+    scan_line: 16             # 16-beam Velodyne Puck
+    timestamp_unit: 0         # 0 = seconds
+    blind: 0.5                # near blind area
+    det_range: 100            # distance range
+
+mapping:
+    imu_en: true
+    imu_time_inte: 0.005      # 1 / 200Hz
+    lidar_time_inte: 0.1      # 1 / 10Hz
+    satu_acc: 30.0
+    satu_gyro: 35.0
+    acc_norm: 9.80665         # Gazebo gravity norm
+    lidar_meas_cov: 0.05
+    acc_cov_output: 500
+    gyr_cov_output: 1000
+    b_acc_cov: 0.0001
+    b_gyr_cov: 0.0001
+    imu_meas_acc_cov: 0.04
+    imu_meas_omg_cov: 0.02
+    plane_thr: 0.1
+    match_s: 81
+    ivox_grid_resolution: 2.0
+    gravity: [0.0, 0.0, -9.80665]
+    init_with_imu: true
+    gravity_init: [0.0, 0.0, -9.80665]
+    extrinsic_T: [0.0, 0.0, 0.15]
+    extrinsic_R: [1.0, 0.0, 0.0,
+                  0.0, 1.0, 0.0,
+                  0.0, 0.0, 1.0]
+
+gnss:
+    gnss_enable: false
+    ephem_from_rinex: false
+    ephem_file_name: ""
+    obs_from_rinex: false
+    pvt_is_gt: false
+    gt_file_name: ""
+    gt_file_type: 2
+    outlier_rejection: true
+    psr_dopp_weight: 1
+    cp_weight: 10
+    gnss_meas_topic: "/gnss_raw"
+    gnss_ephem_topic: "/ublox_driver/ephem"
+    gnss_glo_ephem_topic: "/ublox_driver/glo_ephem"
+    gnss_iono_params_topic: "/ublox_driver/iono_params"
+    gnss_tp_info_topic: "/ublox_driver/time_pulse_info"
+    rtk_pvt_topic: "/ublox_driver/receiver_pvt"
+    rtk_lla_topic: "/navsat/fix"
+    gnss_elevation_thres: 15
+    gnss_psr_std_thres: 5.0
+    gnss_dopp_std_thres: 5.0
+    gnss_cp_std_thres: 5.0
+    gnss_cp_time_thres: 100.0
+    gtsam_variable_thres: 30
+    gtsam_marg_variable_thres: 1
+    gnss_sample_period: 1
+    outlier_thres: 10
+    outlier_thres_init: 20
+    window_size: 10
+    prior_noise: 1000
+    marg_noise: 0.1
+    odo_noise: 10
+    grav_noise: 1.0
+    psr_dopp_noise: 10.0
+    cp_noise: 0.1
+    gnss_ekf_noise: 0.01
+    gnss_local_online_sync: false
+    local_trigger_info_topic: "/external_trigger"
+    gnss_local_time_diff: 0.0
+    gnss_iono_default_parameters: [0.1118E-07, 0.2235E-07, -0.4172E-06, 0.6557E-06, 0.1249E+06, -0.4424E+06, 0.1507E+07, -0.2621E+06]
+    gnss_extrinsic_T: [0.005, -0.05, 0.15]
+    gnss_extrinsic_R: [1.0, 0.0, 0.0,
+                       0.0, 1.0, 0.0,
+                       0.0, 0.0, 1.0]
+
+nmea:
+    nmea_enable: false
+    posit_odo_topic: "/rtklib_odom"
+    ppp_std_thres: 1000.0
+    pos_noise: 1
+    nmea_weight: 1000.0
+    nmea_local_time_diff: 0.0
+    ppp_file_name: ""
+    ppp_anc: [0.0, 0.0, 0.0]
+
+odometry:
+    publish_odometry_without_downsample: false
+
+publish:
+    path_en: true
+    scan_publish_en: true
+    scan_bodyframe_pub_en: false
+
+pcd_save:
+    pcd_save_en: false
+    interval: -1

@@ -1,0 +1,15 @@
+{
+  "rows": 800000,
+  "first_column": "sequential sample index, despite upstream Time/s header",
+  "point_rate_hz": 200000,
+  "cycle_duration_s": 4.0,
+  "azimuth_deg": [
+    0.00037577,
+    360.0
+  ],
+  "elevation_deg": [
+    -7.212299999999999,
+    52.164
+  ],
+  "source_commit": "1cce1073633a062b92e30243a4c2920e45551bb5"
+}

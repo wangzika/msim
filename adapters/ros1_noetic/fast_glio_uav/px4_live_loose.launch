@@ -1,0 +1,50 @@
+<launch>
+  <arg name="config_file" />
+  <arg name="rviz_config" />
+  <arg name="rviz" default="true" />
+  <arg name="point_filter_num" default="2" />
+  <param name="/use_sim_time" value="true" />
+  <rosparam command="load" file="$(arg config_file)" />
+  <param name="/point_filter_num" type="int" value="$(arg point_filter_num)" />
+  <!-- FAST-LIO reads this through the global NodeHandle, not its private one.
+       200 m with det_range=100 m repeatedly shifts and crops the local map. -->
+  <param name="/cube_side_length" type="double" value="1000.0" />
+  <!-- The Gazebo IMU's bias is estimated online; freezing it caused
+       roll/pitch and height drift in the corridor replay. -->
+  <param name="/mapping/bias_freeze_en" value="false" />
+
+  <node pkg="fast_lio" type="fastlio_mapping" name="laserMapping" output="screen">
+    <param name="point_filter_num" type="int" value="$(arg point_filter_num)" />
+    <param name="filter_size_surf" type="double" value="0.5" />
+    <param name="filter_size_map" type="double" value="0.5" />
+    <param name="lidar_update/enable" value="true" />
+    <param name="gnss_loose/enable" value="true" />
+    <param name="gnss_tight/enable" value="false" />
+    <param name="gnss_raw_tight/enable" value="false" />
+    <param name="gnss_loose/odom_topic" value="/msim/spoofed_gnss_odom" />
+    <param name="gnss_loose/input_coord" value="enu" />
+    <param name="gnss_loose/raw_subscribe_enable" value="false" />
+    <param name="gnss_loose/raw_quality_enable" value="false" />
+    <param name="gnss_loose/reject_raw_none" value="false" />
+    <param name="gnss_loose/env_r_scale_enable" value="false" />
+    <param name="gnss_loose/init_samples" value="5" />
+    <param name="gnss_loose/init_min_motion" value="2.0" />
+    <param name="gnss_loose/max_time_diff" value="0.1" />
+    <param name="gnss_loose/max_interp_interval" value="1.1" />
+    <param name="gnss_loose/gate_chi2" value="1000.0" />
+    <param name="gnss_loose/gate_residual_threshold" value="40.0" />
+    <param name="gnss_loose/residual_reject_threshold" value="50.0" />
+    <param name="gnss_loose/correction_gain" value="0.4" />
+    <param name="gnss_loose/max_correction_step" value="1.0" />
+    <param name="gnss_loose/diag_log_enable" value="false" />
+    <param name="gnss_loose/map_use_loose" value="false" />
+    <param name="gnss_loose/feedback_to_lio" value="false" />
+    <param name="gnss_loose/correct_z" value="true" />
+    <param name="gnss_loose/use_initial_heading" value="true" />
+    <param name="gnss_loose/initial_heading_deg" value="0.0" />
+    <rosparam param="gnss_loose/lever_arm_body">[0.05, 0.0, 0.04]</rosparam>
+  </node>
+
+  <node if="$(arg rviz)" pkg="rviz" type="rviz" name="msim_fastglio_rviz"
+        args="-d $(arg rviz_config)" output="log" required="true" />
+</launch>

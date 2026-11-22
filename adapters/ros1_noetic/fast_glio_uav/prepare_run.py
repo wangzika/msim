@@ -41,6 +41,7 @@ def main():
         scenario_path = run / ('scenario-signalsim.json' if existing.is_file() else 'scenario.json')
         if not scenario_path.exists():
             config = json.loads(TEMPLATE.read_text())
+            config['geodesy']['origin_lla_deg_m'] = report['origin_lla_deg_m']
             if existing.is_file():
                 old = json.loads(existing.read_text())
                 config['time']['utc_start'] = old['time']['utc_start']

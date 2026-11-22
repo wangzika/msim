@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "description": "Reproducible 16-channel spinning-lidar-like and MEMS IMU baseline; provisional error parameters, not a calibrated product specification.",
+  "imu_ros": {
+    "rate_hz": 200.0,
+    "seed": 20261115,
+    "gyro_noise_density": 0.0008726646,
+    "accel_noise_density": 0.00637,
+    "gyro_turn_on_bias_sigma": 0.0017453293,
+    "accel_turn_on_bias_sigma": 0.02,
+    "gyro_bias_random_walk": 0.00002,
+    "accel_bias_random_walk": 0.0002,
+    "gyro_bias_correlation_time_s": 1000.0,
+    "accel_bias_correlation_time_s": 300.0,
+    "orientation_initial_sigma_rad": 0.0052359878,
+    "orientation_random_walk_rad_sqrt_s": 0.0003490659,
+    "orientation_white_sigma_rad": 0.0008726646
+  },
+  "imu_px4": {
+    "gyroscopeNoiseDensity": 0.0008726646,
+    "gyroscopeRandomWalk": 0.00002,
+    "gyroscopeBiasCorrelationTime": 1000.0,
+    "gyroscopeTurnOnBiasSigma": 0.0017453293,
+    "accelerometerNoiseDensity": 0.00637,
+    "accelerometerRandomWalk": 0.0002,
+    "accelerometerBiasCorrelationTime": 300.0,
+    "accelerometerTurnOnBiasSigma": 0.02
+  },
+  "lidar": {
+    "horizontal_samples": 1800,
+    "vertical_samples": 16,
+    "rate_hz": 10.0,
+    "range_min_m": 0.3,
+    "range_max_m": 100.0,
+    "range_resolution_m": 0.001,
+    "range_noise_sigma_m": 0.02
+  }
+}

@@ -2,3 +2,8 @@
 /runs/
 __pycache__/
 *.pyc
+/scenes/ksql_airport.world
+/.chart-data-*/
+/.codex-build/
+.~*
+~$*

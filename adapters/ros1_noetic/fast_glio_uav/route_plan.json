@@ -1,0 +1,7 @@
+[
+  {"north_m": 0, "east_m": 0, "hold_s": 12},
+  {"north_m": 8, "east_m": 0, "hold_s": 15},
+  {"north_m": 18, "east_m": 0, "hold_s": 15},
+  {"north_m": 28, "east_m": 0, "hold_s": 15},
+  {"north_m": 33, "east_m": 0, "hold_s": 45}
+]

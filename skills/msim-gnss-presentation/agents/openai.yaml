@@ -1,0 +1,7 @@
+interface:
+  display_name: "MSIM 仿真平台汇报"
+  short_description: "制作仿真平台与 GNSS 主题学术汇报"
+  brand_color: "#0D5BB3"
+  default_prompt: "使用 $msim-gnss-presentation 制作一份 msim 仿真平台汇报，可选常规学术样式或组会简洁大字样式。"
+policy:
+  allow_implicit_invocation: true

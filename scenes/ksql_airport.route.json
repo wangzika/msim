@@ -1,0 +1,57 @@
+[
+  {
+    "north_m": 0,
+    "east_m": 0,
+    "hold_s": 15
+  },
+  {
+    "north_m": 60,
+    "east_m": 0,
+    "hold_s": 22
+  },
+  {
+    "north_m": 140,
+    "east_m": 0,
+    "hold_s": 24
+  },
+  {
+    "north_m": 220,
+    "east_m": 30,
+    "hold_s": 26
+  },
+  {
+    "north_m": 280,
+    "east_m": 90,
+    "hold_s": 25
+  },
+  {
+    "north_m": 340,
+    "east_m": 60,
+    "hold_s": 25
+  },
+  {
+    "north_m": 340,
+    "east_m": 0,
+    "hold_s": 22
+  },
+  {
+    "north_m": 220,
+    "east_m": -10,
+    "hold_s": 26
+  },
+  {
+    "north_m": 140,
+    "east_m": -30,
+    "hold_s": 24
+  },
+  {
+    "north_m": 60,
+    "east_m": -20,
+    "hold_s": 22
+  },
+  {
+    "north_m": 0,
+    "east_m": 0,
+    "hold_s": 25
+  }
+]

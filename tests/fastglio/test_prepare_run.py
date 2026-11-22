@@ -13,6 +13,18 @@ ORIGIN = [30.5312, 114.3601, 50.0]
 
 
 class PrepareRunTest(unittest.TestCase):
+    def test_new_capture_uses_scene_geographic_origin(self):
+        with tempfile.TemporaryDirectory() as directory:
+            run = Path(directory) / 'airport'
+            run.mkdir()
+            origin = [37.52364, -122.255122, 1.7]
+            (run / 'capture-report.json').write_text(json.dumps({
+                'duration_s': 2, 'origin_lla_deg_m': origin}))
+            result = subprocess.check_output([sys.executable, str(SCRIPT),
+                                              '--run', str(run), '--duration-s', '2'], text=True)
+            config = json.loads(Path(result.strip()).read_text())
+            self.assertEqual(config['geodesy']['origin_lla_deg_m'], origin)
+
     def test_new_capture_gets_standalone_signalsim_scenario(self):
         with tempfile.TemporaryDirectory() as directory:
             run = Path(directory) / 'flight'

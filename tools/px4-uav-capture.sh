@@ -4,27 +4,106 @@ set -euo pipefail
 MSIM_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 FAST_GLIO_ROOT="${FAST_GLIO_ROOT:-/home/wzb/FAST_GLIO}"
 PX4_ROOT="${PX4_ROOT:-$MSIM_ROOT/build/deps/PX4-Autopilot}"
+sensor_profile=""
+scene_profile=""
+sensor_args=()
+scene=simple
+world_input=""
+frontend=auto
+point_filter_num=auto
+fusion_delay_s=0.65
+route_clock=wall
 duration=300
 gui=false
+gazebo_viz=false
+fastglio_live=false
+headless=false
+skip_signalsim=false
+verification_ok=true
 run=""
 postprocess=false
 manual=false
-online_gnss=false
+flight_pattern=patrol
+online_gnss=true
 gnss_east_bias=0
 gnss_north_bias=0
+spoof_start_s=inf
+spoof_east_rate=0
+spoof_north_rate=0
 while (($#)); do
   case "$1" in
     --duration-s) duration="$2"; shift 2;;
     --gui) gui=true; shift;;
+    --gazebo-viz) gazebo_viz=true; shift;;
+    --fastglio-live) fastglio_live=true; shift;;
+    --headless) headless=true; shift;;
+    --skip-signalsim) skip_signalsim=true; shift;;
     --run) run="$2"; shift 2;;
+    --sensor-profile) sensor_profile="$2"; shift 2;;
+    --scene-profile) scene_profile="$2"; shift 2;;
+    --list-sensors) /usr/bin/python3 "$MSIM_ROOT/tools/sensor-config.py" --list; exit 0;;
+    --lidar-model|--imu-model|--gps-model|--lidar-timing) sensor_args+=("$1" "$2"); shift 2;;
+    --help) echo 'px4-uav-capture.sh --fastglio-live --duration-s 60 [--scene simple|complex_urban|industrial_yard|ksql_airport] [--scene-profile file.json] [--lidar-model vlp16|hdl32|os1-64|mid360] [--imu-model mems-baseline|low-noise] [--gps-model standalone|native|ideal] [--lidar-timing rolling|snapshot] [--list-sensors]'; exit 0;;
+    --scene) scene="$2"; shift 2;;
+    --world) world_input="$2"; shift 2;;
+    --fastglio-frontend) frontend="$2"; shift 2;;
+    --point-filter-num) point_filter_num="$2"; shift 2;;
+    --fusion-delay-s) fusion_delay_s="$2"; shift 2;;
+    --route-clock) route_clock="$2"; shift 2;;
     --postprocess-only) postprocess=true; shift;;
     --manual) manual=true; shift;;
+    --flight-pattern) flight_pattern="$2"; shift 2;;
     --online-gnss) online_gnss=true; shift;;
     --gnss-east-bias-m) gnss_east_bias="$2"; shift 2;;
     --gnss-north-bias-m) gnss_north_bias="$2"; shift 2;;
+    --spoof-start-s) spoof_start_s="$2"; shift 2;;
+    --spoof-east-rate-mps) spoof_east_rate="$2"; shift 2;;
+    --spoof-north-rate-mps) spoof_north_rate="$2"; shift 2;;
     *) echo "Unknown argument: $1" >&2; exit 2;;
   esac
 done
+/usr/bin/python3 - "$fusion_delay_s" "$spoof_start_s" "$spoof_east_rate" "$spoof_north_rate" "$gnss_east_bias" "$gnss_north_bias" <<'PY'
+import math,sys
+delay,start,east,north,be,bn=map(float,sys.argv[1:])
+if not math.isfinite(delay) or not 0<=delay<=2:
+    raise SystemExit('--fusion-delay-s 必须在 0～2 秒之间')
+if math.isnan(start) or start<0 or not all(math.isfinite(v) and abs(v)<=10 for v in (east,north)):
+    raise SystemExit('欺骗开始时间必须非负，漂移速度必须在 ±10 m/s 内')
+if not all(math.isfinite(v) and abs(v)<=1000 for v in (be,bn)):
+    raise SystemExit('固定 GPS 偏移必须在 ±1000 m 内')
+PY
+if [[ "$frontend" != auto && "$frontend" != marsim && "$frontend" != velodyne && "$frontend" != livox ]]; then
+  echo "--fastglio-frontend must be auto, marsim, velodyne or livox" >&2; exit 2
+fi
+if [[ "$route_clock" != wall && "$route_clock" != sim ]]; then
+  echo "--route-clock must be wall or sim" >&2; exit 2
+fi
+if [[ "$point_filter_num" != auto && ! "$point_filter_num" =~ ^[1-9][0-9]*$ ]]; then
+  echo "--point-filter-num must be auto or a positive integer" >&2; exit 2
+fi
+case "$scene" in
+  simple|complex_urban|industrial_yard) ;;
+  ksql_airport)
+    if [[ -z "$scene_profile" ]]; then scene_profile="$MSIM_ROOT/scenes/ksql_airport.profile.json"; fi
+    ;;
+  *) echo "--scene must be simple, complex_urban, industrial_yard or ksql_airport" >&2; exit 2;;
+esac
+if ! $postprocess && [[ -z "$world_input" && "$scene" != simple ]]; then
+  if [[ "$scene" == ksql_airport ]]; then
+    /usr/bin/python3 "$MSIM_ROOT/tools/prepare-ksql-scene.py" --profile "$scene_profile"
+  fi
+  world_input="$MSIM_ROOT/scenes/$scene.world"
+fi
+if [[ "$flight_pattern" != patrol && "$flight_pattern" != hover && "$flight_pattern" != route ]]; then
+  echo "--flight-pattern must be patrol, hover or route" >&2
+  exit 2
+fi
+if $fastglio_live; then gazebo_viz=true; fi
+if $gazebo_viz; then
+  gui=true
+  online_gnss=true
+fi
+if $headless; then gui=false; fi
 if [[ -z "$run" ]]; then
   run="$MSIM_ROOT/runs/uav-px4-$(date +%Y%m%d-%H%M%S)"
 fi
@@ -40,6 +119,7 @@ if ! $postprocess; then
     exit 2
   fi
   export PATH="$FAST_GLIO_ROOT/.pixi/envs/default/bin:$PATH"
+  export CONDA_PREFIX="$FAST_GLIO_ROOT/.pixi/envs/default"
   set +u
   source "$FAST_GLIO_ROOT/devel/setup.bash"
   source "$PX4_ROOT/Tools/simulation/gazebo-classic/setup_gazebo.bash" \
@@ -47,25 +127,110 @@ if ! $postprocess; then
   set -u
   export PX4_ROOT
   export PYTHONPATH="$MSIM_ROOT/build/px4-pydeps${PYTHONPATH:+:$PYTHONPATH}"
-  export ROS_PACKAGE_PATH="$PX4_ROOT:$PX4_ROOT/Tools/simulation/gazebo-classic:${ROS_PACKAGE_PATH:-}"
-  export PX4_HOME_LAT=30.5312 PX4_HOME_LON=114.3601 PX4_HOME_ALT=50.0
+  export ROS_PACKAGE_PATH="$MSIM_ROOT/adapters/ros1_noetic:$PX4_ROOT:$PX4_ROOT/Tools/simulation/gazebo-classic:${ROS_PACKAGE_PATH:-}"
   export ROS_LOG_DIR="$run/roslogs"
   export ROS_HOME="$run/ros-home"
-  assets="$MSIM_ROOT/build/px4-assets"
-  prepare=(--px4-root "$PX4_ROOT" --fast-glio-root "$FAST_GLIO_ROOT" --output-dir "$assets")
+  assets="$MSIM_ROOT/build/px4-assets/$scene-${run##*/}"
+  scene_args=()
+  if [[ -n "$scene_profile" ]]; then scene_args+=(--profile "$(realpath "$scene_profile")"); fi
+  /usr/bin/python3 "$MSIM_ROOT/adapters/ros1_noetic/fast_glio_uav/scene_profile.py" \
+    "${scene_args[@]}" --output "$assets/scene-profile.json"
+  export MSIM_SCENE_PROFILE="$assets/scene-profile.json"
+  mapfile -t scene_values < <(/usr/bin/python3 "$MSIM_ROOT/adapters/ros1_noetic/fast_glio_uav/scene_profile.py" \
+    --profile "$MSIM_SCENE_PROFILE" --values)
+  export PX4_HOME_LAT="${scene_values[0]}" PX4_HOME_LON="${scene_values[1]}" PX4_HOME_ALT="${scene_values[2]}"
+  export MSIM_ROUTE_PLAN="${MSIM_ROUTE_PLAN:-${scene_values[7]}}"
+  if [[ -n "${scene_values[8]:-}" ]]; then
+    export GAZEBO_RESOURCE_PATH="${scene_values[8]}:${GAZEBO_RESOURCE_PATH:-}"
+  fi
+  if [[ -n "$sensor_profile" ]]; then sensor_args+=(--sensor-profile "$(realpath "$sensor_profile")"); fi
+  /usr/bin/python3 "$MSIM_ROOT/tools/sensor-config.py" "${sensor_args[@]}" --output "$assets/sensor_profile.json"
+  sensor_profile="$assets/sensor_profile.json"
+  pattern=$(/usr/bin/python3 - "$sensor_profile" <<'PY'
+import json,sys
+print(json.load(open(sys.argv[1]))['lidar']['scan_pattern'])
+PY
+)
+  if [[ "$frontend" == auto ]]; then
+    if [[ "$pattern" == livox_csv ]]; then frontend=livox; else frontend=velodyne; fi
+  fi
+  if [[ "$point_filter_num" == auto ]]; then
+    if [[ "$pattern" == livox_csv ]]; then point_filter_num=1; else point_filter_num=2; fi
+  fi
+  if [[ "$pattern" == livox_csv && "$frontend" != livox ]] || [[ "$pattern" != livox_csv && "$frontend" == livox ]]; then
+    echo 'Mid-360 使用 livox 原生入口，其他雷达使用 velodyne 或快照 marsim 入口。' >&2; exit 2
+  fi
+  if [[ "$frontend" == marsim ]] && ! /usr/bin/python3 - "$sensor_profile" <<'PY'
+import json,sys
+sys.exit(json.load(open(sys.argv[1]))['lidar']['timing']!='snapshot')
+PY
+  then
+    echo 'MARSIM 入口只支持快照；请选择 --fastglio-frontend velodyne，或显式使用 --lidar-timing snapshot。' >&2
+    exit 2
+  fi
+  "$MSIM_ROOT/tools/build-gazebo-sensors.sh" > "$assets/build-sensors.log" 2>&1 || { tail -40 "$assets/build-sensors.log"; exit 1; }
+  export GAZEBO_PLUGIN_PATH="$MSIM_ROOT/build/gazebo-sensors:${GAZEBO_PLUGIN_PATH:-}"
+  export MSIM_SENSOR_PROFILE="$sensor_profile"
+  prepare=(--px4-root "$PX4_ROOT" --fast-glio-root "$FAST_GLIO_ROOT" --output-dir "$assets" --sensor-profile "$sensor_profile")
+  if [[ -n "$world_input" ]]; then prepare+=(--world-input "$world_input"); fi
   if $online_gnss; then prepare+=(--online-gnss); fi
+  if $gazebo_viz; then prepare+=(--gazebo-viz); fi
   /usr/bin/python3 "$MSIM_ROOT/adapters/ros1_noetic/fast_glio_uav/prepare_px4_assets.py" "${prepare[@]}"
   model="$assets/iris_msim.sdf"
   if $online_gnss; then model="$assets/iris_msim_online_gnss.sdf"; fi
+  export MSIM_WORLD_SOURCE="$assets/urban_canyon_msim.world" MSIM_MODEL_SOURCE="$model"
+  export MSIM_FASTGLIO_FRONTEND="$frontend"
+  export MSIM_FUSION_DELAY_S="$fusion_delay_s"
   capture=(--run "$run" --duration-s "$duration" \
     --launch-file "$MSIM_ROOT/adapters/ros1_noetic/fast_glio_uav/px4_world.launch" \
     --launch-arg "world:=$assets/urban_canyon_msim.world" \
-    --launch-arg "sdf:=$model")
+    --launch-arg "sdf:=$model" \
+    --launch-arg "sensor_profile:=$sensor_profile")
+  capture+=(--launch-arg "fusion_delay_s:=$fusion_delay_s")
+  capture+=(--launch-arg "spawn_x:=${scene_values[3]}" \
+    --launch-arg "spawn_y:=${scene_values[4]}" --launch-arg "spawn_z:=${scene_values[5]}")
   if $online_gnss; then
+    export MSIM_GNSS_SOURCE=gazebo_plugin
     export MSIM_GNSS_EAST_BIAS_M="$gnss_east_bias" MSIM_GNSS_NORTH_BIAS_M="$gnss_north_bias"
+    export MSIM_SPOOF_START_S="$spoof_start_s"
+    export MSIM_SPOOF_EAST_RATE_MPS="$spoof_east_rate"
+    export MSIM_SPOOF_NORTH_RATE_MPS="$spoof_north_rate"
     capture+=(--injector-script "$MSIM_ROOT/adapters/ros1_noetic/fast_glio_uav/px4_online_gnss.py")
   fi
+  if $gazebo_viz && ! $headless; then
+    capture+=(--gazebo-viz-script \
+      "$MSIM_ROOT/adapters/ros1_noetic/fast_glio_uav/gazebo_spoof_viz.py")
+  fi
+  if $fastglio_live; then
+    fastglio_config="$assets/fastglio_${frontend}.yaml"
+    python - "$MSIM_ROOT/adapters/ros1_noetic/fast_glio_uav/px4_replay.yaml" "$fastglio_config" "$sensor_profile" "$frontend" <<'PY'
+import sys,yaml,json
+from pathlib import Path
+config=yaml.safe_load(Path(sys.argv[1]).read_text())
+config['common']['lid_topic']='/msim/livox_lidar_for_fusion' if sys.argv[4]=='livox' else '/msim/velodyne_points_annotated'
+config['preprocess']['lidar_type']={'livox':1,'velodyne':2,'marsim':5}[sys.argv[4]]
+config['mapping']['bias_freeze_en']=False
+profile=json.loads(Path(sys.argv[3]).read_text())
+config['preprocess']['scan_line']=profile['lidar']['vertical_samples']
+config['preprocess']['scan_rate']=profile['lidar']['rate_hz']
+config['preprocess']['timestamp_unit']=0
+Path(sys.argv[2]).write_text(yaml.safe_dump(config,sort_keys=False))
+PY
+    capture+=(--launch-arg "annotate_lidar:=true")
+    capture+=(--fastglio-launch \
+      "$MSIM_ROOT/adapters/ros1_noetic/fast_glio_uav/px4_live_loose.launch" \
+      --fastglio-config "$fastglio_config" \
+      --fastglio-point-filter-num "$point_filter_num" \
+      --fastglio-rviz-config \
+      "$MSIM_ROOT/adapters/ros1_noetic/fast_glio_uav/px4_live_loose.rviz")
+    if ! $headless; then
+      capture+=(--tile-windows-script \
+        "$MSIM_ROOT/adapters/ros1_noetic/fast_glio_uav/tile_live_windows.py")
+    fi
+  fi
   if ! $manual; then
+    export MSIM_PX4_FLIGHT_PATTERN="$flight_pattern"
+    export MSIM_ROUTE_CLOCK="$route_clock"
     capture+=(--controller-script \
       "$MSIM_ROOT/adapters/ros1_noetic/fast_glio_uav/px4_patrol.py")
   fi
@@ -76,9 +241,23 @@ if ! $postprocess; then
     --run "$run" --duration-s "$duration" --antenna-offset 0.05 0 0.04
   if ! $manual; then
     verify=(--run "$run")
-    if $online_gnss; then verify+=(--online-gnss); fi
-    python "$MSIM_ROOT/adapters/ros1_noetic/fast_glio_uav/verify_px4_flight.py" "${verify[@]}"
+    if $online_gnss; then verify+=(--online-gnss --require-lidar-sync); fi
+    if ! python "$MSIM_ROOT/adapters/ros1_noetic/fast_glio_uav/verify_px4_flight.py" "${verify[@]}"; then
+      verification_ok=false
+      echo "飞行或同步检查未通过；继续导出定位图表，请检查 px4-flight-report.json。" >&2
+    fi
   fi
+  if $fastglio_live; then
+    export MPLCONFIGDIR="$run/matplotlib-cache"
+    mkdir -p "$MPLCONFIGDIR"
+    python "$MSIM_ROOT/tools/plot-fastglio-live.py" --run "$run"
+    python "$MSIM_ROOT/tools/plot-fastglio-enu-error.py" --run "$run"
+    python "$MSIM_ROOT/tools/evaluate-fastglio-replay.py" \
+      --bag "$run/sensors.bag" \
+      --output "$run/fastglio-live-lio-error.json"
+  fi
+  if ! $verification_ok; then exit 1; fi
 fi
+if $skip_signalsim; then exit 0; fi
 "$MSIM_ROOT/tools/fastglio-uav-capture.sh" --postprocess-only \
   --run "$run" --duration-s "$duration"

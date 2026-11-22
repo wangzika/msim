@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "repository": "https://github.com/osrf/uav_testing",
+  "commit": "0f511ef628af6c53f0e646d117b9f63b2396ead6",
+  "declared_package_license": "Apache 2.0",
+  "files": {
+    "ksql_airport/media/SanCarlosAirport_Buildings.DAE": {
+      "size": 30047687,
+      "git_blob_sha1": "e23331b94a0440a4f28c22bf8a45af1c27a120f6"
+    },
+    "ksql_airport/media/SanCarlosAirport_Terrain.DAE": {
+      "size": 4273072,
+      "git_blob_sha1": "8bf80c394dc6e86555066a3e6392d7fb23f03083"
+    },
+    "ksql_airport/media/textures/SanCarlosAirport_Sat.png": {
+      "size": 21898534,
+      "git_blob_sha1": "d3dc5711e51ecb65f5da9116796e70078ccc091a"
+    },
+    "ksql_airport/package.xml": {
+      "size": 2557,
+      "git_blob_sha1": "13625c05e629d475422aec3f6feccd99872864d1"
+    },
+    "ksql_airport/worlds/ksql.world": {
+      "size": 2107,
+      "git_blob_sha1": "c9874caad4751d732048e6ede85f8dcc1e2b6ef4"
+    }
+  },
+  "git_tree_sha1": "1ccdd6eb04536dfde38acc0f1232e8f5c145d88c",
+  "source_commit_date": "2019-11-18T15:34:03Z"
+}

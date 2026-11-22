@@ -1,0 +1,2594 @@
+<?xml version='1.0' encoding='utf-8'?>
+<sdf version="1.6">
+  <world name="industrial_yard">
+    <scene>
+      <ambient>0.6 0.6 0.6 1.0</ambient>
+      <background>0.8 0.85 0.9 1.0</background>
+      <shadows>false</shadows>
+    </scene>
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+    <physics type="ode">
+      <max_step_size>0.002</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+      <real_time_update_rate>500</real_time_update_rate>
+      <gravity>0 0 -9.80665</gravity>
+    </physics>
+    <model name="imported_west_0_shelves_high2">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <mesh>
+              <uri>model://shelves_high2/meshes/shelves_high2_collision.dae</uri>
+              <scale>1 1.2 1.2</scale>
+            </mesh>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>model://shelves_high2/meshes/shelves_high2.dae</uri>
+              <scale>1 1.2 1.2</scale>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <pose>-17.0 -2.6 0.0 0.0 0.0 0.0</pose>
+    </model>
+    <model name="imported_east_1_shelves_high2">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <mesh>
+              <uri>model://shelves_high2/meshes/shelves_high2_collision.dae</uri>
+              <scale>1 1.2 1.2</scale>
+            </mesh>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>model://shelves_high2/meshes/shelves_high2.dae</uri>
+              <scale>1 1.2 1.2</scale>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <pose>21.0 -2.6 0.0 0.0 0.0 0.0</pose>
+    </model>
+    <model name="imported_west_2_shelves_high2">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <mesh>
+              <uri>model://shelves_high2/meshes/shelves_high2_collision.dae</uri>
+              <scale>1 1.2 1.2</scale>
+            </mesh>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>model://shelves_high2/meshes/shelves_high2.dae</uri>
+              <scale>1 1.2 1.2</scale>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <pose>-22.13394 -2.6 0.0 0.0 0.0 0.0</pose>
+    </model>
+    <model name="imported_east_3_shelves_high2">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <mesh>
+              <uri>model://shelves_high2/meshes/shelves_high2_collision.dae</uri>
+              <scale>1 1.2 1.2</scale>
+            </mesh>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>model://shelves_high2/meshes/shelves_high2.dae</uri>
+              <scale>1 1.2 1.2</scale>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <pose>15.866060000000001 -2.6 0.0 0.0 0.0 0.0</pose>
+    </model>
+    <model name="imported_west_4_shelves_high2">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <mesh>
+              <uri>model://shelves_high2/meshes/shelves_high2_collision.dae</uri>
+              <scale>1 1.2 1.2</scale>
+            </mesh>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>model://shelves_high2/meshes/shelves_high2.dae</uri>
+              <scale>1 1.2 1.2</scale>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <pose>-17.0 -7.5 0.0 0.0 0.0 0.0</pose>
+    </model>
+    <model name="imported_east_5_shelves_high2">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <mesh>
+              <uri>model://shelves_high2/meshes/shelves_high2_collision.dae</uri>
+              <scale>1 1.2 1.2</scale>
+            </mesh>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>model://shelves_high2/meshes/shelves_high2.dae</uri>
+              <scale>1 1.2 1.2</scale>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <pose>21.0 -7.5 0.0 0.0 0.0 0.0</pose>
+    </model>
+    <model name="imported_west_6_shelves_high2">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <mesh>
+              <uri>model://shelves_high2/meshes/shelves_high2_collision.dae</uri>
+              <scale>1 1.2 1.2</scale>
+            </mesh>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>model://shelves_high2/meshes/shelves_high2.dae</uri>
+              <scale>1 1.2 1.2</scale>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <pose>-17.0 -13.8 0.0 0.0 0.0 0.0</pose>
+    </model>
+    <model name="imported_east_7_shelves_high2">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <mesh>
+              <uri>model://shelves_high2/meshes/shelves_high2_collision.dae</uri>
+              <scale>1 1.2 1.2</scale>
+            </mesh>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>model://shelves_high2/meshes/shelves_high2.dae</uri>
+              <scale>1 1.2 1.2</scale>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <pose>21.0 -13.8 0.0 0.0 0.0 0.0</pose>
+    </model>
+    <model name="imported_west_8_big_box3">
+      <static>true</static>
+      <link name="link">
+        <inertial>
+          <mass>40.0</mass>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1.20 0.80 1.25</size>
+            </box>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <max_vel>0.1</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>model://big_box3/meshes/big_box.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <pose>-16.51374 -2.609295 0.760253 0.0 0.000143 -1.57317</pose>
+    </model>
+    <model name="imported_east_9_big_box3">
+      <static>true</static>
+      <link name="link">
+        <inertial>
+          <mass>40.0</mass>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1.20 0.80 1.25</size>
+            </box>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <max_vel>0.1</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>model://big_box3/meshes/big_box.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <pose>21.48626 -2.609295 0.760253 0.0 0.000143 -1.57317</pose>
+    </model>
+    <model name="imported_west_10_europallet">
+      <static>true</static>
+      <link name="link">
+        <inertial>
+          <mass>25.0</mass>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+        </inertial>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>model://europallet/meshes/europallet.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name="pallet_envelope">
+          <pose>0 0 0.075 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>1.2 0.8 0.15</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+      <pose>-16.51912 -2.599056 0.0635 0.0 0.0 -1.56736</pose>
+    </model>
+    <model name="imported_east_11_europallet">
+      <static>true</static>
+      <link name="link">
+        <inertial>
+          <mass>25.0</mass>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+        </inertial>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>model://europallet/meshes/europallet.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name="pallet_envelope">
+          <pose>0 0 0.075 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>1.2 0.8 0.15</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+      <pose>21.48088 -2.599056 0.0635 0.0 0.0 -1.56736</pose>
+    </model>
+    <model name="imported_west_12_big_box3">
+      <static>true</static>
+      <link name="link">
+        <inertial>
+          <mass>40.0</mass>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1.20 0.80 1.25</size>
+            </box>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <max_vel>0.1</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>model://big_box3/meshes/big_box.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <pose>-20.37439 -2.559036 0.776474 0.0 0.0 -1.59804</pose>
+    </model>
+    <model name="imported_east_13_big_box3">
+      <static>true</static>
+      <link name="link">
+        <inertial>
+          <mass>40.0</mass>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1.20 0.80 1.25</size>
+            </box>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <max_vel>0.1</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>model://big_box3/meshes/big_box.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <pose>17.62561 -2.559036 0.776474 0.0 0.0 -1.59804</pose>
+    </model>
+    <model name="imported_west_14_big_box4">
+      <static>true</static>
+      <link name="link">
+        <inertial>
+          <mass>40.0</mass>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1.20 0.80 1.25</size>
+            </box>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <max_vel>0.1</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>model://big_box4/meshes/big_box.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <pose>-15.38703 -2.535409 0.774725 0.0 0.0 -1.59992</pose>
+    </model>
+    <model name="imported_east_15_big_box4">
+      <static>true</static>
+      <link name="link">
+        <inertial>
+          <mass>40.0</mass>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1.20 0.80 1.25</size>
+            </box>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <max_vel>0.1</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>model://big_box4/meshes/big_box.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <pose>22.61297 -2.535409 0.774725 0.0 0.0 -1.59992</pose>
+    </model>
+    <model name="imported_west_16_big_box3">
+      <static>true</static>
+      <link name="link">
+        <inertial>
+          <mass>40.0</mass>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1.20 0.80 1.25</size>
+            </box>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <max_vel>0.1</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>model://big_box3/meshes/big_box.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <pose>-21.45548 -2.650143 0.774725 0.0 0.0 -1.56894</pose>
+    </model>
+    <model name="imported_east_17_big_box3">
+      <static>true</static>
+      <link name="link">
+        <inertial>
+          <mass>40.0</mass>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1.20 0.80 1.25</size>
+            </box>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <max_vel>0.1</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>model://big_box3/meshes/big_box.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <pose>16.54452 -2.650143 0.774725 0.0 0.0 -1.56894</pose>
+    </model>
+    <model name="imported_west_18_big_box4">
+      <static>true</static>
+      <link name="link">
+        <inertial>
+          <mass>40.0</mass>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1.20 0.80 1.25</size>
+            </box>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <max_vel>0.1</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>model://big_box4/meshes/big_box.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <pose>-22.67439 -2.559036 0.776474 0.0 0.0 -1.59804</pose>
+    </model>
+    <model name="imported_east_19_big_box4">
+      <static>true</static>
+      <link name="link">
+        <inertial>
+          <mass>40.0</mass>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1.20 0.80 1.25</size>
+            </box>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <max_vel>0.1</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>model://big_box4/meshes/big_box.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <pose>15.325610000000001 -2.559036 0.776474 0.0 0.0 -1.59804</pose>
+    </model>
+    <model name="imported_west_20_europallet">
+      <static>true</static>
+      <link name="link">
+        <inertial>
+          <mass>25.0</mass>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+        </inertial>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>model://europallet/meshes/europallet.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name="pallet_envelope">
+          <pose>0 0 0.075 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>1.2 0.8 0.15</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+      <pose>-22.70127 -2.584254 0.0635 0.0 0.0 -1.5558</pose>
+    </model>
+    <model name="imported_east_21_europallet">
+      <static>true</static>
+      <link name="link">
+        <inertial>
+          <mass>25.0</mass>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+        </inertial>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>model://europallet/meshes/europallet.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name="pallet_envelope">
+          <pose>0 0 0.075 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>1.2 0.8 0.15</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+      <pose>15.298729999999999 -2.584254 0.0635 0.0 0.0 -1.5558</pose>
+    </model>
+    <model name="imported_west_22_big_box3">
+      <static>true</static>
+      <link name="link">
+        <inertial>
+          <mass>40.0</mass>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1.20 0.80 1.25</size>
+            </box>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <max_vel>0.1</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>model://big_box3/meshes/big_box.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <pose>-23.95548 -2.650143 0.774725 0.0 0.0 -1.56894</pose>
+    </model>
+    <model name="imported_east_23_big_box3">
+      <static>true</static>
+      <link name="link">
+        <inertial>
+          <mass>40.0</mass>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1.20 0.80 1.25</size>
+            </box>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <max_vel>0.1</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>model://big_box3/meshes/big_box.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <pose>14.04452 -2.650143 0.774725 0.0 0.0 -1.56894</pose>
+    </model>
+    <model name="imported_west_24_big_box3">
+      <static>true</static>
+      <link name="link">
+        <inertial>
+          <mass>40.0</mass>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1.20 0.80 1.25</size>
+            </box>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <max_vel>0.1</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>model://big_box3/meshes/big_box.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <pose>-21.25548 -2.650143 2.3397 0.0 0.0 -1.56894</pose>
+    </model>
+    <model name="imported_east_25_big_box3">
+      <static>true</static>
+      <link name="link">
+        <inertial>
+          <mass>40.0</mass>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1.20 0.80 1.25</size>
+            </box>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <max_vel>0.1</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>model://big_box3/meshes/big_box.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <pose>16.74452 -2.650143 2.3397 0.0 0.0 -1.56894</pose>
+    </model>
+    <model name="imported_west_26_europallet">
+      <static>true</static>
+      <link name="link">
+        <inertial>
+          <mass>25.0</mass>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+        </inertial>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>model://europallet/meshes/europallet.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name="pallet_envelope">
+          <pose>0 0 0.075 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>1.2 0.8 0.15</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+      <pose>-21.21303 -2.656261 1.6373 0.0 0.0 1.56536</pose>
+    </model>
+    <model name="imported_east_27_europallet">
+      <static>true</static>
+      <link name="link">
+        <inertial>
+          <mass>25.0</mass>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+        </inertial>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>model://europallet/meshes/europallet.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name="pallet_envelope">
+          <pose>0 0 0.075 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>1.2 0.8 0.15</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+      <pose>16.78697 -2.656261 1.6373 0.0 0.0 1.56536</pose>
+    </model>
+    <model name="imported_west_28_pallet_full">
+      <static>true</static>
+      <self_collide>true</self_collide>
+      <allow_auto_disable>true</allow_auto_disable>
+      <include>
+        <uri>model://europallet</uri>
+        <name>pallet</name>
+        <pose>0 0 0  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_1_lvl_1</name>
+        <pose>0.40 -0.24 0.172  0 0 0</pose>
+        <static>true</static>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_2_lvl_1</name>
+        <pose>0.40 0 0.172  0 0 0</pose>
+        <static>true</static>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_3_lvl_1</name>
+        <pose>0.40 0.24 0.172  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_4_lvl_1</name>
+        <pose>0 -0.24 0.172  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_5_lvl_1</name>
+        <pose>0 0 0.172  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_6_lvl_1</name>
+        <pose>0 0.24 0.172  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_7_lvl_1</name>
+        <pose>-0.40 -0.24 0.172  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_8_lvl_1</name>
+        <pose>-0.40 0 0.172  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_9_lvl_1</name>
+        <pose>-0.40 0.24 0.172  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_1_lvl_2</name>
+        <pose>0.40 -0.24 0.353  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_2_lvl_2</name>
+        <pose>0.40 0 0.353  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_3_lvl_2</name>
+        <pose>0.40 0.24 0.353  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_4_lvl_2</name>
+        <pose>0 -0.24 0.353  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_5_lvl_2</name>
+        <pose>0 0 0.353  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_6_lvl_2</name>
+        <pose>0 0.24 0.353  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_7_lvl_2</name>
+        <pose>-0.40 -0.24 0.353  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_8_lvl_2</name>
+        <pose>-0.40 0 0.353  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_9_lvl_2</name>
+        <pose>-0.40 0.24 0.353  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_1_lvl_3</name>
+        <pose>0.40 -0.24 0.534  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_2_lvl_3</name>
+        <pose>0.40 0 0.534  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_3_lvl_3</name>
+        <pose>0.40 0.24 0.534  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_4_lvl_3</name>
+        <pose>0 -0.24 0.534  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_5_lvl_3</name>
+        <pose>0 0 0.534  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_6_lvl_3</name>
+        <pose>0 0.24 0.534  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_7_lvl_3</name>
+        <pose>-0.40 -0.24 0.534  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_8_lvl_3</name>
+        <pose>-0.40 0 0.534  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_9_lvl_3</name>
+        <pose>-0.40 0.24 0.534  0 0 0</pose>
+        <static>true</static>
+      </include>
+      <pose>-17.665014 -2.662363 1.63184 0.0 0.0 -1.57575</pose>
+    </model>
+    <model name="imported_east_29_pallet_full">
+      <static>true</static>
+      <self_collide>true</self_collide>
+      <allow_auto_disable>true</allow_auto_disable>
+      <include>
+        <uri>model://europallet</uri>
+        <name>pallet</name>
+        <pose>0 0 0  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_1_lvl_1</name>
+        <pose>0.40 -0.24 0.172  0 0 0</pose>
+        <static>true</static>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_2_lvl_1</name>
+        <pose>0.40 0 0.172  0 0 0</pose>
+        <static>true</static>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_3_lvl_1</name>
+        <pose>0.40 0.24 0.172  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_4_lvl_1</name>
+        <pose>0 -0.24 0.172  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_5_lvl_1</name>
+        <pose>0 0 0.172  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_6_lvl_1</name>
+        <pose>0 0.24 0.172  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_7_lvl_1</name>
+        <pose>-0.40 -0.24 0.172  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_8_lvl_1</name>
+        <pose>-0.40 0 0.172  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_9_lvl_1</name>
+        <pose>-0.40 0.24 0.172  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_1_lvl_2</name>
+        <pose>0.40 -0.24 0.353  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_2_lvl_2</name>
+        <pose>0.40 0 0.353  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_3_lvl_2</name>
+        <pose>0.40 0.24 0.353  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_4_lvl_2</name>
+        <pose>0 -0.24 0.353  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_5_lvl_2</name>
+        <pose>0 0 0.353  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_6_lvl_2</name>
+        <pose>0 0.24 0.353  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_7_lvl_2</name>
+        <pose>-0.40 -0.24 0.353  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_8_lvl_2</name>
+        <pose>-0.40 0 0.353  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_9_lvl_2</name>
+        <pose>-0.40 0.24 0.353  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_1_lvl_3</name>
+        <pose>0.40 -0.24 0.534  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_2_lvl_3</name>
+        <pose>0.40 0 0.534  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_3_lvl_3</name>
+        <pose>0.40 0.24 0.534  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_4_lvl_3</name>
+        <pose>0 -0.24 0.534  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_5_lvl_3</name>
+        <pose>0 0 0.534  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_6_lvl_3</name>
+        <pose>0 0.24 0.534  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_7_lvl_3</name>
+        <pose>-0.40 -0.24 0.534  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_8_lvl_3</name>
+        <pose>-0.40 0 0.534  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_9_lvl_3</name>
+        <pose>-0.40 0.24 0.534  0 0 0</pose>
+        <static>true</static>
+      </include>
+      <pose>20.334986 -2.662363 1.63184 0.0 0.0 -1.57575</pose>
+    </model>
+    <model name="imported_west_30_pallet_full">
+      <static>true</static>
+      <self_collide>true</self_collide>
+      <allow_auto_disable>true</allow_auto_disable>
+      <include>
+        <uri>model://europallet</uri>
+        <name>pallet</name>
+        <pose>0 0 0  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_1_lvl_1</name>
+        <pose>0.40 -0.24 0.172  0 0 0</pose>
+        <static>true</static>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_2_lvl_1</name>
+        <pose>0.40 0 0.172  0 0 0</pose>
+        <static>true</static>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_3_lvl_1</name>
+        <pose>0.40 0.24 0.172  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_4_lvl_1</name>
+        <pose>0 -0.24 0.172  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_5_lvl_1</name>
+        <pose>0 0 0.172  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_6_lvl_1</name>
+        <pose>0 0.24 0.172  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_7_lvl_1</name>
+        <pose>-0.40 -0.24 0.172  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_8_lvl_1</name>
+        <pose>-0.40 0 0.172  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_9_lvl_1</name>
+        <pose>-0.40 0.24 0.172  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_1_lvl_2</name>
+        <pose>0.40 -0.24 0.353  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_2_lvl_2</name>
+        <pose>0.40 0 0.353  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_3_lvl_2</name>
+        <pose>0.40 0.24 0.353  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_4_lvl_2</name>
+        <pose>0 -0.24 0.353  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_5_lvl_2</name>
+        <pose>0 0 0.353  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_6_lvl_2</name>
+        <pose>0 0.24 0.353  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_7_lvl_2</name>
+        <pose>-0.40 -0.24 0.353  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_8_lvl_2</name>
+        <pose>-0.40 0 0.353  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_9_lvl_2</name>
+        <pose>-0.40 0.24 0.353  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_1_lvl_3</name>
+        <pose>0.40 -0.24 0.534  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_2_lvl_3</name>
+        <pose>0.40 0 0.534  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_3_lvl_3</name>
+        <pose>0.40 0.24 0.534  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_4_lvl_3</name>
+        <pose>0 -0.24 0.534  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_5_lvl_3</name>
+        <pose>0 0 0.534  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_6_lvl_3</name>
+        <pose>0 0.24 0.534  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_7_lvl_3</name>
+        <pose>-0.40 -0.24 0.534  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_8_lvl_3</name>
+        <pose>-0.40 0 0.534  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_9_lvl_3</name>
+        <pose>-0.40 0.24 0.534  0 0 0</pose>
+        <static>true</static>
+      </include>
+      <pose>-17.665014 -2.662363 2.31 0.0 0.0 -1.57575</pose>
+    </model>
+    <model name="imported_east_31_pallet_full">
+      <static>true</static>
+      <self_collide>true</self_collide>
+      <allow_auto_disable>true</allow_auto_disable>
+      <include>
+        <uri>model://europallet</uri>
+        <name>pallet</name>
+        <pose>0 0 0  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_1_lvl_1</name>
+        <pose>0.40 -0.24 0.172  0 0 0</pose>
+        <static>true</static>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_2_lvl_1</name>
+        <pose>0.40 0 0.172  0 0 0</pose>
+        <static>true</static>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_3_lvl_1</name>
+        <pose>0.40 0.24 0.172  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_4_lvl_1</name>
+        <pose>0 -0.24 0.172  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_5_lvl_1</name>
+        <pose>0 0 0.172  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_6_lvl_1</name>
+        <pose>0 0.24 0.172  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_7_lvl_1</name>
+        <pose>-0.40 -0.24 0.172  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_8_lvl_1</name>
+        <pose>-0.40 0 0.172  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_9_lvl_1</name>
+        <pose>-0.40 0.24 0.172  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_1_lvl_2</name>
+        <pose>0.40 -0.24 0.353  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_2_lvl_2</name>
+        <pose>0.40 0 0.353  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_3_lvl_2</name>
+        <pose>0.40 0.24 0.353  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_4_lvl_2</name>
+        <pose>0 -0.24 0.353  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_5_lvl_2</name>
+        <pose>0 0 0.353  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_6_lvl_2</name>
+        <pose>0 0.24 0.353  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_7_lvl_2</name>
+        <pose>-0.40 -0.24 0.353  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_8_lvl_2</name>
+        <pose>-0.40 0 0.353  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_9_lvl_2</name>
+        <pose>-0.40 0.24 0.353  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_1_lvl_3</name>
+        <pose>0.40 -0.24 0.534  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_2_lvl_3</name>
+        <pose>0.40 0 0.534  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_3_lvl_3</name>
+        <pose>0.40 0.24 0.534  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_4_lvl_3</name>
+        <pose>0 -0.24 0.534  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_5_lvl_3</name>
+        <pose>0 0 0.534  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_6_lvl_3</name>
+        <pose>0 0.24 0.534  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_7_lvl_3</name>
+        <pose>-0.40 -0.24 0.534  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_8_lvl_3</name>
+        <pose>-0.40 0 0.534  0 0 0</pose>
+      </include>
+      <include>
+        <uri>model://small_box</uri>
+        <name>small_box_9_lvl_3</name>
+        <pose>-0.40 0.24 0.534  0 0 0</pose>
+        <static>true</static>
+      </include>
+      <pose>20.334986 -2.662363 2.31 0.0 0.0 -1.57575</pose>
+    </model>
+    <model name="imported_west_32_big_box4">
+      <static>true</static>
+      <link name="link">
+        <inertial>
+          <mass>40.0</mass>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1.20 0.80 1.25</size>
+            </box>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <max_vel>0.1</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>model://big_box4/meshes/big_box.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <pose>-15.43082 -2.678842 2.35696 0.0 0.0 -1.56652</pose>
+    </model>
+    <model name="imported_east_33_big_box4">
+      <static>true</static>
+      <link name="link">
+        <inertial>
+          <mass>40.0</mass>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1.20 0.80 1.25</size>
+            </box>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <max_vel>0.1</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>model://big_box4/meshes/big_box.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <pose>22.56918 -2.678842 2.35696 0.0 0.0 -1.56652</pose>
+    </model>
+    <model name="imported_west_34_big_box3">
+      <static>true</static>
+      <link name="link">
+        <inertial>
+          <mass>40.0</mass>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1.20 0.80 1.25</size>
+            </box>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <max_vel>0.1</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>model://big_box3/meshes/big_box.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <pose>-22.67439 -2.559036 2.35696 0.0 0.0 -1.59804</pose>
+    </model>
+    <model name="imported_east_35_big_box3">
+      <static>true</static>
+      <link name="link">
+        <inertial>
+          <mass>40.0</mass>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1.20 0.80 1.25</size>
+            </box>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <max_vel>0.1</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>model://big_box3/meshes/big_box.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <pose>15.325610000000001 -2.559036 2.35696 0.0 0.0 -1.59804</pose>
+    </model>
+    <model name="imported_west_36_europallet">
+      <static>true</static>
+      <link name="link">
+        <inertial>
+          <mass>25.0</mass>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+        </inertial>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>model://europallet/meshes/europallet.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name="pallet_envelope">
+          <pose>0 0 0.075 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>1.2 0.8 0.15</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+      <pose>-23.91303 -2.656261 1.64676 0.0 0.0 1.56536</pose>
+    </model>
+    <model name="imported_east_37_europallet">
+      <static>true</static>
+      <link name="link">
+        <inertial>
+          <mass>25.0</mass>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+        </inertial>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>model://europallet/meshes/europallet.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name="pallet_envelope">
+          <pose>0 0 0.075 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>1.2 0.8 0.15</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+      <pose>14.08697 -2.656261 1.64676 0.0 0.0 1.56536</pose>
+    </model>
+    <model name="warehouse_block_0">
+      <static>true</static>
+      <pose>-16 -26 4.5 0 0 0.12</pose>
+      <link name="body">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>6 7 9</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>6 7 9</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.53 0.59 0.65 1</ambient>
+            <diffuse>0.53 0.59 0.65 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="warehouse_block_1">
+      <static>true</static>
+      <pose>-17 -10 6.0 0 0 -0.12</pose>
+      <link name="body">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>6 7 12</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>6 7 12</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.53 0.59 0.65 1</ambient>
+            <diffuse>0.53 0.59 0.65 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="warehouse_block_2">
+      <static>true</static>
+      <pose>-16 9 3.5 0 0 0.12</pose>
+      <link name="body">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>6 7 7</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>6 7 7</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.53 0.59 0.65 1</ambient>
+            <diffuse>0.53 0.59 0.65 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="warehouse_block_3">
+      <static>true</static>
+      <pose>13 -24 4.0 0 0 -0.12</pose>
+      <link name="body">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>6 7 8</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>6 7 8</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.53 0.59 0.65 1</ambient>
+            <diffuse>0.53 0.59 0.65 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="warehouse_block_4">
+      <static>true</static>
+      <pose>13 -5 5.0 0 0 0.12</pose>
+      <link name="body">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>6 7 10</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>6 7 10</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.53 0.59 0.65 1</ambient>
+            <diffuse>0.53 0.59 0.65 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="warehouse_block_5">
+      <static>true</static>
+      <pose>14 14 3.25 0 0 -0.12</pose>
+      <link name="body">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>6 7 6.5</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>6 7 6.5</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.53 0.59 0.65 1</ambient>
+            <diffuse>0.53 0.59 0.65 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="yard_silo_0_0">
+      <static>true</static>
+      <pose>-12 -24 5 0 0 0</pose>
+      <link name="body">
+        <collision name="collision">
+          <geometry>
+            <cylinder>
+              <radius>0.65</radius>
+              <length>10</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <cylinder>
+              <radius>0.65</radius>
+              <length>10</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.62 0.57 0.45 1</ambient>
+            <diffuse>0.62 0.57 0.45 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="yard_silo_0_1">
+      <static>true</static>
+      <pose>-12 -12 6 0 0 0</pose>
+      <link name="body">
+        <collision name="collision">
+          <geometry>
+            <cylinder>
+              <radius>0.65</radius>
+              <length>12</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <cylinder>
+              <radius>0.65</radius>
+              <length>12</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.62 0.57 0.45 1</ambient>
+            <diffuse>0.62 0.57 0.45 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="yard_silo_0_2">
+      <static>true</static>
+      <pose>-12 0 5 0 0 0</pose>
+      <link name="body">
+        <collision name="collision">
+          <geometry>
+            <cylinder>
+              <radius>0.65</radius>
+              <length>10</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <cylinder>
+              <radius>0.65</radius>
+              <length>10</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.62 0.57 0.45 1</ambient>
+            <diffuse>0.62 0.57 0.45 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="yard_silo_0_3">
+      <static>true</static>
+      <pose>-12 12 6 0 0 0</pose>
+      <link name="body">
+        <collision name="collision">
+          <geometry>
+            <cylinder>
+              <radius>0.65</radius>
+              <length>12</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <cylinder>
+              <radius>0.65</radius>
+              <length>12</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.62 0.57 0.45 1</ambient>
+            <diffuse>0.62 0.57 0.45 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="yard_silo_0_4">
+      <static>true</static>
+      <pose>-12 23 5 0 0 0</pose>
+      <link name="body">
+        <collision name="collision">
+          <geometry>
+            <cylinder>
+              <radius>0.65</radius>
+              <length>10</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <cylinder>
+              <radius>0.65</radius>
+              <length>10</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.62 0.57 0.45 1</ambient>
+            <diffuse>0.62 0.57 0.45 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="yard_silo_1_0">
+      <static>true</static>
+      <pose>6.5 -24 5 0 0 0</pose>
+      <link name="body">
+        <collision name="collision">
+          <geometry>
+            <cylinder>
+              <radius>0.65</radius>
+              <length>10</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <cylinder>
+              <radius>0.65</radius>
+              <length>10</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.62 0.57 0.45 1</ambient>
+            <diffuse>0.62 0.57 0.45 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="yard_silo_1_1">
+      <static>true</static>
+      <pose>6.5 -12 6 0 0 0</pose>
+      <link name="body">
+        <collision name="collision">
+          <geometry>
+            <cylinder>
+              <radius>0.65</radius>
+              <length>12</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <cylinder>
+              <radius>0.65</radius>
+              <length>12</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.62 0.57 0.45 1</ambient>
+            <diffuse>0.62 0.57 0.45 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="yard_silo_1_2">
+      <static>true</static>
+      <pose>6.5 0 5 0 0 0</pose>
+      <link name="body">
+        <collision name="collision">
+          <geometry>
+            <cylinder>
+              <radius>0.65</radius>
+              <length>10</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <cylinder>
+              <radius>0.65</radius>
+              <length>10</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.62 0.57 0.45 1</ambient>
+            <diffuse>0.62 0.57 0.45 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="yard_silo_1_3">
+      <static>true</static>
+      <pose>6.5 12 6 0 0 0</pose>
+      <link name="body">
+        <collision name="collision">
+          <geometry>
+            <cylinder>
+              <radius>0.65</radius>
+              <length>12</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <cylinder>
+              <radius>0.65</radius>
+              <length>12</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.62 0.57 0.45 1</ambient>
+            <diffuse>0.62 0.57 0.45 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="yard_silo_1_4">
+      <static>true</static>
+      <pose>6.5 23 5 0 0 0</pose>
+      <link name="body">
+        <collision name="collision">
+          <geometry>
+            <cylinder>
+              <radius>0.65</radius>
+              <length>10</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <cylinder>
+              <radius>0.65</radius>
+              <length>10</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.62 0.57 0.45 1</ambient>
+            <diffuse>0.62 0.57 0.45 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="overhead_beam_0">
+      <static>true</static>
+      <pose>-3 -8 12 0 0 0</pose>
+      <link name="body">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>30 1.0 0.5</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>30 1.0 0.5</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.65 0.36 0.2 1</ambient>
+            <diffuse>0.65 0.36 0.2 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="overhead_beam_1">
+      <static>true</static>
+      <pose>-3 12 12 0 0 0</pose>
+      <link name="body">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>30 1.0 0.5</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>30 1.0 0.5</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.65 0.36 0.2 1</ambient>
+            <diffuse>0.65 0.36 0.2 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="yard_step_0_0">
+      <static>true</static>
+      <pose>10.0 5.0 0.5 0 0 0.3</pose>
+      <link name="body">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>2 1.0 1.0</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>2 1.0 1.0</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.63 0.48 0.3 1</ambient>
+            <diffuse>0.63 0.48 0.3 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="yard_step_0_1">
+      <static>true</static>
+      <pose>10.4 5.8 0.95 0 0 0.3</pose>
+      <link name="body">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>2 1.0 1.9</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>2 1.0 1.9</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.63 0.48 0.3 1</ambient>
+            <diffuse>0.63 0.48 0.3 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="yard_step_0_2">
+      <static>true</static>
+      <pose>10.8 6.6 1.4 0 0 0.3</pose>
+      <link name="body">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>2 1.0 2.8</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>2 1.0 2.8</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.63 0.48 0.3 1</ambient>
+            <diffuse>0.63 0.48 0.3 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="yard_step_0_3">
+      <static>true</static>
+      <pose>11.2 7.4 1.85 0 0 0.3</pose>
+      <link name="body">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>2 1.0 3.7</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>2 1.0 3.7</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.63 0.48 0.3 1</ambient>
+            <diffuse>0.63 0.48 0.3 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="yard_step_0_4">
+      <static>true</static>
+      <pose>11.6 8.2 2.3 0 0 0.3</pose>
+      <link name="body">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>2 1.0 4.6</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>2 1.0 4.6</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.63 0.48 0.3 1</ambient>
+            <diffuse>0.63 0.48 0.3 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="yard_step_1_0">
+      <static>true</static>
+      <pose>-15.0 -19.0 0.5 0 0 -0.3</pose>
+      <link name="body">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>2 1.0 1.0</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>2 1.0 1.0</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.63 0.48 0.3 1</ambient>
+            <diffuse>0.63 0.48 0.3 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="yard_step_1_1">
+      <static>true</static>
+      <pose>-14.6 -18.2 0.95 0 0 -0.3</pose>
+      <link name="body">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>2 1.0 1.9</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>2 1.0 1.9</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.63 0.48 0.3 1</ambient>
+            <diffuse>0.63 0.48 0.3 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="yard_step_1_2">
+      <static>true</static>
+      <pose>-14.2 -17.4 1.4 0 0 -0.3</pose>
+      <link name="body">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>2 1.0 2.8</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>2 1.0 2.8</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.63 0.48 0.3 1</ambient>
+            <diffuse>0.63 0.48 0.3 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="yard_step_1_3">
+      <static>true</static>
+      <pose>-13.8 -16.6 1.85 0 0 -0.3</pose>
+      <link name="body">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>2 1.0 3.7</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>2 1.0 3.7</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.63 0.48 0.3 1</ambient>
+            <diffuse>0.63 0.48 0.3 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="yard_step_1_4">
+      <static>true</static>
+      <pose>-13.4 -15.8 2.3 0 0 -0.3</pose>
+      <link name="body">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>2 1.0 4.6</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>2 1.0 4.6</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.63 0.48 0.3 1</ambient>
+            <diffuse>0.63 0.48 0.3 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="yard_step_2_0">
+      <static>true</static>
+      <pose>12.0 -17.0 0.5 0 0 0.1</pose>
+      <link name="body">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>2 1.0 1.0</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>2 1.0 1.0</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.63 0.48 0.3 1</ambient>
+            <diffuse>0.63 0.48 0.3 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="yard_step_2_1">
+      <static>true</static>
+      <pose>12.4 -16.2 0.95 0 0 0.1</pose>
+      <link name="body">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>2 1.0 1.9</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>2 1.0 1.9</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.63 0.48 0.3 1</ambient>
+            <diffuse>0.63 0.48 0.3 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="yard_step_2_2">
+      <static>true</static>
+      <pose>12.8 -15.4 1.4 0 0 0.1</pose>
+      <link name="body">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>2 1.0 2.8</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>2 1.0 2.8</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.63 0.48 0.3 1</ambient>
+            <diffuse>0.63 0.48 0.3 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="yard_step_2_3">
+      <static>true</static>
+      <pose>13.2 -14.6 1.85 0 0 0.1</pose>
+      <link name="body">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>2 1.0 3.7</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>2 1.0 3.7</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.63 0.48 0.3 1</ambient>
+            <diffuse>0.63 0.48 0.3 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="yard_step_2_4">
+      <static>true</static>
+      <pose>13.6 -13.8 2.3 0 0 0.1</pose>
+      <link name="body">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>2 1.0 4.6</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>2 1.0 4.6</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.63 0.48 0.3 1</ambient>
+            <diffuse>0.63 0.48 0.3 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="msim_scene_camera">
+      <static>true</static>
+      <pose>40 -52 45 0 0.55 2.28</pose>
+      <link name="camera_link">
+        <sensor name="overview" type="camera">
+          <always_on>true</always_on>
+          <update_rate>0.2</update_rate>
+          <camera>
+            <horizontal_fov>1.15</horizontal_fov>
+            <image>
+              <width>1280</width>
+              <height>800</height>
+              <format>R8G8B8</format>
+            </image>
+            <clip>
+              <near>0.1</near>
+              <far>250</far>
+            </clip>
+          </camera>
+          <plugin name="scene_camera_ros" filename="libgazebo_ros_camera.so">
+            <robotNamespace>/msim</robotNamespace>
+            <cameraName>scene_overview</cameraName>
+            <imageTopicName>image_raw</imageTopicName>
+            <cameraInfoTopicName>camera_info</cameraInfoTopicName>
+            <frameName>scene_camera</frameName>
+            <updateRate>0.2</updateRate>
+          </plugin>
+        </sensor>
+      </link>
+    </model>
+  </world>
+</sdf>

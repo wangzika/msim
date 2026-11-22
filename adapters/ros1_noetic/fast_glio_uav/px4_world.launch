@@ -2,16 +2,28 @@
   <arg name="gui" default="false"/>
   <arg name="world"/>
   <arg name="sdf"/>
+  <arg name="sensor_profile" default="$(find msim_sensors)/config/sensor_profile.json"/>
+  <arg name="annotate_lidar" default="false"/>
+  <arg name="fusion_delay_s" default="0.65"/>
+  <arg name="spawn_x" default="0"/>
+  <arg name="spawn_y" default="-20"/>
+  <arg name="spawn_z" default="0"/>
   <include file="$(env PX4_ROOT)/launch/posix_sitl.launch">
     <arg name="vehicle" value="iris"/>
     <arg name="world" value="$(arg world)"/>
     <arg name="sdf" value="$(arg sdf)"/>
     <arg name="gui" value="$(arg gui)"/>
     <arg name="interactive" value="false"/>
-    <arg name="x" value="0"/>
-    <arg name="y" value="-20"/>
-    <arg name="z" value="0"/>
+    <arg name="x" value="$(arg spawn_x)"/>
+    <arg name="y" value="$(arg spawn_y)"/>
+    <arg name="z" value="$(arg spawn_z)"/>
   </include>
-  <node pkg="uav_simulator" type="point_cloud_converter"
-        name="point_cloud_converter" output="screen"/>
+  <node pkg="msim_sensors" type="imu_model_node.py"
+        name="msim_imu_model" output="screen" required="true">
+    <param name="profile_path" value="$(arg sensor_profile)"/>
+  </node>
+  <node if="$(arg annotate_lidar)" pkg="msim_sensors" type="lidar_format_node.py"
+        name="msim_lidar_format" output="screen" required="true">
+    <param name="processing_delay_s" value="$(arg fusion_delay_s)"/>
+  </node>
 </launch>

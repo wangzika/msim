@@ -23,8 +23,11 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--bag', type=Path, required=True)
     ap.add_argument('--output', type=Path, required=True)
+    ap.add_argument('--odom-topic', default='/Odometry')
+    ap.add_argument('--start-time-s', type=float)
+    ap.add_argument('--end-time-s', type=float)
     args = ap.parse_args()
-    samples = {'/Odometry': [], '/ground_truth/state': [],
+    samples = {args.odom_topic: [], '/ground_truth/state': [],
                '/gnss_loose/diagnostics': []}
     with rosbag.Bag(str(args.bag)) as bag:
         for topic, msg, _ in bag.read_messages(topics=list(samples)):
@@ -32,12 +35,16 @@ def main():
                 samples[topic].append(msg.data)
             else:
                 samples[topic].append((stamp_ns(msg), position(msg)))
-    odom, truth = samples['/Odometry'], samples['/ground_truth/state']
+    odom, truth = samples[args.odom_topic], samples['/ground_truth/state']
     if not odom or not truth:
         ap.error('algorithm output or truth missing from replay bag')
     truth_stamps = [x[0] for x in truth]
     pairs = []
     for t, p in odom:
+        if args.start_time_s is not None and t < args.start_time_s * 1e9:
+            continue
+        if args.end_time_s is not None and t > args.end_time_s * 1e9:
+            continue
         index = bisect_left(truth_stamps, t)
         near = min((truth[j] for j in (index - 1, index) if 0 <= j < len(truth)),
                    key=lambda sample: abs(sample[0] - t), default=None)
@@ -56,14 +63,23 @@ def main():
     horizontal = [math.hypot(x, y) for x, y, _ in errors]
     spatial = [math.sqrt(x*x + y*y + z*z) for x, y, z in errors]
     report = dict(method='first matched pose translation; no rotation or scale fit',
+                  odom_topic=args.odom_topic,
                   odometry_messages=len(odom), truth_messages=len(truth),
                   matched_pairs=len(pairs),
                   max_match_time_delta_ms=max(p[3] for p in pairs)/1e6,
+                  east_rmse_m=rms([e[0] for e in errors]),
+                  north_rmse_m=rms([e[1] for e in errors]),
+                  up_rmse_m=rms([e[2] for e in errors]),
                   horizontal_rmse_m=rms(horizontal),
                   vertical_rmse_m=rms([e[2] for e in errors]),
                   three_d_rmse_m=rms(spatial),
                   final_horizontal_error_m=horizontal[-1],
-                  final_three_d_error_m=spatial[-1])
+                  final_three_d_error_m=spatial[-1],
+                  final_enu_error_m=errors[-1],
+                  first_matched_stamp_ns=pairs[0][0],
+                  last_matched_stamp_ns=pairs[-1][0])
+    if args.start_time_s is not None or args.end_time_s is not None:
+        report['requested_window_s'] = [args.start_time_s, args.end_time_s]
     diagnostics = samples['/gnss_loose/diagnostics']
     if diagnostics:
         from collections import Counter

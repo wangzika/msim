@@ -20,11 +20,12 @@ from nav_msgs.msg import Odometry
 from rosgraph_msgs.msg import Clock
 from rtklib.msg import GNSS_Info, GNSS_Info_ZD
 from std_msgs.msg import String
+from scene_profile import from_environment, load_scene_profile
 
 HERE = Path(__file__).resolve().parent
 TOPICS = ['/clock', '/ground_truth/state', '/imu/data', '/velodyne_points']
 LEVER = [0.005, -0.05, 0.15]
-ORIGIN = [30.5312, 114.3601, 50.0]
+ORIGIN = from_environment()['origin_lla_deg_m']
 C = 299792458.0
 
 
@@ -51,13 +52,67 @@ def stop(process):
 def capture(args):
     run = args.run
     run.mkdir(parents=True, exist_ok=False)
+    scene = from_environment()
+    (run/'scene-profile.json').write_text(json.dumps(scene, indent=2)+'\n')
+    if scene.get('asset_manifest'):
+        (run/'scene-assets.json').write_bytes(Path(scene['asset_manifest']).read_bytes())
+    sensor_profile = os.environ.get('MSIM_SENSOR_PROFILE')
+    if sensor_profile:
+        (run / 'sensor_profile.json').write_bytes(Path(sensor_profile).read_bytes())
+        profile=json.loads(Path(sensor_profile).read_text())
+        pattern=profile['lidar'].get('pattern_file')
+        if pattern:
+            (run/'lidar-pattern.csv').write_bytes(Path(pattern).read_bytes())
+            provenance=Path(pattern).with_name('source.json')
+            if provenance.is_file():
+                (run/'lidar-pattern-source.json').write_bytes(provenance.read_bytes())
+            for source_name, archive_name in (('LICENSE','lidar-pattern-LICENSE'),('pattern-summary.json','lidar-pattern-summary.json')):
+                extra=Path(pattern).with_name(source_name)
+                if extra.is_file():
+                    (run/archive_name).write_bytes(extra.read_bytes())
+    plugin_dir = HERE.parents[2] / 'build/gazebo-sensors'
+    plugin_hashes = {}
+    for name in ('libmsim_gps_relay.so', 'libmsim_scanning_lidar.so'):
+        library = plugin_dir / name
+        if library.is_file():
+            plugin_hashes[name] = hashlib.sha256(library.read_bytes()).hexdigest()
+    if plugin_hashes:
+        (run / 'sensor-plugins.json').write_text(json.dumps(plugin_hashes, indent=2)+'\n')
+    for variable, filename in (('MSIM_WORLD_SOURCE','world.sdf'),
+                               ('MSIM_MODEL_SOURCE','vehicle.sdf')):
+        if os.environ.get(variable):
+            (run / filename).write_bytes(Path(os.environ[variable]).read_bytes())
+    if args.fastglio_config:
+        (run/'algorithm.yaml').write_bytes(args.fastglio_config.read_bytes())
+    if args.fastglio_launch:
+        (run/'algorithm.launch').write_bytes(args.fastglio_launch.read_bytes())
+    (run/'capture-settings.json').write_text(json.dumps(dict(
+        duration_s=args.duration_s,route_clock=os.environ.get('MSIM_ROUTE_CLOCK','wall'),
+        flight_pattern=os.environ.get('MSIM_PX4_FLIGHT_PATTERN'),
+        frontend=os.environ.get('MSIM_FASTGLIO_FRONTEND','marsim'),
+        gnss_source=os.environ.get('MSIM_GNSS_SOURCE','legacy'),
+        point_filter_num=args.fastglio_point_filter_num,
+        fusion_processing_delay_s=float(os.environ.get('MSIM_FUSION_DELAY_S', '0')),
+        world_source=os.environ.get('MSIM_WORLD_SOURCE'),
+        origin_lla_deg_m=scene['origin_lla_deg_m'],
+        spawn_enu_m=scene['spawn_enu_m'], flight_height_m=scene['flight_height_m'],
+        spoof_start_s=os.environ.get('MSIM_SPOOF_START_S','inf'),
+        spoof_east_rate_mps=os.environ.get('MSIM_SPOOF_EAST_RATE_MPS','0')),
+        indent=2)+'\n')
+    if os.environ.get('MSIM_PX4_FLIGHT_PATTERN') == 'route':
+        route_copy = run / 'route_plan.json'
+        route_copy.write_bytes(Path(os.environ.get('MSIM_ROUTE_PLAN',str(HERE / 'route_plan.json'))).read_bytes())
+        os.environ['MSIM_ROUTE_PLAN'] = str(route_copy)
     Path(os.environ.get('ROS_LOG_DIR', str(run / 'roslogs'))).mkdir(parents=True, exist_ok=True)
-    launch = record = controller = injector = None
+    launch = record = controller = injector = visualizer = fastglio = None
     state = dict(clock=None, counts=Counter(), truth=None)
     launch_log = (run / 'launch.log').open('w')
     record_log = (run / 'record.log').open('w')
     controller_log = (run / 'controller.log').open('w')
     injector_log = (run / 'injector.log').open('w')
+    visualizer_log = (run / 'gazebo-viz.log').open('w')
+    fastglio_log = (run / 'fastglio-live.log').open('w')
+    tile_log = (run / 'window-layout.log').open('w')
     try:
         launch_file = args.launch_file or HERE / 'uav_world.launch'
         launch_args = (args.launch_arg if args.launch_file else
@@ -78,6 +133,18 @@ def capture(args):
         else:
             raise RuntimeError('ROS master did not start')
         rospy.init_node('msim_fastglio_capture', anonymous=True, disable_signals=True)
+
+        def save_overview(message):
+            path=run/'gazebo-scene-overview.png'
+            if path.exists():return
+            from PIL import Image
+            mode={'rgb8':'RGB','bgr8':'BGR'}.get(message.encoding)
+            if mode:
+                Image.frombytes('RGB',(message.width,message.height),bytes(message.data),
+                                'raw',mode,message.step).save(path)
+        from sensor_msgs.msg import Image as RosImage
+        overview_sub=rospy.Subscriber('/msim/scene_overview/image_raw',RosImage,
+                                     save_overview,queue_size=1,buff_size=8*1024*1024)
 
         def on_clock(msg):
             state['clock'] = ns(msg.clock)
@@ -116,10 +183,64 @@ def capture(args):
                 time.sleep(0.2)
             else:
                 raise RuntimeError('online GNSS injector not publishing; see injector.log')
+        if args.gazebo_viz_script:
+            ready = run / 'gazebo-viz-ready.json'
+            env = dict(os.environ, MSIM_GAZEBO_VIZ_READY=str(ready))
+            visualizer = subprocess.Popen([sys.executable, str(args.gazebo_viz_script)],
+                stdout=visualizer_log, stderr=subprocess.STDOUT,
+                env=env, start_new_session=True)
+            viz_deadline = time.monotonic() + 45
+            while time.monotonic() < viz_deadline:
+                if visualizer.poll() is not None:
+                    raise RuntimeError('Gazebo visualizer exited; see gazebo-viz.log')
+                if ready.is_file():
+                    break
+                time.sleep(0.2)
+            else:
+                raise RuntimeError('Gazebo visualizer did not start; see gazebo-viz.log')
+        if args.fastglio_launch:
+            fastglio = subprocess.Popen([
+                'roslaunch', str(args.fastglio_launch),
+                'config_file:=' + str(args.fastglio_config),
+                'rviz_config:=' + str(args.fastglio_rviz_config),
+                'rviz:=' + ('true' if args.gui else 'false'),
+                'point_filter_num:=' + str(args.fastglio_point_filter_num)],
+                stdout=fastglio_log, stderr=subprocess.STDOUT,
+                start_new_session=True)
+            fastglio_deadline = time.monotonic() + 45
+            while time.monotonic() < fastglio_deadline:
+                if fastglio.poll() is not None:
+                    raise RuntimeError('FAST_GLIO exited; see fastglio-live.log')
+                try:
+                    subscribers = master.getSystemState()[1]
+                    if any('/laserMapping' in nodes for _, nodes in subscribers):
+                        break
+                except (IndexError, KeyError, TypeError, rosgraph.MasterError):
+                    pass
+                time.sleep(0.2)
+            else:
+                raise RuntimeError('FAST_GLIO did not subscribe to sensors; see fastglio-live.log')
+            subprocess.run(['rosparam','dump',str(run/'parameters.yaml')],check=True)
+        if args.tile_windows_script:
+            tiled = subprocess.run([sys.executable, str(args.tile_windows_script)],
+                                   stdout=tile_log, stderr=subprocess.STDOUT,
+                                   timeout=45, check=False)
+            if tiled.returncode:
+                raise RuntimeError('Gazebo/RViz window layout failed; see window-layout.log')
         if args.controller_script:
             controller = subprocess.Popen([sys.executable, str(args.controller_script)],
                 stdout=controller_log, stderr=subprocess.STDOUT, start_new_session=True)
-        record = subprocess.Popen(['rosbag', 'record', '-O', str(run / 'sensors.bag'), *TOPICS],
+        record_topics = [*TOPICS]
+        if args.injector_script:
+            record_topics.extend(['/gnss/spoof_detection', '/msim/spoofed_gnss_odom',
+                                  '/msim/normal_gnss_odom', '/msim/gps_samples', '/msim/gps_attack'])
+        record_topics.append('/msim/lidar_scan_info')
+        record_topics.extend(['/livox/lidar','/msim/livox_lidar_for_fusion'])
+        if args.fastglio_launch:
+            record_topics.extend(['/Odometry', '/path', '/loose_odom', '/loose_path',
+                                  '/rtk_path', '/gnss_loose/diagnostics'])
+            record_topics.append('/msim/velodyne_points_annotated')
+        record = subprocess.Popen(['rosbag', 'record', '-O', str(run / 'sensors.bag'), *record_topics],
             stdout=record_log, stderr=subprocess.STDOUT, start_new_session=True)
         start = state['clock']
         deadline = time.monotonic() + max(120, args.duration_s * 8)
@@ -131,6 +252,10 @@ def capture(args):
                 raise RuntimeError('flight controller exited; see controller.log')
             if injector is not None and injector.poll() is not None:
                 raise RuntimeError('online GNSS injector exited; see injector.log')
+            if visualizer is not None and visualizer.poll() is not None:
+                raise RuntimeError('Gazebo visualizer exited; see gazebo-viz.log')
+            if fastglio is not None and fastglio.poll() is not None:
+                raise RuntimeError('FAST_GLIO exited; see fastglio-live.log')
             if time.monotonic() > deadline:
                 raise RuntimeError('simulation clock stalled')
             elapsed = ((state['clock'] or start) - start) / 1e9
@@ -143,15 +268,44 @@ def capture(args):
     finally:
         stop(record)
         stop(controller)
+        stop(fastglio)
+        stop(visualizer)
         stop(injector)
         stop(launch)
         launch_log.close()
         record_log.close()
         controller_log.close()
         injector_log.close()
+        visualizer_log.close()
+        fastglio_log.close()
+        tile_log.close()
     bag = run / 'sensors.bag'
     if not bag.is_file() or bag.stat().st_size == 0:
         raise RuntimeError('sensors.bag missing or empty')
+    if args.fastglio_launch:
+        required = ('/msim/spoofed_gnss_odom', '/Odometry', '/path',
+                    '/loose_odom', '/loose_path', '/rtk_path',
+                    '/gnss_loose/diagnostics')
+        with rosbag.Bag(str(bag)) as recorded:
+            info = recorded.get_type_and_topic_info().topics
+            counts = {topic: info[topic].message_count if topic in info else 0
+                      for topic in required}
+            diagnostics = [msg.data for _, msg, _ in recorded.read_messages(
+                topics=['/gnss_loose/diagnostics'])]
+        accepted = sum(len(row) > 2 and int(row[1]) == 4 and row[2] == 1.0
+                       for row in diagnostics)
+        report = dict(topic_counts=counts,
+                      gnss_alignment_reached=any(len(row) > 2 and row[2] == 1.0
+                                                 for row in diagnostics),
+                      gnss_updates_accepted=accepted)
+        report['pass_live_loose_gate'] = (all(counts.values()) and
+                                          counts['/loose_odom'] >= 10 and
+                                          accepted >= 5)
+        (run / 'fastglio-live-report.json').write_text(
+            json.dumps(report, indent=2) + '\n')
+        print(json.dumps(report, indent=2), flush=True)
+        if not report['pass_live_loose_gate']:
+            raise RuntimeError('FAST_GLIO loose coupling did not produce accepted updates')
     print(str(bag), flush=True)
 
 
@@ -600,6 +754,7 @@ def verify(args):
 
 
 def main():
+    global ORIGIN
     parser = argparse.ArgumentParser()
     sub = parser.add_subparsers(dest='command', required=True)
     for name in ('capture', 'trajectory', 'merge', 'verify'):
@@ -616,6 +771,14 @@ def main():
                              help='flight script started after all sensor topics are ready')
             cmd.add_argument('--injector-script', type=Path,
                              help='online GNSS source started before the flight controller')
+            cmd.add_argument('--gazebo-viz-script', type=Path,
+                             help='Gazebo overlay for live GNSS spoofing experiment')
+            cmd.add_argument('--fastglio-launch', type=Path,
+                             help='Start live FAST_GLIO alongside Gazebo')
+            cmd.add_argument('--fastglio-config', type=Path)
+            cmd.add_argument('--fastglio-point-filter-num', type=int, default=2)
+            cmd.add_argument('--fastglio-rviz-config', type=Path)
+            cmd.add_argument('--tile-windows-script', type=Path)
             cmd.add_argument('--flight-mode', default='patrol_s', choices=[
                 'patrol_s', 'patrol_8', 'patrol_boustrophedon',
                 'patrol_sprint', 'patrol_spiral'])
@@ -633,6 +796,9 @@ def main():
             cmd.add_argument('--bag', type=Path)
             cmd.add_argument('--report', type=Path)
     args = parser.parse_args()
+    archived_profile = args.run/'scene-profile.json'
+    if archived_profile.is_file():
+        ORIGIN = load_scene_profile(archived_profile)['origin_lla_deg_m']
     if args.duration_s < 2:
         parser.error('duration must be at least 2 seconds')
     globals()[args.command](args)

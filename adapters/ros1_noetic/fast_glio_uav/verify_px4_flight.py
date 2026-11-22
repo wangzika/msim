@@ -7,13 +7,17 @@ import math
 from pathlib import Path
 
 from pyulog import ULog
+from sensor_sync import summarize_lidar_alignment
 
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--run', type=Path, required=True)
     ap.add_argument('--online-gnss', action='store_true')
+    ap.add_argument('--require-lidar-sync', action='store_true')
     args = ap.parse_args()
+    if args.require_lidar_sync and not args.online_gnss:
+        ap.error('--require-lidar-sync requires --online-gnss')
     trajectory = json.loads((args.run / 'trajectory.json').read_text())['samples']
     first = trajectory[0]['position_ecef_m']
     max_displacement = max(math.dist(first, s['position_ecef_m']) for s in trajectory)
@@ -35,24 +39,36 @@ def main():
     gps_count = len(gps['timestamp'])
     max_satellites = int(max(gps['satellites_used'])) if gps_count else 0
     injection_match_fraction = None
+    lidar_alignment = None
+    lidar_sync_pass = None
     if args.online_gnss:
         injected = [json.loads(line) for line in
                     (args.run / 'injected-gps.jsonl').read_text().splitlines()]
-        if not injected or any(row['source'] != 'gazebo_truth' for row in injected):
+        if not injected or any(row['source'] not in ('gazebo_truth', 'gazebo_gps_plugin') for row in injected):
             ap.error('online GNSS injection log missing or source unknown')
-        injected_coordinates = {(round(row['lat_deg'] * 1e7),
-                                 round(row['lon_deg'] * 1e7)) for row in injected}
+        # PX4's native Gazebo MAVLink bridge truncates degree*1e7 to int32;
+        # the legacy Python HIL sender rounds. Match each actual wire format.
+        injected_coordinates = {((int if row['source'] == 'gazebo_gps_plugin' else round)(row['lat_deg'] * 1e7),
+                                 (int if row['source'] == 'gazebo_gps_plugin' else round)(row['lon_deg'] * 1e7)) for row in injected}
         matched = sum((round(lat * 1e7), round(lon * 1e7)) in injected_coordinates
                       for lat, lon in zip(gps['latitude_deg'], gps['longitude_deg']))
         injection_match_fraction = matched / gps_count if gps_count else 0.0
+        if all('lidar_sync_status' in row for row in injected):
+            lidar_alignment = summarize_lidar_alignment(injected)
+            lidar_sync_pass = lidar_alignment['lidar_sync_fraction'] >= 0.9
+        elif args.require_lidar_sync:
+            lidar_sync_pass = False
     ok = (armed and offboard and max_displacement >= 5 and max_climb >= 3
           and gps_count >= 5 and max_satellites >= 4 and
-          (not args.online_gnss or injection_match_fraction >= 0.8))
+          (not args.online_gnss or injection_match_fraction >= 0.8) and
+          (not args.require_lidar_sync or lidar_sync_pass))
     report = dict(pass_flight_gate=bool(ok), armed=bool(armed), offboard=bool(offboard),
                   max_displacement_m=max_displacement, max_climb_m=max_climb,
                   px4_gps_samples=gps_count, max_px4_gps_satellites=max_satellites,
                   online_gnss=args.online_gnss,
                   injection_match_fraction=injection_match_fraction,
+                  lidar_alignment=lidar_alignment,
+                  pass_lidar_sync_gate=lidar_sync_pass,
                   px4_ulog=str(logs[0]))
     (args.run / 'px4-flight-report.json').write_text(json.dumps(report, indent=2) + '\n')
     print(json.dumps(report, indent=2))
