@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b1724">
+  <title>msim 网页仿真控制台</title>
+  <link rel="stylesheet" href="/style.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <div><div class="eyebrow">MSIM / WEB CONSOLE</div><h1>仿真控制台</h1></div>
+    <div class="connection"><span id="connectionDot" class="dot"></span><span id="connection">等待数据</span></div>
+  </header>
+  <main>
+    <div class="meta"><span id="runName">等待实验</span><span id="sceneName">场景未就绪</span><span id="simTime">仿真时间 —</span></div>
+    <div class="layout">
+      <section class="panel scene-panel">
+        <div class="panel-head"><div><div class="eyebrow">SCENE VIEW</div><h2>场景与飞行轨迹</h2></div><button id="resetView" type="button">重置视角</button></div>
+        <canvas id="scene" aria-label="可旋转缩放的场景与飞机三维轨迹"></canvas>
+        <div class="legend"><span><i class="swatch truth"></i>真值</span><span><i class="swatch gps"></i>GPS</span><span><i class="swatch route"></i>航线</span><span><i class="swatch obstacle"></i>碰撞几何</span></div>
+        <p class="help">拖动旋转 · 滚轮缩放 · 双击重置。场景按 SDF 碰撞体简化绘制；仿真计算仍在后台运行。</p>
+      </section>
+      <aside class="side">
+        <section class="panel stats">
+          <div class="eyebrow">TELEMETRY</div><h2>实时状态</h2>
+          <div class="stat-grid">
+            <div><span>飞行模式</span><strong id="flightMode">—</strong></div>
+            <div><span>GPS 检测</span><strong id="gpsStatus">—</strong></div>
+            <div><span>东 / 北 / 高</span><strong id="position">—</strong></div>
+            <div><span>天空遮挡</span><strong id="occlusion">—</strong></div>
+            <div><span>噪声倍率</span><strong id="noiseScale">—</strong></div>
+            <div><span>点云数量</span><strong id="cloudCount">—</strong></div>
+          </div>
+        </section>
+        <section class="panel controls" id="controls" hidden>
+          <div class="eyebrow">FLIGHT CONTROL</div><h2>手动飞行</h2>
+          <div class="control-fields"><label>起飞高度 <input id="height" type="number" min="0.5" max="30" step="0.5" value="5"> m</label><label>水平速度 <input id="speed" type="number" min="0.2" max="8" step="0.2" value="2"> m/s</label></div>
+          <div class="button-row"><button data-op="takeoff">起飞</button><button data-op="hold">悬停</button><button data-op="land">降落</button></div>
+          <div class="key-grid" aria-label="方向控制">
+            <button data-key="q">左转 Q</button><button data-key="w">前进 W</button><button data-key="e">右转 E</button>
+            <button data-key="a">左移 A</button><button data-key="s">后退 S</button><button data-key="d">右移 D</button>
+            <button data-key="r">上升 R</button><button data-key="f">下降 F</button>
+          </div>
+          <button id="finish" class="finish">降落并保存</button>
+          <p class="help">按住方向键移动，松开或切出页面自动悬停。控制指令仍由 PX4 OFFBOARD 执行。</p>
+          <p id="commandStatus" class="command-status" role="status"></p>
+        </section>
+      </aside>
+    </div>
+    <section class="panel map-panel">
+      <div class="panel-head"><div><div class="eyebrow">LIO VIEW</div><h2>配准点云与定位轨迹</h2></div><span id="mapFrame">等待点云</span></div>
+      <canvas id="map" aria-label="配准点云与 LiDAR IMU 轨迹的俯视图"></canvas>
+      <div class="legend"><span><i class="swatch cloud"></i>点云抽样</span><span><i class="swatch lio"></i>LiDAR / IMU</span><span><i class="swatch loose"></i>GPS 松组合</span></div>
+      <p class="help">点云与定位轨迹使用算法原始坐标系；上方场景使用 Gazebo ENU 坐标系。</p>
+    </section>
+  </main>
+</body>
+</html>

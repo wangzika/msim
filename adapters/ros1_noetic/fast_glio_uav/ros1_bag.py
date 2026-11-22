@@ -108,7 +108,7 @@ def capture(args):
         route_copy.write_bytes(Path(os.environ.get('MSIM_ROUTE_PLAN',str(HERE / 'route_plan.json'))).read_bytes())
         os.environ['MSIM_ROUTE_PLAN'] = str(route_copy)
     Path(os.environ.get('ROS_LOG_DIR', str(run / 'roslogs'))).mkdir(parents=True, exist_ok=True)
-    launch = record = controller = injector = visualizer = fastglio = mapper = None
+    launch = record = controller = injector = visualizer = fastglio = mapper = web_console = None
     state = dict(clock=None, counts=Counter(), truth=None)
     stop_requested = dict(value=False, reason=None)
     stop_file = run/'capture-stop.json'
@@ -127,6 +127,7 @@ def capture(args):
     fastglio_log = (run / 'fastglio-live.log').open('w')
     tile_log = (run / 'window-layout.log').open('w')
     map_log = (run / 'mapping.log').open('w')
+    web_log = (run / 'web-console.log').open('w')
     try:
         launch_file = args.launch_file or HERE / 'uav_world.launch'
         launch_args = (args.launch_arg if args.launch_file else
@@ -241,6 +242,13 @@ def capture(args):
         if args.map_script:
             mapper = subprocess.Popen([sys.executable, str(args.map_script)],
                 stdout=map_log, stderr=subprocess.STDOUT, start_new_session=True)
+        if args.web_console_script:
+            web_console = subprocess.Popen([sys.executable, str(args.web_console_script),
+                '--run', str(run), '--port', str(args.web_console_port), '--ros'],
+                stdout=web_log, stderr=subprocess.STDOUT, start_new_session=True)
+            time.sleep(0.5)
+            if web_console.poll() is not None:
+                raise RuntimeError('Web console exited; see web-console.log')
         if args.tile_windows_script:
             tiled = subprocess.run([sys.executable, str(args.tile_windows_script)],
                                    stdout=tile_log, stderr=subprocess.STDOUT,
@@ -286,6 +294,8 @@ def capture(args):
                 raise RuntimeError('FAST_GLIO exited; see fastglio-live.log')
             if mapper is not None and mapper.poll() is not None:
                 raise RuntimeError('map recorder exited; see mapping.log')
+            if web_console is not None and web_console.poll() is not None:
+                raise RuntimeError('web console exited; see web-console.log')
             if not args.interactive and time.monotonic() > deadline:
                 raise RuntimeError('simulation clock stalled')
             elapsed = ((state['clock'] or start) - start) / 1e9
@@ -304,6 +314,7 @@ def capture(args):
             stop(controller)
         stop(fastglio)
         stop(mapper)
+        stop(web_console)
         stop(visualizer)
         stop(injector)
         stop(launch)
@@ -315,6 +326,7 @@ def capture(args):
         fastglio_log.close()
         tile_log.close()
         map_log.close()
+        web_log.close()
         if args.interactive:
             signal.signal(signal.SIGINT, previous_sigint)
     bag = run / 'sensors.bag'
@@ -816,6 +828,8 @@ def main():
             cmd.add_argument('--interactive', action='store_true')
             cmd.add_argument('--mapping-only', action='store_true')
             cmd.add_argument('--map-script', type=Path)
+            cmd.add_argument('--web-console-script', type=Path)
+            cmd.add_argument('--web-console-port', type=int, default=8766)
             cmd.add_argument('--gui', action='store_true')
             cmd.add_argument('--launch-file', type=Path,
                              help='ROS launch file for an alternate vehicle simulator')

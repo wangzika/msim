@@ -12,6 +12,8 @@ Gazebo 现在支持 `--scene complex_urban`（错落建筑、立柱、高架桥�
 
 自由操纵采集可运行 `./tools/px4-uav-capture.sh --teleop --scene ksql_airport`，在键盘窗口控制飞机，同时在 RViz 建图；结束后保存传感器 bag、`map.pcd` 和轨迹图。[按键与保存说明](docs/px4/TELEOP_MAPPING.md)。
 
+新分支提供轻量[网页仿真控制台](docs/px4/WEB_CONSOLE.md)：`./tools/px4-uav-capture.sh --web --scene complex_urban --duration-s 60 --skip-signalsim` 以无窗口模式运行，浏览器查看场景、轨迹和抽样点云；加 `--teleop` 可在网页手动飞行。仿真计算仍由本机 Gazebo、PX4 和 FAST_GLIO 执行。
+
 要同时看左侧 Gazebo 飞机仿真和右侧 FAST_GLIO 松组合 RViz 三维轨迹，运行 `./tools/px4-uav-capture.sh --duration-s 60 --fastglio-live --flight-pattern route --spoof-start-s 20 --spoof-east-rate-mps 0.18`。运行后保存 `fastglio-live-3d.png` 效果图；设置和输入边界见 [PX4 接入说明](docs/px4/README.md)。
 
 传感器可通过 `--lidar-model vlp16|hdl32|os1-64|mid360`、`--imu-model mems-baseline|low-noise`、`--gps-model standalone|native|ideal` 快速切换。Mid-360 自动选择原生 Livox 前端，其他型号选择 Velodyne 前端。默认 LiDAR 为带 0.02 m 径向噪声的分时扫描，点时间覆盖约 98 ms；[配置、处理延迟与验收说明](docs/px4/SENSOR_SWITCHING.md)。

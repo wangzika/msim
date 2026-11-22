@@ -21,6 +21,8 @@ teleop_height=5.0
 gui=false
 gazebo_viz=false
 fastglio_live=false
+web_console=false
+web_port=8766
 headless=false
 skip_signalsim=false
 verification_ok=true
@@ -43,6 +45,8 @@ while (($#)); do
     --gui) gui=true; shift;;
     --gazebo-viz) gazebo_viz=true; shift;;
     --fastglio-live) fastglio_live=true; shift;;
+    --web) web_console=true; shift;;
+    --web-port) web_port="$2"; shift 2;;
     --headless) headless=true; shift;;
     --skip-signalsim) skip_signalsim=true; shift;;
     --run) run="$2"; shift 2;;
@@ -50,7 +54,7 @@ while (($#)); do
     --scene-profile) scene_profile="$2"; shift 2;;
     --list-sensors) /usr/bin/python3 "$MSIM_ROOT/tools/sensor-config.py" --list; exit 0;;
     --lidar-model|--imu-model|--gps-model|--lidar-timing) sensor_args+=("$1" "$2"); shift 2;;
-    --help) echo 'px4-uav-capture.sh [--teleop [--teleop-speed-mps 2] [--teleop-height-m 5] | --fastglio-live --flight-pattern route] [--duration-s 60] [--scene simple|complex_urban|industrial_yard|ksql_airport] [--scene-profile file.json] [--lidar-model vlp16|hdl32|os1-64|mid360] [--imu-model mems-baseline|low-noise] [--gps-model standalone|native|ideal] [--lidar-timing rolling|snapshot] [--list-sensors]'; exit 0;;
+    --help) echo 'px4-uav-capture.sh [--web [--web-port 8766] [--teleop]] [--fastglio-live --flight-pattern route] [--duration-s 60] [--scene simple|complex_urban|industrial_yard|ksql_airport] [--scene-profile file.json] [--lidar-model vlp16|hdl32|os1-64|mid360] [--imu-model mems-baseline|low-noise] [--gps-model standalone|native|ideal] [--lidar-timing rolling|snapshot] [--list-sensors]'; exit 0;;
     --scene) scene="$2"; shift 2;;
     --world) world_input="$2"; shift 2;;
     --fastglio-frontend) frontend="$2"; shift 2;;
@@ -69,6 +73,14 @@ while (($#)); do
     *) echo "Unknown argument: $1" >&2; exit 2;;
   esac
 done
+if $web_console; then
+  headless=true
+  fastglio_live=true
+  gui=false
+  if [[ ! "$web_port" =~ ^[0-9]+$ ]] || ((web_port<1024 || web_port>65535)); then
+    echo '--web-port 须为 1024～65535 的端口。' >&2; exit 2
+  fi
+fi
 if $teleop; then
   if $postprocess; then echo '--teleop 与 --postprocess-only 不能同时使用。' >&2; exit 2; fi
   manual=true
@@ -218,6 +230,9 @@ PY
     --launch-arg "sdf:=$model" \
     --launch-arg "sensor_profile:=$sensor_profile")
   capture+=(--launch-arg "fusion_delay_s:=$fusion_delay_s")
+  if $web_console; then
+    capture+=(--web-console-script "$MSIM_ROOT/tools/web-sim-console.py" --web-console-port "$web_port")
+  fi
   capture+=(--launch-arg "spawn_x:=${scene_values[3]}" \
     --launch-arg "spawn_y:=${scene_values[4]}" --launch-arg "spawn_z:=${scene_values[5]}")
   if $online_gnss; then
@@ -275,6 +290,7 @@ PY
   fi
   if $gui; then capture+=(--gui); fi
   echo "PX4 SITL 城市无人机采集：$run"
+  if $web_console; then echo "网页控制台：http://127.0.0.1:$web_port/"; fi
   if $teleop; then
     if $headless; then
       echo '后台手动采集：通过 /msim/teleop/command 控制；Ctrl+C 结束并保存。'
