@@ -2,6 +2,7 @@
 // apply one receiver/attack realization for both PX4 and ROS consumers.
 #include <gazebo/gazebo.hh>
 #include <gazebo/physics/physics.hh>
+#include <gazebo/physics/RayShape.hh>
 #include <gazebo/transport/transport.hh>
 #include <SITLGps.pb.h>
 #include <ros/ros.h>
@@ -17,6 +18,7 @@
 #include <mutex>
 #include <random>
 #include <sstream>
+#include <string>
 
 namespace msim {
 using Vec = ignition::math::Vector3d;
@@ -43,6 +45,9 @@ Vec lla(const Vec& v) {
 
 class GpsRelay : public gazebo::ModelPlugin {
   gazebo::physics::WorldPtr world_;
+  gazebo::physics::ModelPtr model_;
+  gazebo::physics::RayShapePtr sky_ray_;
+  ignition::math::Pose3d antenna_pose_;
   gazebo::transport::NodePtr gz_;
   gazebo::transport::SubscriberPtr sub_;
   gazebo::transport::PublisherPtr output_;
@@ -57,6 +62,8 @@ class GpsRelay : public gazebo::ModelPlugin {
   std::normal_distribution<double> gaussian_{0,1};
   double ps_xy_, ps_z_, vs_xy_, vs_z_, var_xy_, var_z_;
   double bias_xy_, bias_z_, bias_tau_;
+  bool adaptive_environment_=false;
+  double environment_range_=80., environment_gain_=3.;
   Vec bias_, fixed_offset_;
   double first_=-1, last_=-1;
   uint32_t seq_=0;
@@ -69,16 +76,51 @@ class GpsRelay : public gazebo::ModelPlugin {
   }
   Vec to_lla(const Vec& p) const { return lla(origin_ecef_+enu_.Transposed()*p); }
 
-  nav_msgs::Odometry odom(const Vec& p, const Vec& v, double stamp) {
+  // A fixed set of upward rays is a reproducible proxy for local sky visibility.
+  // It uses collision geometry, so mesh scenes and changing obstacles contribute.
+  double blocked_sky_fraction() {
+    if (!adaptive_environment_) return 0.;
+    const Vec antenna=(model_->WorldPose()*antenna_pose_).Pos();
+    constexpr int azimuths=12;
+    const double elevations[]={15.,35.,60.};
+    int blocked=0;
+    for (double elevation : elevations) for (int i=0;i<azimuths;++i) {
+      double az=2.*M_PI*i/azimuths, el=elevation*M_PI/180.;
+      Vec direction(cos(el)*cos(az),cos(el)*sin(az),sin(el));
+      // Start outside the Iris body; a self-hit is skipped if another model is used.
+      Vec start=antenna+direction*.6;
+      bool hit=false;
+      for (int attempt=0;attempt<4;++attempt) {
+        sky_ray_->SetPoints(start,antenna+direction*environment_range_);
+        double distance=environment_range_;
+        std::string entity;
+        sky_ray_->GetIntersection(distance,entity);
+        if (entity.empty() || !std::isfinite(distance) || distance>=environment_range_) break;
+        const std::string own=model_->GetName()+"::";
+        const std::string scoped=model_->GetScopedName()+"::";
+        if (entity.compare(0,own.size(),own)!=0 &&
+            entity.compare(0,scoped.size(),scoped)!=0) {
+          hit=true; break;
+        }
+        start+=direction*(std::max(0.,distance)+.1);
+      }
+      if (hit) ++blocked;
+    }
+    return static_cast<double>(blocked)/(azimuths*3);
+  }
+
+  nav_msgs::Odometry odom(const Vec& p, const Vec& v, double stamp,
+                          double variance_xy, double variance_z,
+                          double noise_scale) {
     nav_msgs::Odometry m;
     m.header.seq=seq_; m.header.stamp.fromSec(stamp);
     m.header.frame_id="msim_enu"; m.child_frame_id="gnss_antenna";
     m.pose.pose.position.x=p.X(); m.pose.pose.position.y=p.Y(); m.pose.pose.position.z=p.Z();
     m.pose.pose.orientation.w=1.;
-    m.pose.covariance[0]=m.pose.covariance[7]=var_xy_; m.pose.covariance[14]=var_z_;
+    m.pose.covariance[0]=m.pose.covariance[7]=variance_xy; m.pose.covariance[14]=variance_z;
     m.twist.twist.linear.x=v.X(); m.twist.twist.linear.y=v.Y(); m.twist.twist.linear.z=v.Z();
-    m.twist.covariance[0]=m.twist.covariance[7]=vs_xy_*vs_xy_;
-    m.twist.covariance[14]=vs_z_*vs_z_;
+    m.twist.covariance[0]=m.twist.covariance[7]=vs_xy_*vs_xy_*noise_scale*noise_scale;
+    m.twist.covariance[14]=vs_z_*vs_z_*noise_scale*noise_scale;
     return m;
   }
 
@@ -116,14 +158,19 @@ class GpsRelay : public gazebo::ModelPlugin {
     }
     ++seq_;
     Vec p=to_enu(msg->latitude_deg(),msg->longitude_deg(),msg->altitude());
+    const double blocked=blocked_sky_fraction();
+    const double noise_scale=1.+environment_gain_*blocked;
+    const double variance_xy=var_xy_*noise_scale*noise_scale;
+    const double variance_z=var_z_*noise_scale*noise_scale;
     // Exact stationary first-order Gauss-Markov receiver position bias.
     double phi=seq_==1?0:std::exp(-delta/bias_tau_);
     double gain=std::sqrt(1-phi*phi);
     bias_=phi*bias_+gain*Vec(bias_xy_*gaussian_(random_),bias_xy_*gaussian_(random_),bias_z_*gaussian_(random_));
-    p+=bias_;
-    p += Vec(ps_xy_*gaussian_(random_),ps_xy_*gaussian_(random_),ps_z_*gaussian_(random_));
-    Vec v(msg->velocity_east()+vs_xy_*gaussian_(random_),
-          msg->velocity_north()+vs_xy_*gaussian_(random_),msg->velocity_up()+vs_z_*gaussian_(random_));
+    p+=noise_scale*bias_;
+    p += Vec(noise_scale*ps_xy_*gaussian_(random_),noise_scale*ps_xy_*gaussian_(random_),noise_scale*ps_z_*gaussian_(random_));
+    Vec v(msg->velocity_east()+noise_scale*vs_xy_*gaussian_(random_),
+          msg->velocity_north()+noise_scale*vs_xy_*gaussian_(random_),
+          msg->velocity_up()+noise_scale*vs_z_*gaussian_(random_));
     bool active=stamp-first_>=a.start;
     double dt=active?stamp-first_-a.start:0.;
     Vec shift=fixed_offset_+(active?a.offset+Vec(dt*a.east_rate,dt*a.north_rate,0):Vec::Zero);
@@ -138,9 +185,10 @@ class GpsRelay : public gazebo::ModelPlugin {
     attacked.set_velocity_east(vv.X()); attacked.set_velocity_north(vv.Y()); attacked.set_velocity_up(vv.Z());
     attacked.set_velocity(std::hypot(vv.X(),vv.Y()));
     // Explicit experimental accuracy indicators, not an assertion of calibrated native uncertainty.
-    attacked.set_eph(std::sqrt(var_xy_)); attacked.set_epv(std::sqrt(var_z_));
+    attacked.set_eph(std::sqrt(variance_xy)); attacked.set_epv(std::sqrt(variance_z));
     output_->Publish(attacked);
-    normal_pub_.publish(odom(p,v,stamp)); attack_pub_.publish(odom(pv,vv,stamp));
+    normal_pub_.publish(odom(p,v,stamp,variance_xy,variance_z,noise_scale));
+    attack_pub_.publish(odom(pv,vv,stamp,variance_xy,variance_z,noise_scale));
     std::ostringstream j; j<<std::setprecision(16)
       <<"{\"source\":\"gazebo_gps_plugin\",\"sequence\":"<<seq_
       <<",\"sim_time_ns\":"<<msg->time_usec()*1000
@@ -151,6 +199,10 @@ class GpsRelay : public gazebo::ModelPlugin {
       <<",\"gps_east_m\":"<<pv.X()<<",\"gps_north_m\":"<<pv.Y()<<",\"gps_up_m\":"<<pv.Z()
       <<",\"attack_east_m\":"<<shift.X()<<",\"attack_north_m\":"<<shift.Y()<<",\"attack_up_m\":"<<shift.Z()
       <<",\"attack_active\":"<<(active?"true":"false")
+      <<",\"sky_blocked_fraction\":"<<blocked
+      <<",\"environment_noise_scale\":"<<noise_scale
+      <<",\"reported_variance_xy_m2\":"<<variance_xy
+      <<",\"reported_variance_z_m2\":"<<variance_z
       <<",\"velocity_consistent\":"<<(a.velocity?"true":"false")<<"}";
     std_msgs::String status; status.data=j.str(); samples_pub_.publish(status);
   }
@@ -160,6 +212,16 @@ class GpsRelay : public gazebo::ModelPlugin {
   void Load(gazebo::physics::ModelPtr model, sdf::ElementPtr s) override {
     if(!ros::isInitialized()) throw std::runtime_error("GPS relay needs Gazebo ROS API plugin");
     world_=model->GetWorld();
+    model_=model;
+    antenna_pose_=s->Get<ignition::math::Pose3d>("antenna_pose");
+    adaptive_environment_=s->Get<bool>("adaptive_environment");
+    environment_range_=s->Get<double>("environment_range_m");
+    environment_gain_=s->Get<double>("environment_noise_gain");
+    if (adaptive_environment_) {
+      sky_ray_=boost::dynamic_pointer_cast<gazebo::physics::RayShape>(
+          world_->Physics()->CreateShape("ray",gazebo::physics::CollisionPtr()));
+      if (!sky_ray_) throw std::runtime_error("GPS environment model requires ray casting");
+    }
     origin_={env("PX4_HOME_LAT",30.5312),env("PX4_HOME_LON",114.3601),env("PX4_HOME_ALT",50)};
     origin_ecef_=ecef(origin_.X(),origin_.Y(),origin_.Z());
     double lat=origin_.X()*M_PI/180., lon=origin_.Y()*M_PI/180.;

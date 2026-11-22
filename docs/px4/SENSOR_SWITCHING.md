@@ -32,7 +32,7 @@ Gazebo 与 RViz 同时显示；到时自动结束并保存录包及 PNG。不要
 | | `mid360` | 官方非重复扫描方向序列，360° × 名义 −7°～52°，200,000 点/s |
 | `--imu-model` | `mems-baseline`（默认） | 现有 MEMS 噪声、零偏与慢漂移基线 |
 | | `low-noise` | 上述噪声、零偏和随机驱动强度的 0.2 倍；不代表某台具体实物 |
-| `--gps-model` | `standalone`（默认） | 原生 GPS 噪声＋接收机相关偏差与白噪声 |
+| `--gps-model` | `standalone`（默认） | 原生 GPS 噪声＋接收机相关偏差与白噪声；附加位置误差随周围遮挡变化 |
 | | `native` | 仅保留 PX4 原生 GPS 误差，不附加接收机噪声；仍支持欺骗 |
 | | `ideal` | 关闭原生及附加噪声，用作理想控制组；仍支持欺骗 |
 | `--lidar-timing` | `rolling`（默认） | 在不同物理时刻分批求交，保留各点实际采集时间 |
@@ -77,6 +77,10 @@ python3 tools/sensor-config.py --lidar-model hdl32 --gps-model standalone \
 | ROS 报告位置方差 | 1.0 m² | 5.0 m² |
 
 附加偏差按实际样本间隔精确离散：`b(k)=exp(-dt/tau)*b(k-1)+sigma*sqrt(1-exp(-2dt/tau))*N(0,1)`，初值从稳态分布抽样。随机种子在 JSON 中可修改。原生 GPS 的误差另行保留，因此报告方差是显式实验权重，并非实物标定结果。GPS 位置白噪声不会被差分成速度噪声。
+
+`standalone` 默认启用场景自适应附加误差：从 GPS 天线向 12 个方位、15°／35°／60° 仰角投射 36 条射线，在 `environment_range_m`（默认 80 m）内统计被碰撞几何挡住的比例 `f`。位置白噪声、相关偏差和速度白噪声在每个 GPS 历元乘以 `1 + environment_noise_gain × f`（默认增益 3）；发布给 PX4 的 `eph/epv`、ROS 位置和速度方差同步增加。`/msim/gps_samples` 记录 `sky_blocked_fraction`、`environment_noise_scale` 与报告方差，便于核对开阔区和建筑旁的变化。自定义传感器 JSON 可调整上述两个参数，或设置 `gps.adaptive_environment=false` 关闭；`native`、`ideal` 默认关闭。
+
+这是根据局部可见天空比例构造的环境误差近似，适用于在线 PX4 测量；它不逐卫星解算遮挡、多径或卫星几何。逐卫星传播仍由离线 SignalSim 观测链路处理。建筑需有 Gazebo 碰撞几何才会参与射线测试；单纯视觉贴图不会增加噪声。
 
 原生 GPS 名义为 5 Hz，当前上游更新门限可能使实际间隔出现约 0.2/0.4 s，不能用名义值替代实测频率。原生发布延迟实测约 118～122 ms。中继保留样本时间；攻击的 `--spoof-start-s` 以原生 GPS 首个采样的仿真时刻为零点，日志的 `gnss_origin_sim_time_ns` 记录该原点。
 

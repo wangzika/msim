@@ -6,7 +6,7 @@ PX4 SITL 可在同一 Gazebo world 中沿预设航线飞行。当前采集默认
 
 在线欺骗实验现在把现有 LiDAR 点云按 Gazebo 仿真时间与每个 GPS 历元配对，逐历元记录扫描时间差，并在浏览器显示同步状态。LiDAR 尚未参与欺骗报警判定。
 
-Gazebo 现在支持 `--scene complex_urban`（错落建筑、立柱、高架桥）和 `--scene industrial_yard`（导入 PX4 货架、货箱、托盘，并补充多高度结构），也可用 `--world` 加载自定义 world。[场景运行方法](scenes/README.md)与[六组场景对照实验](docs/px4/COMPLEX_SCENES_20261116.md)包含实际截图、ENU 误差和三维轨迹。场景几何只影响当前激光与物理仿真，在线 GNSS 保留原生误差、接收机误差及脚本攻击偏移，尚无建筑驱动的多路径模型。
+Gazebo 现在支持 `--scene complex_urban`（错落建筑、立柱、高架桥）和 `--scene industrial_yard`（导入 PX4 货架、货箱、托盘，并补充多高度结构），也可用 `--world` 加载自定义 world。[场景运行方法](scenes/README.md)与[六组场景对照实验](docs/px4/COMPLEX_SCENES_20261116.md)包含实际截图、ENU 误差和三维轨迹。在线 GNSS 的 `standalone` 模式现按周围碰撞几何的天空遮挡比例调整附加位置误差与报告方差；它是场景自适应误差近似，尚无在线逐卫星多路径模型，详情见[传感器配置说明](docs/px4/SENSOR_SWITCHING.md)。
 
 新增 `--scene ksql_airport`，接入约 2.87 km × 2.78 km 的机场周边地形、卫星底图与建筑碰撞网格，选定 1 km × 1 km 测试区域。已完成 300 秒航线及带欺骗双窗口实测；首次下载、启动命令、场景配置与精度边界见 [KSQL 接入报告](docs/px4/KSQL_INTEGRATION_20261122.md)。
 

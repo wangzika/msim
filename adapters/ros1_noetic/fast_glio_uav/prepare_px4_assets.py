@@ -92,6 +92,7 @@ def prepare_model(source, target, online_gnss=False, lidar_pitch_deg=0.0,
         model.remove(gps)
         model.append(native)
         relay = ET.SubElement(model, 'plugin', name='msim_gps_relay', filename='libmsim_gps_relay.so')
+        ET.SubElement(relay, 'antenna_pose').text = pose
         for key, value in profile['gps'].items():
             ET.SubElement(relay, key).text = str(value).lower() if isinstance(value, bool) else str(value)
     link = model.find("link[@name='base_link']")

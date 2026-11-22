@@ -29,15 +29,18 @@ GPS = {
                        bias_sigma_xy_m=.7, bias_sigma_z_m=2., bias_tau_s=120.,
                        velocity_sigma_xy_mps=.05, velocity_sigma_z_mps=.1,
                        reported_variance_xy_m2=1., reported_variance_z_m2=5.,
-                       native_noise=True),
+                       native_noise=True, adaptive_environment=True,
+                       environment_range_m=80., environment_noise_gain=3.),
     'native': dict(position_sigma_xy_m=0., position_sigma_z_m=0.,
                   velocity_sigma_xy_mps=0., velocity_sigma_z_mps=0.,
                   reported_variance_xy_m2=1., reported_variance_z_m2=1.,
-                  native_noise=True),
+                  native_noise=True, adaptive_environment=False,
+                  environment_range_m=80., environment_noise_gain=3.),
     'ideal': dict(position_sigma_xy_m=0., position_sigma_z_m=0.,
                  velocity_sigma_xy_mps=0., velocity_sigma_z_mps=0.,
                  reported_variance_xy_m2=.01, reported_variance_z_m2=.01,
-                 native_noise=False),
+                 native_noise=False, adaptive_environment=False,
+                 environment_range_m=80., environment_noise_gain=3.),
 }
 
 
@@ -72,6 +75,9 @@ def resolve(base=None, lidar=None, imu=None, gps=None, timing=None):
     p['gps'].setdefault('bias_sigma_z_m', 0.)
     p['gps'].setdefault('bias_tau_s', 120.)
     p['gps'].setdefault('spoof_velocity_consistent', True)
+    p['gps'].setdefault('adaptive_environment', False)
+    p['gps'].setdefault('environment_range_m', 80.)
+    p['gps'].setdefault('environment_noise_gain', 3.)
     p['lidar'].setdefault('vertical_min_deg', -15.)
     p['lidar'].setdefault('vertical_max_deg', 15.)
     p['lidar'].setdefault('seed', 20261119)
@@ -113,10 +119,12 @@ def validate(p):
         if l['vertical_samples']!=4 or not math.isclose(l['point_rate_hz'],l['horizontal_samples']*4*l['rate_hz']):
             raise ValueError('Mid-360 point rate must match samples per frame and frame rate')
     for key, value in g.items():
-        if key in ('native_noise', 'spoof_velocity_consistent'):
+        if key in ('native_noise', 'spoof_velocity_consistent', 'adaptive_environment'):
             if not isinstance(value, bool):
                 raise ValueError('GPS flag must be boolean: ' + key)
         elif isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or value < 0:
             raise ValueError('invalid GPS ' + key)
     if not isinstance(g['seed'], int) or not 0<=g['seed']<2**32 or not 0<=l['seed']<2**32 or min(g['reported_variance_xy_m2'], g['reported_variance_z_m2'], g['bias_tau_s']) <= 0:
         raise ValueError('invalid GPS seed or reported variance')
+    if not 1 <= g['environment_range_m'] <= 500 or g['environment_noise_gain'] > 20:
+        raise ValueError('invalid GPS environment model parameters')

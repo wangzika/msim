@@ -24,6 +24,9 @@ class SensorProfilesTest(unittest.TestCase):
             self.assertEqual(p['lidar']['timing'], 'rolling')
         p = resolve(imu='low-noise', gps='native', timing='snapshot')
         self.assertEqual(p['gps']['position_sigma_xy_m'], 0)
+        self.assertFalse(p['gps']['adaptive_environment'])
+        self.assertTrue(resolve(gps='standalone')['gps']['adaptive_environment'])
+        self.assertFalse(resolve(gps='ideal')['gps']['adaptive_environment'])
         self.assertAlmostEqual(p['imu_ros']['gyro_noise_density'], resolve()['imu_ros']['gyro_noise_density']*.2)
         with tempfile.TemporaryDirectory() as tmp:
             f = Path(tmp)/'custom.json'
@@ -38,6 +41,9 @@ class SensorProfilesTest(unittest.TestCase):
             p = resolve(); p[section][key] = value
             with self.assertRaises(ValueError):
                 validate(p)
+        p = resolve(); p['gps']['environment_range_m'] = 0
+        with self.assertRaises(ValueError):
+            validate(p)
 
     def test_mid360_uses_pinned_recorded_pattern_not_uniform_beams(self):
         p=resolve(lidar='mid360')
@@ -69,6 +75,9 @@ class SensorProfilesTest(unittest.TestCase):
             self.assertEqual(gps.findtext('.//plugin/topic'), 'msim_gps_raw')
             self.assertIsNotNone(model.find("joint[@name='gps0_joint']"))
             self.assertEqual(len(model.findall("plugin[@name='msim_gps_relay']")), 1)
+            relay = model.find("plugin[@name='msim_gps_relay']")
+            self.assertEqual(relay.findtext('adaptive_environment'), 'true')
+            self.assertEqual(relay.findtext('antenna_pose'), '0.05 0 0.04 0 0 0')
             scanner = model.find("plugin[@name='msim_scanning_lidar']")
             self.assertEqual(scanner.findtext('vertical_samples'), '32')
             self.assertEqual(scanner.findtext('timing'), 'rolling')
