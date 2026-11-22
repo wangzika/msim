@@ -1,0 +1,2 @@
+# Pure-Python unit tests; ROS, Gazebo and PX4 integration dependencies are separate.
+numpy==2.2.6
