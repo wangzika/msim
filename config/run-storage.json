@@ -1,0 +1,5 @@
+{
+  "run_root": "/media/wzb/Elements/msim/runs",
+  "mount_point": "/media/wzb/Elements",
+  "description": "实验数据写入外置硬盘；exFAT 上的 PX4/ROS 临时目录使用本机 POSIX 文件系统，结束后校验归档。"
+}

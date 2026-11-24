@@ -6,17 +6,17 @@ PX4 SITL 可在同一 Gazebo world 中沿预设航线飞行。当前采集默认
 
 在线欺骗实验现在把现有 LiDAR 点云按 Gazebo 仿真时间与每个 GPS 历元配对，逐历元记录扫描时间差，并在浏览器显示同步状态。LiDAR 尚未参与欺骗报警判定。
 
-Gazebo 现在支持 `--scene complex_urban`（错落建筑、立柱、高架桥）和 `--scene industrial_yard`（导入 PX4 货架、货箱、托盘，并补充多高度结构），也可用 `--world` 加载自定义 world。[场景运行方法](scenes/README.md)与[六组场景对照实验](docs/px4/COMPLEX_SCENES_20261116.md)包含实际截图、ENU 误差和三维轨迹。在线 GNSS 的 `standalone` 模式现按周围碰撞几何的天空遮挡比例调整附加位置误差与报告方差；它是场景自适应误差近似，尚无在线逐卫星多路径模型，详情见[传感器配置说明](docs/px4/SENSOR_SWITCHING.md)。
+Gazebo 现在支持 `--scene complex_urban`（错落建筑、立柱、高架桥）和 `--scene industrial_yard`（导入 PX4 货架、货箱、托盘，并补充多高度结构），也可用 `--world` 加载自定义 world。[场景运行方法](scenes/README.md)与[六组场景对照实验](docs/px4/COMPLEX_SCENES_20261116.md)包含实际截图、ENU 误差和三维轨迹。历史 `standalone` GPS 模式按天空遮挡比例放大附加误差，保留为未标定经验模型；新采集默认采用下述文献接收机位置误差基线，详情见[传感器配置说明](docs/px4/SENSOR_SWITCHING.md)。
 
 新增 `--scene ksql_airport`，接入约 2.87 km × 2.78 km 的机场周边地形、卫星底图与建筑碰撞网格，选定 1 km × 1 km 测试区域。已完成 300 秒航线及带欺骗双窗口实测；首次下载、启动命令、场景配置与精度边界见 [KSQL 接入报告](docs/px4/KSQL_INTEGRATION_20261122.md)。
 
 自由操纵采集可运行 `./tools/px4-uav-capture.sh --teleop --scene ksql_airport`，在键盘窗口控制飞机，同时在 RViz 建图；结束后保存传感器 bag、`map.pcd` 和轨迹图。[按键与保存说明](docs/px4/TELEOP_MAPPING.md)。
 
-新分支提供轻量[网页仿真控制台](docs/px4/WEB_CONSOLE.md)：`./tools/px4-uav-capture.sh --web --scene complex_urban --duration-s 60 --skip-signalsim` 以无窗口模式运行，浏览器查看场景、轨迹和抽样点云；加 `--teleop` 可在网页手动飞行。仿真计算仍由本机 Gazebo、PX4 和 FAST_GLIO 执行。
+本机[网页 SLAM 三维工作台](docs/px4/WEB_CONSOLE.md)：`./tools/px4-uav-capture.sh --web --scene complex_urban --duration-s 60 --skip-signalsim` 以无窗口模式运行，浏览器旋转、缩放三维点云地图，加载真实地形 / 建筑模型与卫星纹理，切换图层、跟随飞机并导出 PNG；加 `--teleop` 可在网页手动飞行。`--list-scenes` 列出可用场景，网页可生成下次启动命令。仿真计算仍由本机 Gazebo、PX4 和 FAST_GLIO 执行。
 
 要同时看左侧 Gazebo 飞机仿真和右侧 FAST_GLIO 松组合 RViz 三维轨迹，运行 `./tools/px4-uav-capture.sh --duration-s 60 --fastglio-live --flight-pattern route --spoof-start-s 20 --spoof-east-rate-mps 0.18`。运行后保存 `fastglio-live-3d.png` 效果图；设置和输入边界见 [PX4 接入说明](docs/px4/README.md)。
 
-传感器可通过 `--lidar-model vlp16|hdl32|os1-64|mid360`、`--imu-model mems-baseline|low-noise`、`--gps-model standalone|native|ideal` 快速切换。Mid-360 自动选择原生 Livox 前端，其他型号选择 Velodyne 前端。默认 LiDAR 为带 0.02 m 径向噪声的分时扫描，点时间覆盖约 98 ms；[配置、处理延迟与验收说明](docs/px4/SENSOR_SWITCHING.md)。
+传感器可通过 `--lidar-model vlp16|hdl32|os1-64|mid360`、`--imu-model mems-baseline|low-noise`、`--gps-model f9p-dgnss-ucr|standalone|native|ideal` 快速切换。GPS 默认采用 ZED-F9P 码差分 DGNSS 的文献位置误差参数，报告方差与生成参数统一；旧 `standalone` 遮挡公式保留为未标定经验模型。[接收机参数与参考资料](docs/px4/GNSS_RECEIVER_MODEL_20261123.md)。Mid-360 自动选择原生 Livox 前端，其他型号选择 Velodyne 前端。默认 LiDAR 为带 0.02 m 径向噪声的分时扫描，点时间覆盖约 98 ms；[配置、处理延迟与验收说明](docs/px4/SENSOR_SWITCHING.md)。
 
 ## 预设航线中途加入 GPS 欺骗
 
@@ -123,3 +123,5 @@ cmake --build build/core
 ctest --test-dir build/core --output-on-failure
 /usr/bin/python3 -m unittest discover -s tests/fastglio -p 'test_*.py'
 ```
+
+PX4 采集默认写入外置盘 `/media/wzb/Elements/msim/runs`，本地 `runs/` 保留兼容入口；配置见 `config/run-storage.json`，单次可用 `--run` 指定其他位置。外置盘未挂载时会停止启动。

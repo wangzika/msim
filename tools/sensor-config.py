@@ -7,7 +7,7 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'adapters/ros1_noetic/msim_sensors'))
-from sensor_profiles import resolve, LIDARS, IMUS, GPS
+from sensor_profiles import resolve, LIDARS, IMUS, GPS, DEFAULT_GPS
 
 
 def main():
@@ -24,6 +24,8 @@ def main():
         print('LiDAR: vlp16, hdl32, os1-64 (uniform beams); mid360 (official Livox CSV scan pattern)')
         print('IMU: ' + ', '.join(IMUS) + ' (research error presets)')
         print('GPS: ' + ', '.join(GPS))
+        print('GPS default: '+DEFAULT_GPS+' (ZED-F9P code DGNSS, published demeaned position-error fit)')
+        print('standalone: uncalibrated experimental noise and sky-obstruction model')
         print('LiDAR timing: rolling, snapshot; mid360 uses native Livox FAST-LIO input automatically')
         return
     try:

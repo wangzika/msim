@@ -1,60 +1,71 @@
 <!doctype html>
-<html lang="zh-CN">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#0b1724">
-  <title>msim 网页仿真控制台</title>
+<html lang="zh-CN"><head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b1420"><title>msim · SLAM 三维工作台</title>
   <link rel="stylesheet" href="/style.css">
-  <script src="/app.js" defer></script>
-</head>
-<body>
+  <script type="importmap">{"imports":{"three":"/vendor/three/three.module.js"}}</script>
+  <script type="module" src="/app.js"></script>
+</head><body>
   <header class="topbar">
-    <div><div class="eyebrow">MSIM / WEB CONSOLE</div><h1>仿真控制台</h1></div>
+    <a class="brand" href="/"><span class="brand-icon">m</span><span>msim <small>SLAM WORKSPACE</small></span></a>
+    <div class="top-meta"><span id="sceneName">场景未就绪</span><span class="divider"></span><span id="runName">等待实验</span></div>
     <div class="connection"><span id="connectionDot" class="dot"></span><span id="connection">等待数据</span></div>
   </header>
   <main>
-    <div class="meta"><span id="runName">等待实验</span><span id="sceneName">场景未就绪</span><span id="simTime">仿真时间 —</span></div>
-    <div class="layout">
-      <section class="panel scene-panel">
-        <div class="panel-head"><div><div class="eyebrow">SCENE VIEW</div><h2>场景与飞行轨迹</h2></div><button id="resetView" type="button">重置视角</button></div>
-        <canvas id="scene" aria-label="可旋转缩放的场景与飞机三维轨迹"></canvas>
-        <div class="legend"><span><i class="swatch truth"></i>真值</span><span><i class="swatch gps"></i>GPS</span><span><i class="swatch route"></i>航线</span><span><i class="swatch obstacle"></i>碰撞几何</span></div>
-        <p class="help">拖动旋转 · 滚轮缩放 · 双击重置。场景按 SDF 碰撞体简化绘制；仿真计算仍在后台运行。</p>
+    <div class="workspace-heading"><div><span class="eyebrow">LIVE MAPPING</span><h1>三维建图工作台</h1></div><div class="heading-chips"><span id="simTime">仿真时间 —</span><span id="modeBadge">等待仿真</span></div></div>
+    <div class="workspace">
+      <section class="panel workspace-main">
+        <div class="viewer-tabs" role="tablist" aria-label="三维视图"><button id="mapTab" role="tab" aria-selected="true" class="selected">点云建图</button><button id="sceneTab" role="tab" aria-selected="false">场景与真值</button><span id="mapFrame" class="frame-badge">camera_init</span></div>
+        <div class="toolbar" aria-label="相机工具">
+          <div class="button-group"><button data-view="3d" class="selected">3D</button><button data-view="top">俯视</button><button data-view="front">正视</button><button data-view="side">侧视</button></div>
+          <button id="fitView">适应数据</button><label class="toggle"><input type="checkbox" id="followPose">跟随飞机</label>
+          <div class="toolbar-end"><button id="pauseView">暂停显示</button><button id="exportImage">导出 PNG</button><button id="fullscreen">全屏</button></div>
+        </div>
+        <div id="mapPanel" class="view-panel" role="tabpanel" aria-labelledby="mapTab">
+          <div id="mapViewport" class="viewport">
+            <div class="viewport-label"><span class="live-mark"></span><span>LiDAR / IMU</span><span class="muted">点云与轨迹</span></div>
+            <div id="mapEmpty" class="empty-state"><span class="empty-symbol">⌖</span><h2>等待三维点云</h2><p>实时接收配准点云，或读取已保存的 map.pcd。</p></div>
+            <div class="axis-key"><span class="axis-x">X</span><span class="axis-y">Y</span><span class="axis-z">Z ↑</span></div>
+            <div class="viewport-hud"><span id="pointSummary">0 点</span><span id="cloudSource">等待地图</span><span id="fps">— FPS</span></div>
+            <div id="pauseBanner" class="pause-banner" hidden>画面已暂停 · 遥测与采集继续</div>
+          </div>
+        </div>
+        <div id="scenePanel" class="view-panel" role="tabpanel" aria-labelledby="sceneTab" hidden><div class="scene-model-tools"><button id="sceneLocalView">飞机附近</button><button id="sceneWholeView">全场景</button><label><input id="sceneShowModels" type="checkbox" checked>真实场景模型与纹理</label><span>模型与 Gazebo 使用同一资源</span></div><div id="sceneViewport" class="viewport">
+          <div class="viewport-label"><span class="live-mark"></span><span>Gazebo ENU</span><span class="muted">真值参考</span></div>
+          <div class="axis-key"><span class="axis-x">E</span><span class="axis-y">N</span><span class="axis-z">U ↑</span></div>
+          <div class="viewport-hud"><span id="sceneGeometry">等待场景</span><span>白：真值 · 蓝：GPS · 黄：航线</span></div>
+        </div></div>
+        <div class="viewer-footer"><span>左键旋转 · 右键 / Shift 拖动平移 · 滚轮缩放 · 双击取景</span><a id="exportResult" class="export-result" hidden>PNG 已保存 · 点击下载</a><span id="viewCoordinates">X —　Y —　Z —</span></div>
+        <div class="map-legend" id="mapLegend"><span><i class="height-swatch"></i>按高度着色</span><span><i class="swatch current"></i>当前帧</span><span><i class="swatch lio"></i>LiDAR / IMU</span><span><i class="swatch loose"></i>GPS 松组合</span><span class="legend-note" id="frameNote">算法坐标系与 Gazebo ENU 分开显示。</span></div>
       </section>
-      <aside class="side">
-        <section class="panel stats">
-          <div class="eyebrow">TELEMETRY</div><h2>实时状态</h2>
-          <div class="stat-grid">
-            <div><span>飞行模式</span><strong id="flightMode">—</strong></div>
-            <div><span>GPS 检测</span><strong id="gpsStatus">—</strong></div>
-            <div><span>东 / 北 / 高</span><strong id="position">—</strong></div>
-            <div><span>天空遮挡</span><strong id="occlusion">—</strong></div>
-            <div><span>噪声倍率</span><strong id="noiseScale">—</strong></div>
-            <div><span>点云数量</span><strong id="cloudCount">—</strong></div>
-          </div>
+      <aside class="sidebar">
+        <section class="panel layers-panel" id="layersPanel">
+          <div class="section-title"><h2>显示图层</h2><span class="small-tag">LAYERS</span></div>
+          <label class="layer-row"><span><input type="checkbox" data-layer="map" checked><i class="height-swatch"></i>累计点云</span><small id="mapCount">—</small></label>
+          <label class="layer-row"><span><input type="checkbox" data-layer="current" checked><i class="swatch current"></i>当前配准帧</span><small id="scanCount">—</small></label>
+          <label class="layer-row"><span><input type="checkbox" data-layer="lio" checked><i class="swatch lio"></i>LiDAR / IMU 轨迹</span></label>
+          <label class="layer-row"><span><input type="checkbox" data-layer="loose" checked><i class="swatch loose"></i>GPS 松组合轨迹</span><small id="looseAvailability">—</small></label>
+          <div class="layer-options"><label><input type="checkbox" data-layer="grid" checked>网格</label><label><input type="checkbox" data-layer="axes" checked>坐标轴</label><label><input type="checkbox" data-layer="robot" checked>飞机位姿</label></div>
+          <div class="display-settings"><label>点大小 <output id="pointSizeValue">2.0 px</output><input id="pointSize" type="range" min="1" max="5" step="0.25" value="2"></label><div class="field-pair"><label>点云配色<select id="colorMode"><option value="height">高度渐变</option><option value="solid">统一颜色</option></select></label><label>显示预算<select id="pointBudget"><option value="30000">3 万点</option><option value="60000">6 万点</option><option value="90000" selected>9 万点</option></select></label></div></div>
+          <a id="downloadMap" class="secondary-link" href="/api/map.pcd" download hidden>下载已保存的完整地图 PCD ↗</a>
         </section>
+        <section class="panel telemetry-panel"><div class="section-title"><h2>实时状态</h2><span class="small-tag">TELEMETRY</span></div><div class="telemetry-grid"><div><span>飞控模式</span><strong id="flightMode">—</strong></div><div><span>GPS 检测</span><strong id="gpsStatus">—</strong></div><div class="full-field"><span>真值 E / N / U</span><strong id="position">—</strong></div><div><span>天空遮挡</span><strong id="occlusion">—</strong></div><div><span>噪声倍率</span><strong id="noiseScale">—</strong></div></div></section>
         <section class="panel controls" id="controls" hidden>
-          <div class="eyebrow">FLIGHT CONTROL</div><h2>手动飞行</h2>
-          <div class="control-fields"><label>起飞高度 <input id="height" type="number" min="0.5" max="30" step="0.5" value="5"> m</label><label>水平速度 <input id="speed" type="number" min="0.2" max="8" step="0.2" value="2"> m/s</label></div>
-          <div class="button-row"><button data-op="takeoff">起飞</button><button data-op="hold">悬停</button><button data-op="land">降落</button></div>
-          <div class="key-grid" aria-label="方向控制">
-            <button data-key="q">左转 Q</button><button data-key="w">前进 W</button><button data-key="e">右转 E</button>
-            <button data-key="a">左移 A</button><button data-key="s">后退 S</button><button data-key="d">右移 D</button>
-            <button data-key="r">上升 R</button><button data-key="f">下降 F</button>
-          </div>
-          <button id="finish" class="finish">降落并保存</button>
-          <p class="help">按住方向键移动，松开或切出页面自动悬停。控制指令仍由 PX4 OFFBOARD 执行。</p>
-          <p id="commandStatus" class="command-status" role="status"></p>
+          <div class="section-title"><h2>手动飞行</h2><span class="small-tag" id="teleopState">等待飞控</span></div>
+          <button id="enableKeyboard" class="keyboard-enable">启用键盘 ↑↓←→ / WASD</button><p id="inputHint" class="input-hint" role="status">点击“启用键盘”后使用方向键操纵。</p>
+          <div class="field-pair"><label>起飞高度 / m<input id="height" type="number" min="0.5" max="30" step="0.5" value="5"></label><label>速度 / m/s<input id="speed" type="number" min="0.2" max="8" step="0.2" value="2"></label></div>
+          <div class="button-row"><button data-op="takeoff">起飞 T</button><button data-op="hold">悬停</button><button data-op="land">降落 L</button></div>
+          <div class="key-grid"><button data-key="q">左转 Q</button><button data-key="w">前进 W</button><button data-key="e">右转 E</button><button data-key="a">左移 A</button><button data-key="s">后退 S</button><button data-key="d">右移 D</button><button data-key="r">上升 R</button><button data-key="f">下降 F</button></div>
+          <button id="finish" class="finish">降落并保存</button><p class="help">按住移动，松开或切出页面悬停；前后左右以机头为准。<span id="commandLatency"></span></p><p id="commandStatus" class="command-status" role="status"></p>
+        </section>
+        <section class="panel scene-switch"><div class="section-title"><h2>切换场景</h2><span class="small-tag">SCENES</span></div>
+          <label>下次启动的场景<select id="sceneSelect"><option value="simple">城市走廊</option><option value="complex_urban">复杂街区</option><option value="industrial_yard">工业场地</option><option value="ksql_airport">KSQL 机场</option></select></label>
+          <p id="sceneDescription" class="help"></p><label>采集方式<select id="captureMode"><option value="teleop">网页手动飞行</option><option value="route">自动航线（自动起飞）</option></select></label>
+          <p id="commandModeHelp" class="help"></p><textarea id="sceneCommand" rows="4" readonly aria-label="场景启动命令"></textarea><button id="copySceneCommand" disabled>复制命令到终端</button>
+          <a id="downloadSceneScript" class="secondary-link" download>下载启动脚本 .sh ↗</a><p class="help">先结束并保存当前采集，再在终端运行新命令。下载的脚本可在终端用 bash 运行；网页不会直接启动新仿真。</p><p id="sceneCommandStatus" role="status" class="command-status"></p>
         </section>
       </aside>
     </div>
-    <section class="panel map-panel">
-      <div class="panel-head"><div><div class="eyebrow">LIO VIEW</div><h2>配准点云与定位轨迹</h2></div><span id="mapFrame">等待点云</span></div>
-      <canvas id="map" aria-label="配准点云与 LiDAR IMU 轨迹的俯视图"></canvas>
-      <div class="legend"><span><i class="swatch cloud"></i>点云抽样</span><span><i class="swatch lio"></i>LiDAR / IMU</span><span><i class="swatch loose"></i>GPS 松组合</span></div>
-      <p class="help">点云与定位轨迹使用算法原始坐标系；上方场景使用 Gazebo ENU 坐标系。</p>
-    </section>
+    <footer class="page-footer"><span>msim · 本机 SLAM 可视化</span><span id="dataDescription">仿真传感器数据 · WebGL 三维渲染 · 浏览器离线可用</span></footer>
   </main>
-</body>
-</html>
+</body></html>

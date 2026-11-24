@@ -22,6 +22,8 @@ from rtklib.msg import GNSS_Info, GNSS_Info_ZD
 from std_msgs.msg import String
 from scene_profile import from_environment, load_scene_profile
 from teleop_controls import trajectory_window
+from capture_health import raise_if_simulation_crashed,raise_recorder_exit,require_recording_space
+from run_storage import archive_runtime
 
 HERE = Path(__file__).resolve().parent
 TOPICS = ['/clock', '/ground_truth/state', '/imu/data', '/velodyne_points']
@@ -52,6 +54,7 @@ def stop(process):
 
 def capture(args):
     run = args.run
+    require_recording_space(run.parent)
     run.mkdir(parents=True, exist_ok=False)
     scene = from_environment()
     (run/'scene-profile.json').write_text(json.dumps(scene, indent=2)+'\n')
@@ -92,12 +95,15 @@ def capture(args):
     (run/'capture-settings.json').write_text(json.dumps(dict(
         duration_s=args.duration_s,route_clock=os.environ.get('MSIM_ROUTE_CLOCK','wall'),
         interactive=args.interactive, mapping_only=args.mapping_only,
+        teleop_takeoff_height_m=float(os.environ.get('MSIM_TELEOP_HEIGHT_M','5')) if args.interactive else None,
+        teleop_speed_mps=float(os.environ.get('MSIM_TELEOP_SPEED_MPS','2')) if args.interactive else None,
         flight_pattern=os.environ.get('MSIM_PX4_FLIGHT_PATTERN'),
         frontend=os.environ.get('MSIM_FASTGLIO_FRONTEND','marsim'),
         gnss_source=os.environ.get('MSIM_GNSS_SOURCE','legacy'),
         point_filter_num=args.fastglio_point_filter_num,
         fusion_processing_delay_s=float(os.environ.get('MSIM_FUSION_DELAY_S', '0')),
         world_source=os.environ.get('MSIM_WORLD_SOURCE'),
+        scene_key=os.environ.get('MSIM_SCENE_KEY',scene['name']),
         origin_lla_deg_m=scene['origin_lla_deg_m'],
         spawn_enu_m=scene['spawn_enu_m'], flight_height_m=scene['flight_height_m'],
         spoof_start_s=os.environ.get('MSIM_SPOOF_START_S','inf'),
@@ -128,6 +134,7 @@ def capture(args):
     tile_log = (run / 'window-layout.log').open('w')
     map_log = (run / 'mapping.log').open('w')
     web_log = (run / 'web-console.log').open('w')
+    phase='starting_ros'
     try:
         launch_file = args.launch_file or HERE / 'uav_world.launch'
         launch_args = (args.launch_arg if args.launch_file else
@@ -176,20 +183,24 @@ def capture(args):
                 rospy.Subscriber('/imu/data', rospy.AnyMsg, on_imu, queue_size=100),
                 rospy.Subscriber('/velodyne_points', rospy.AnyMsg, on_lidar, queue_size=20)]
         ready_deadline = time.monotonic() + 90
+        phase='waiting_sensors'
         while time.monotonic() < ready_deadline and not all(state['counts'][x] for x in
                                                             ('clock', 'truth', 'imu', 'lidar')):
+            raise_if_simulation_crashed(run/'launch.log')
             if launch.poll() is not None:
                 raise RuntimeError('Gazebo exited; see launch.log')
             time.sleep(0.1)
         if not all(state['counts'][x] for x in ('clock', 'truth', 'imu', 'lidar')):
             raise RuntimeError('required sensor topics did not arrive')
         if args.injector_script:
+            phase='waiting_gnss'
             env = dict(os.environ, MSIM_GNSS_LOG=str(run / 'injected-gps.jsonl'))
             injector = subprocess.Popen([sys.executable, str(args.injector_script)],
                 stdout=injector_log, stderr=subprocess.STDOUT,
                 env=env, start_new_session=True)
             injection_deadline = time.monotonic() + 45
             while time.monotonic() < injection_deadline:
+                raise_if_simulation_crashed(run/'launch.log')
                 if injector.poll() is not None:
                     raise RuntimeError('online GNSS injector exited; see injector.log')
                 if (run / 'injected-gps.jsonl').is_file() and \
@@ -214,6 +225,7 @@ def capture(args):
             else:
                 raise RuntimeError('Gazebo visualizer did not start; see gazebo-viz.log')
         if args.fastglio_launch:
+            phase='starting_fastglio'
             algorithm_args = [
                 'roslaunch', str(args.fastglio_launch),
                 'config_file:=' + str(args.fastglio_config),
@@ -227,6 +239,7 @@ def capture(args):
                 start_new_session=True)
             fastglio_deadline = time.monotonic() + 45
             while time.monotonic() < fastglio_deadline:
+                raise_if_simulation_crashed(run/'launch.log')
                 if fastglio.poll() is not None:
                     raise RuntimeError('FAST_GLIO exited; see fastglio-live.log')
                 try:
@@ -276,11 +289,15 @@ def capture(args):
         start = state['clock']
         deadline = time.monotonic() + max(120, args.duration_s * 8)
         next_report = 10
+        phase='recording'
         while args.duration_s == 0 or (state['clock'] or 0) - start < (args.duration_s + 2) * 1_000_000_000:
+            raise_if_simulation_crashed(run/'launch.log')
             if args.interactive and (stop_requested['value'] or stop_file.exists()):
                 break
-            if launch.poll() is not None or record.poll() is not None:
-                raise RuntimeError('simulation or recorder exited; see logs')
+            if launch.poll() is not None:
+                raise RuntimeError('仿真启动器退出；请检查 launch.log')
+            if record.poll() is not None:
+                raise_recorder_exit(run/'record.log',record.returncode)
             if controller is not None and controller.poll() is not None:
                 raise RuntimeError('flight controller exited; see controller.log')
             if injector is not None and injector.poll() is not None:
@@ -306,6 +323,11 @@ def capture(args):
             time.sleep(0.1)
         for sub in subs:
             sub.unregister()
+    except BaseException as error:
+        (run/'capture-failure.json').write_text(json.dumps(dict(phase=phase,error=str(error),
+            error_type=type(error).__name__,last_sim_time_ns=state['clock'],
+            sensor_counts=dict(state['counts']),launch_log=str(run/'launch.log')),indent=2)+'\n')
+        raise
     finally:
         if args.interactive:
             stop(controller)
@@ -318,6 +340,9 @@ def capture(args):
         stop(visualizer)
         stop(injector)
         stop(launch)
+        if os.environ.get('MSIM_RUNTIME_DIR'):
+            try:archive_runtime(os.environ['MSIM_RUNTIME_DIR'],run)
+            except (OSError,ValueError) as error:print(f'运行日志归档失败，原件保留在 {os.environ["MSIM_RUNTIME_DIR"]}: {error}',file=sys.stderr)
         launch_log.close()
         record_log.close()
         controller_log.close()

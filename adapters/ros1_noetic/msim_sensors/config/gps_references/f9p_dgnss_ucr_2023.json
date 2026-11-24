@@ -1,0 +1,37 @@
+{
+  "id": "f9p-dgnss-ucr",
+  "receiver": "u-blox ZED-F9P",
+  "mode": "single-frequency L1/E1/B1 code DGNSS with VN-DGNSS RTCM corrections",
+  "constellations": ["GPS", "Galileo", "BeiDou"],
+  "classification": "published_position_error_fit_demeaned",
+  "source": {
+    "title": "Lane-Level Localization and Map Matching for Advanced Connected and Automated Vehicle (CAV) Applications",
+    "authors": ["Jay A. Farrell", "Guoyuan Wu", "Wang Hu", "David Oswald", "Peng Hao"],
+    "year": 2023,
+    "report_number": "NCST-UCR-RR-23-13",
+    "doi": "10.7922/G25T3HSS",
+    "url": "https://rosap.ntl.bts.gov/view/dot/67203/dot_67203_DS1.pdf",
+    "pdf_sha256": "0766e1877633d9a59916739565fbb26279a9f86d80bcee4abeaaf647847a8bf6",
+    "alternate_url": "https://escholarship.org/content/qt1f7661b4/qt1f7661b4.pdf",
+    "location": "Appendix B, section 4, Table 1 (PDF page 57 in the 66-page USDOT copy)",
+    "experiment_date": "2021-07-02",
+    "sample_period_s": 1.0,
+    "duration_approx_s": 3600,
+    "conditions": "moving vehicle near UCR with a clear view of the sky; M8P fixed RTK reference",
+    "accessed": "2026-11-23"
+  },
+  "table_axes": "NED",
+  "table": {
+    "north": {"mean_m": 0.41, "alpha_1s": 0.9849, "white_sigma_m": 0.00, "bias_variance_m2": 0.08, "correlation_time_s": 65.60},
+    "east": {"mean_m": -0.09, "alpha_1s": 0.9922, "white_sigma_m": 0.03, "bias_variance_m2": 0.08, "correlation_time_s": 128.51},
+    "down": {"mean_m": 1.49, "alpha_1s": 0.9896, "white_sigma_m": 0.02, "bias_variance_m2": 0.18, "correlation_time_s": 95.31}
+  },
+  "implementation_scope": {
+    "mean": "zero; published finite-experiment means are recorded but not applied",
+    "white_sigma_rounding": "north 0.00 is the published rounded value, not proof of physically zero white noise",
+    "sample_rate": "native Gazebo cadence and delay retained; correlation time re-discretized at actual sample intervals; white sigma kept per sample, not a noise density",
+    "velocity": "ideal native velocity; no velocity-error calibration is provided by this position-only reference",
+    "environment_model": "disabled; no calibrated sky-obstruction law supplied by the reference",
+    "limits": "position-domain statistical reproduction; not raw GNSS/RTCM processing, vendor hardware emulation, RTK fixed performance, or an urban-canyon calibration"
+  }
+}

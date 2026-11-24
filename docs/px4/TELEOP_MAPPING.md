@@ -1,6 +1,6 @@
 # 自由操纵采集与 RViz 实时建图
 
-`--teleop` 启动 Gazebo、RViz 和独立的键盘控制窗口，持续记录传感器、真值与 LiDAR/IMU 定位结果。飞机通过 PX4 OFFBOARD 正常飞行，不直接修改 Gazebo 模型位置。起飞前会先持续发送位置目标，再解锁与切换模式，控制循环保持 20 Hz；对应 [PX4 OFFBOARD 输入要求](https://docs.px4.io/main/en/flight_modes/offboard)。
+`--teleop` 启动 Gazebo、RViz 和独立的键盘控制窗口，持续记录传感器、真值与 LiDAR/IMU 定位结果。飞机通过 PX4 OFFBOARD 正常飞行，不直接修改 Gazebo 模型位置。起飞前会先持续发送位置目标，再解锁与切换模式，控制循环保持 50 Hz；对应 [PX4 OFFBOARD 输入要求](https://docs.px4.io/main/en/flight_modes/offboard)。
 
 ## 启动
 
@@ -28,8 +28,8 @@ cd /home/wzb/msim
 | 按键 / 按钮 | 功能 |
 | --- | --- |
 | T / 起飞 | 解锁并上升到设定相对高度，随后悬停 |
-| W / S | 沿机头方向前进 / 后退 |
-| A / D | 相对机头向左 / 向右平移 |
+| ↑ / ↓ 或 W / S | 沿机头方向前进 / 后退 |
+| ← / → 或 A / D | 相对机头向左 / 向右平移 |
 | R / F | 上升 / 下降 |
 | Q / E | 左转 / 右转 |
 | 空格 / Esc / 悬停 | 停止移动并保持当前位置 |
@@ -84,3 +84,11 @@ python tools/validate-teleop-flight.py --run /绝对路径/本次运行目录
 图形模式的证据为 [键盘窗口截图](../../runs/teleop-validation-20261122/gui-03/control-window.png)、[RViz 实时截图](../../runs/teleop-validation-20261122/gui-03/rviz-window.png)、[键盘事件验证](../../runs/teleop-validation-20261122/gui-03/teleop-ui-report.json)及[完整飞行验证](../../runs/teleop-validation-20261122/gui-03/teleop-integration-report.json)。该轮短程飞行的纯 LIO 三维 RMSE 为 0.102 m，不代表长航线精度。早期调试目录 `headless-01`、`gui-02` 保留，未作为最终通过记录。
 
 在配置好的 ROS/Pixi 环境运行 `python -m unittest discover -s tests/fastglio -v`，34 项测试通过；普通无 ROS 的环境会跳过依赖 ROS/PX4 的测试。
+
+## 2026-11-23 网页输入响应修正
+
+网页和 Qt 窗口均支持方向键及 W/A/S/D。网页新增“启用键盘”，修改高度或速度后按 Enter 可把焦点交还三维画布。网页按键立即发送，保持期间每 80 ms 续发；同一方向来自键盘和鼠标的输入分开记忆，释放其中一个不会错误清除另一个。HTTP 控制指令按顺序发送，只合并等待中的连续方向状态，避免网络拥塞时旧方向覆盖松键或新方向。控制器处理循环提高到 50 Hz，ROS 小指令关闭 Nagle 延迟，并以接收时间计算 0.35 秒失联保护，排队不会给旧指令续期。
+
+页面失焦、编辑设置和隐藏页面时清空方向输入，飞行中会进入位置保持；起飞过程继续原高度目标。显式“悬停”、空格或 Esc 仍可中断爬升。原来失焦直接发送悬停，会把 `taking_off` 切为 `flying`，可能在刚离地时就停住，这是本轮实际复现的问题。
+
+修正后的复杂街区验证已完成：起飞中编辑速度后仍达到 7.69 m，相邻指令无乱序，0.35 秒停止续发后进入位置保持，最终正常降落解除锁定并保存。43 项 Python 测试全部通过，网页输入另有 Node 测试。详细数字见 [网页控制说明](WEB_CONSOLE.md)及 `runs/control-response-verification-20261123/report.json`。

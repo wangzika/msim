@@ -94,7 +94,11 @@ def prepare_model(source, target, online_gnss=False, lidar_pitch_deg=0.0,
         relay = ET.SubElement(model, 'plugin', name='msim_gps_relay', filename='libmsim_gps_relay.so')
         ET.SubElement(relay, 'antenna_pose').text = pose
         for key, value in profile['gps'].items():
-            ET.SubElement(relay, key).text = str(value).lower() if isinstance(value, bool) else str(value)
+            ET.SubElement(relay, key).text = (' '.join(map(str,value)) if isinstance(value,list) else
+                                             str(value).lower() if isinstance(value, bool) else str(value))
+        reference=profile.get('gps_reference',{})
+        ET.SubElement(relay,'position_error_model_id').text=reference.get('id','custom')
+        ET.SubElement(relay,'environment_model').text=('uncalibrated_sky_fraction' if profile['gps']['adaptive_environment'] else 'disabled')
     link = model.find("link[@name='base_link']")
     if link is None:
         raise ValueError('PX4 Iris SDF has no base_link')

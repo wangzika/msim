@@ -4,13 +4,15 @@
 
 2026-11-22 新增 `--lidar-model mid360`：使用 Livox 官方 CSV 方向序列和原生 Livox FAST-LIO 入口，默认不抽稀。详细配置、时间与测试结果见 [Mid-360 接入报告](MID360_20261122.md)。
 
+2026-11-23：新采集默认 GPS 改为 `f9p-dgnss-ucr`，采用公开报告中的 ZED-F9P 码差分 DGNSS 去均值位置误差参数；关闭原生噪声叠加和未标定遮挡放大。旧 `standalone` 行为保留用于复现，明确标为“未标定经验模型”。[参数、公式、适用范围及参考资料](GNSS_RECEIVER_MODEL_20261123.md)。
+
 ## 一条命令运行
 
 ```bash
 cd /home/wzb/msim
 ./tools/px4-uav-capture.sh --duration-s 60 --fastglio-live --skip-signalsim \
   --flight-pattern route --route-clock sim --point-filter-num 4 \
-  --lidar-model vlp16 --imu-model mems-baseline --gps-model standalone \
+  --lidar-model vlp16 --imu-model mems-baseline --gps-model f9p-dgnss-ucr \
   --lidar-timing rolling --spoof-start-s 25 --spoof-east-rate-mps 0.18
 ```
 
@@ -32,7 +34,8 @@ Gazebo 与 RViz 同时显示；到时自动结束并保存录包及 PNG。不要
 | | `mid360` | 官方非重复扫描方向序列，360° × 名义 −7°～52°，200,000 点/s |
 | `--imu-model` | `mems-baseline`（默认） | 现有 MEMS 噪声、零偏与慢漂移基线 |
 | | `low-noise` | 上述噪声、零偏和随机驱动强度的 0.2 倍；不代表某台具体实物 |
-| `--gps-model` | `standalone`（默认） | 原生 GPS 噪声＋接收机相关偏差与白噪声；附加位置误差随周围遮挡变化 |
+| `--gps-model` | `f9p-dgnss-ucr`（默认） | ZED-F9P 码差分 DGNSS 文献位置误差参数；三轴噪声与报告方差匹配，无经验遮挡放大 |
+| | `standalone` | 历史未标定经验模型：原生误差＋附加噪声、偏差及遮挡放大 |
 | | `native` | 仅保留 PX4 原生 GPS 误差，不附加接收机噪声；仍支持欺骗 |
 | | `ideal` | 关闭原生及附加噪声，用作理想控制组；仍支持欺骗 |
 | `--lidar-timing` | `rolling`（默认） | 在不同物理时刻分批求交，保留各点实际采集时间 |
@@ -66,7 +69,9 @@ python3 tools/sensor-config.py --lidar-model hdl32 --gps-model standalone \
 
 保留原生 `gps0`，只将其输出重定向到 `msim_gps_raw`。中继向原生 MAVLink 接口期望的 `gps0` 话题发布，旧 Python HIL_GPS 发送停止；`px4_online_gnss.py` 在新模式下只记录和检测，不再次注入。PX4 与组合算法使用同一次噪声实现和攻击偏移。独立插件构建在 `build/gazebo-sensors/`，不覆盖第三方源码或插件库。
 
-`standalone` 的附加误差（每轴）：
+默认 `f9p-dgnss-ucr` 关闭原生噪声但保留原生时间戳与延迟。按 ENU 顺序，位置白噪声标准差为 `[0.03,0,0.02] m`，慢变项方差为 `[0.08,0.08,0.18] m²`，相关时间为 `[128.51,65.60,95.31] s`；报告方差直接计算为 `[0.0809,0.0800,0.1804] m²`。它是文献去均值位置随机项复现，速度为未标定的理想辅助量，约 5 Hz 的发布是对原实验 1 Hz 的工程扩展。完整说明及参考资料见 [GNSS 接收机基线](GNSS_RECEIVER_MODEL_20261123.md)。
+
+`standalone` 的历史附加误差（每轴，未标定经验设置）：
 
 | 参数 | 东／北 | 天向 |
 | --- | ---: | ---: |
@@ -80,7 +85,7 @@ python3 tools/sensor-config.py --lidar-model hdl32 --gps-model standalone \
 
 `standalone` 默认启用场景自适应附加误差：从 GPS 天线向 12 个方位、15°／35°／60° 仰角投射 36 条射线，在 `environment_range_m`（默认 80 m）内统计被碰撞几何挡住的比例 `f`。位置白噪声、相关偏差和速度白噪声在每个 GPS 历元乘以 `1 + environment_noise_gain × f`（默认增益 3）；发布给 PX4 的 `eph/epv`、ROS 位置和速度方差同步增加。`/msim/gps_samples` 记录 `sky_blocked_fraction`、`environment_noise_scale` 与报告方差，便于核对开阔区和建筑旁的变化。自定义传感器 JSON 可调整上述两个参数，或设置 `gps.adaptive_environment=false` 关闭；`native`、`ideal` 默认关闭。
 
-这是根据局部可见天空比例构造的环境误差近似，适用于在线 PX4 测量；它不逐卫星解算遮挡、多径或卫星几何。逐卫星传播仍由离线 SignalSim 观测链路处理。建筑需有 Gazebo 碰撞几何才会参与射线测试；单纯视觉贴图不会增加噪声。
+这是根据局部可见天空比例构造的**未标定经验模型**，不是 PX4 或厂商公式，也没有实测拟合依据；默认的新接收机基线不启用它。它不逐卫星解算遮挡、多径或卫星几何。逐卫星传播仍由离线 SignalSim 观测链路处理。建筑需有 Gazebo 碰撞几何才会参与射线测试；单纯视觉贴图不会增加噪声。
 
 原生 GPS 名义为 5 Hz，当前上游更新门限可能使实际间隔出现约 0.2/0.4 s，不能用名义值替代实测频率。原生发布延迟实测约 118～122 ms。中继保留样本时间；攻击的 `--spoof-start-s` 以原生 GPS 首个采样的仿真时刻为零点，日志的 `gnss_origin_sim_time_ns` 记录该原点。
 

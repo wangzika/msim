@@ -1,259 +1,349 @@
-'use strict';
+import {SlamViewer} from '/slam-viewer.js';
+import {movementKey,FlightInput,CommandQueue} from '/flight-input.js';
+import {buildSceneCommand,copyCommand} from '/scene-command.js';
 
-const view = {data: null, yaw: -0.72, elevation: 0.64, zoom: 1, pointer: null};
-const activeKeys = new Set();
-const colors = {truth: '#e4ecf1', gps: '#65bfff', route: '#f2d26f',
-  lio: '#49d6e9', loose: '#f6a86d'};
 const $ = id => document.getElementById(id);
-const lastOf = array => array[array.length - 1];
-const isInteractive = () => !!(view.data && view.data.settings && view.data.settings.interactive);
+const lastOf = values => values?.[values.length - 1];
+const format = (value, digits = 1) => Number.isFinite(value) ? value.toFixed(digits) : '—';
+const count = value => Number.isFinite(value) ? value.toLocaleString('zh-CN') : '—';
+const activeKeys = new Set();
+const flightInput = new FlightInput();
+const state = {data: null, connected: false, panel: 'map', paused: false, revisions: {}, metadata: {},
+  fetching: false, fetchingCloud: false, sceneInitialized: false,sceneModelsPromise:null,sceneModelStatus:''};
+let mapView, sceneView;
+const currentView = () => state.panel === 'map' ? mapView : sceneView;
+const interactive = () => state.connected && state.data?.control_available && !state.data?.complete;
 
-function canvasContext(canvas) {
-  const ratio = window.devicePixelRatio || 1;
-  const width = Math.max(1, canvas.clientWidth), height = Math.max(1, canvas.clientHeight);
-  canvas.width = Math.round(width * ratio); canvas.height = Math.round(height * ratio);
-  const ctx = canvas.getContext('2d'); ctx.scale(ratio, ratio);
-  return {ctx, width, height};
+function updateCameraUi() {
+  const view = currentView();if (!view) return;
+  $('followPose').checked = view.follow;
+  document.querySelectorAll('[data-view]').forEach(button => button.classList.toggle('selected', button.dataset.view === view.viewMode));
 }
 
-function format(value, digits = 1) {
-  return Number.isFinite(value) ? value.toFixed(digits) : '—';
-}
-
-function project(point, center, scale, width, height) {
-  const dx = point[0] - center[0], dy = point[1] - center[1], dz = point[2] - center[2];
-  const c = Math.cos(view.yaw), s = Math.sin(view.yaw);
-  const horizontal = c * dx - s * dy, depth = s * dx + c * dy;
-  return [width / 2 + horizontal * scale,
-    height / 2 + (depth * Math.sin(view.elevation) - dz * Math.cos(view.elevation)) * scale];
-}
-
-function drawLine(ctx, points, transform, color, width = 2, dash = []) {
-  ctx.beginPath(); let begun = false;
-  for (const value of points) {
-    if (!value || !value.every(Number.isFinite)) {begun = false; continue;}
-    const p = transform(value);
-    if (!begun) {ctx.moveTo(...p); begun = true;} else ctx.lineTo(...p);
+function initializeViewers() {
+  try {
+    mapView = new SlamViewer($('mapViewport'), {onChange: updateCameraUi});
+    sceneView = new SlamViewer($('sceneViewport'), {sceneMode: true, onChange: updateCameraUi});
+  } catch (error) {
+    $('mapEmpty').innerHTML = '<h2>三维渲染未能启动</h2><p>请使用支持 WebGL 2 的浏览器，并检查图形加速是否可用。</p>';
+    $('dataDescription').textContent = `WebGL：${error.message}`;
+    console.error(error);
   }
-  ctx.strokeStyle = color; ctx.lineWidth = width; ctx.setLineDash(dash);
-  ctx.stroke(); ctx.setLineDash([]);
 }
 
-function boxVertices(shape) {
-  const [x, y, z] = shape.center, [sx, sy, sz] = shape.size;
-  const c = Math.cos(shape.yaw), s = Math.sin(shape.yaw);
-  const points = [];
-  for (const zz of [-sz / 2, sz / 2]) for (const [xx, yy] of
-      [[-sx / 2, -sy / 2], [sx / 2, -sy / 2], [sx / 2, sy / 2], [-sx / 2, sy / 2]]) {
-    points.push([x + c * xx - s * yy, y + s * xx + c * yy, z + zz]);
+function selectPanel(panel) {
+  state.panel = panel;
+  $('mapPanel').hidden = panel !== 'map';$('scenePanel').hidden = panel !== 'scene';
+  $('mapLegend').hidden=panel !== 'map';$('layersPanel').hidden=panel !== 'map';
+  for (const name of ['map', 'scene']) {
+    $(`${name}Tab`).classList.toggle('selected', name === panel);
+    $(`${name}Tab`).setAttribute('aria-selected', String(name === panel));
   }
-  return points;
+  $('mapFrame').textContent = panel === 'map' ? (state.metadata.map?.frame || 'camera_init') : 'Gazebo ENU';
+  currentView()?.resize();
+  if (currentView() && !currentView().fitted) {
+    if (panel==='scene' && sceneView.modelBounds) sceneView.fitSceneContext(sceneView.sceneExtent==='all');else currentView().fit();
+  }
+  updateCameraUi();
+  if (state.data) updateCoordinates(state.data);
+  if (panel==='scene') ensureSceneModels();
 }
 
-function drawScene() {
-  const canvas = $('scene'), {ctx, width, height} = canvasContext(canvas);
-  ctx.clearRect(0, 0, width, height);
-  const data = view.data || {}, rows = data.samples || [], shapes = data.scene || [];
-  const first = rows[0], current = lastOf(rows);
-  const settings = data.settings || {};
-  const spawn = settings.spawn_enu_m || [0, 0, 0];
-  const center = first ? [first.east_m, first.north_m, 4] : [spawn[0], spawn[1], 4];
-  const scale = Math.min(width / 85, height / 55) * view.zoom;
-  const at = point => project(point, center, scale, width, height);
-  const origin = [Math.round(center[0] / 10) * 10, Math.round(center[1] / 10) * 10];
-  for (let i = -7; i <= 7; i++) {
-    drawLine(ctx, [[origin[0] + i * 10, origin[1] - 70, 0],
-      [origin[0] + i * 10, origin[1] + 70, 0]], at, '#244359', 1);
-    drawLine(ctx, [[origin[0] - 70, origin[1] + i * 10, 0],
-      [origin[0] + 70, origin[1] + i * 10, 0]], at, '#244359', 1);
-  }
-  const visible = shapes.filter(shape => Math.abs(shape.center[0] - center[0]) < 105 &&
-    Math.abs(shape.center[1] - center[1]) < 105);
-  const c = Math.cos(view.yaw), s = Math.sin(view.yaw);
-  visible.sort((a, b) => (s * (a.center[0] - b.center[0]) + c * (a.center[1] - b.center[1])));
-  for (const shape of visible) {
-    const v = boxVertices(shape).map(at);
-    const faces = [
-      {indices: [0, 1, 5, 4], fill: '#274b60'},
-      {indices: [1, 2, 6, 5], fill: '#315970'},
-      {indices: [2, 3, 7, 6], fill: '#2b5166'},
-      {indices: [3, 0, 4, 7], fill: '#24465a'},
-      {indices: [4, 5, 6, 7], fill: '#51778a'},
-    ];
-    for (const face of faces) {
-      ctx.beginPath(); face.indices.forEach((index, i) => i ? ctx.lineTo(...v[index]) : ctx.moveTo(...v[index]));
-      ctx.closePath(); ctx.fillStyle = face.fill; ctx.fill();
-      ctx.strokeStyle = '#7395a4'; ctx.globalAlpha = .55; ctx.lineWidth = .7; ctx.stroke(); ctx.globalAlpha = 1;
-    }
-  }
-  if (rows.length) {
-    const route = (data.route || []).map(point => [first.east_m + point.east_m,
-      first.north_m + point.north_m, settings.flight_height_m || 8]);
-    drawLine(ctx, route, at, colors.route, 2.5, [7, 5]);
-    drawLine(ctx, rows.map(row => [row.east_m, row.north_m, row.up_m]), at, colors.truth, 2.8);
-    drawLine(ctx, rows.map(row => [row.gps_east_m, row.gps_north_m, row.gps_up_m]), at, colors.gps, 2);
-    const p = at([current.east_m, current.north_m, current.up_m]);
-    ctx.beginPath(); ctx.arc(p[0], p[1], 7, 0, Math.PI * 2);
-    ctx.fillStyle = '#e4ecf1'; ctx.fill(); ctx.lineWidth = 3; ctx.strokeStyle = '#0b1a29'; ctx.stroke();
+async function ensureSceneModels() {
+  if (!state.data || !sceneView || state.sceneModelsPromise) return;
+  const runName=state.data.run;
+  state.sceneModelStatus='正在加载实际场景模型与纹理…';$('sceneGeometry').textContent=state.sceneModelStatus;
+  state.sceneModelsPromise=(async()=>{
+    try {
+      const response=await fetch('/api/scene-models');const description=await response.json();
+      if (!response.ok) throw new Error(description.error || '场景资源读取失败');
+      if (state.data?.run!==runName) return;
+      const result=await sceneView.loadSceneModels(description);
+      if (state.data?.run!==runName || !result) return;
+      const size=result.bounds.getSize(result.bounds.min.clone());
+      state.sceneModelStatus=`实际场景 ${result.objects} 组 · 范围 ${Math.round(size.x)} × ${Math.round(size.y)} m${description.warnings.length ? ' · 部分资源未加载' : ''}`;
+    } catch(error) {state.sceneModelStatus=`场景模型加载失败：${error.message}`;console.error(error);}
+    $('sceneGeometry').textContent=state.sceneModelStatus;
+  })();
+}
+
+function updateCoordinates(data) {
+  if (state.panel === 'scene') {
+    const row=lastOf(data.samples);
+    $('viewCoordinates').textContent=row ? `E ${format(row.east_m)}　N ${format(row.north_m)}　U ${format(row.up_m)} m` : 'E —　N —　U —';
   } else {
-    ctx.fillStyle = '#b6cbd5'; ctx.font = '16px system-ui';
-    ctx.fillText('等待仿真数据…', 24, 34);
+    const pose=data.live?.pose?.lio?.position || lastOf(data.live?.lio);
+    $('viewCoordinates').textContent=pose ? `X ${format(pose[0])}　Y ${format(pose[1])}　Z ${format(pose[2])} m` : 'X —　Y —　Z —';
   }
-  ctx.fillStyle = '#b0cbd7'; ctx.font = '14px system-ui';
-  ctx.fillText(`E / N / U · ${visible.length} 个场景碰撞体`, 20, height - 20);
 }
 
-function drawMap() {
-  const canvas = $('map'), {ctx, width, height} = canvasContext(canvas);
-  ctx.clearRect(0, 0, width, height);
-  const live = (view.data && view.data.live) || {}, cloud = live.cloud || [], lio = live.lio || [], loose = live.loose || [];
-  const all = [...cloud, ...lio, ...loose];
-  if (!all.length) {
-    ctx.fillStyle = '#a9c3d0'; ctx.font = '16px system-ui';
-    ctx.fillText('等待 LiDAR / IMU 数据；离线记录仍可查看上方场景与 GPS。', 20, 34);
-    return;
-  }
-  const minX = Math.min(...all.map(p => p[0])), maxX = Math.max(...all.map(p => p[0]));
-  const minY = Math.min(...all.map(p => p[1])), maxY = Math.max(...all.map(p => p[1]));
-  const range = Math.max(10, maxX - minX, maxY - minY);
-  const scale = Math.min(width - 40, height - 40) / (range * 1.15);
-  const cx = (minX + maxX) / 2, cy = (minY + maxY) / 2;
-  const at = p => [width / 2 + (p[0] - cx) * scale, height / 2 - (p[1] - cy) * scale];
-  ctx.fillStyle = '#6e9bb0'; ctx.globalAlpha = .6;
-  for (const point of cloud) {const p = at(point); ctx.fillRect(p[0], p[1], 2, 2);}
-  ctx.globalAlpha = 1;
-  drawLine(ctx, lio, at, colors.lio, 2.3);
-  drawLine(ctx, loose, at, colors.loose, 2.3);
-  $('mapFrame').textContent = live.cloud_frame || '算法坐标系';
+function layerVisibility() {
+  if (!mapView) return;
+  document.querySelectorAll('[data-layer]').forEach(input => mapView.setVisible(input.dataset.layer, input.checked));
 }
 
-function render() {
-  const data = view.data; if (!data) return;
-  const rows = data.samples || [], last = lastOf(rows), teleop = data.teleop || {}, live = data.live || {};
-  const settings = data.settings || {};
+function renderGeometry(data) {
+  if (!mapView || state.paused) return;
+  const live = data.live || {};
+  for (const key of ['lio', 'loose']) {
+    const frame = live.frames?.[key] || live.cloud_frame || 'camera_init';
+    mapView.setTrack(key, frame === 'camera_init' ? (live[key] || []) : []);
+  }
+  const pose = live.pose?.lio || (lastOf(live.lio) ? {position: lastOf(live.lio)} : null);
+  if (pose) mapView.setPose(pose);
+  layerVisibility();
+  const rows = data.samples || [], settings = data.settings || {};
+  if (!state.sceneInitialized) {sceneView.setBoxes(data.scene || []);state.sceneInitialized = true;}
+  sceneView.setTrack('truth', rows.map(row => [row.east_m, row.north_m, row.up_m]));
+  sceneView.setTrack('gps', rows.map(row => [row.gps_east_m, row.gps_north_m, row.gps_up_m]));
+  const origin = settings.spawn_enu_m || (rows[0] ? [rows[0].east_m, rows[0].north_m, rows[0].up_m] : [0, 0, 0]);
+  sceneView.setTrack('route', (data.route || []).map(p => [origin[0] + p.east_m, origin[1] + p.north_m,
+    origin[2] + (settings.flight_height_m || 8)]));
+  const latest = lastOf(rows);
+  if (live.pose?.truth) sceneView.setPose(live.pose.truth);
+  else if (latest) sceneView.setPose({position: [latest.east_m, latest.north_m, latest.up_m]});
+  if (!sceneView.fitted) sceneView.fit();
+  $('sceneGeometry').textContent=state.sceneModelStatus || `${(data.scene || []).length} 个碰撞体 · 切换到场景视图加载实际模型`;
+  // Load static geometry during initial setup so opening the scene while flying
+  // does not have to parse a large COLLADA file on the first key press.
+  ensureSceneModels();
+}
+
+function updateCloudLabels() {
+  const map = state.metadata.map, scan = state.metadata.current;
+  const displayed = mapView?.layers.map.geometry.getAttribute('position').count || 0;
+  $('mapCount').textContent = map ? `${count(displayed)} / ${count(map.total)}` : '等待';
+  $('scanCount').textContent = scan ? count(scan.count) : '无数据';
+  $('pointSummary').textContent = map ? `${count(displayed)} 点 · 地图共 ${count(map.total)} 点` : '等待累计点云';
+  const sources = {'/msim/lio_map': '累计地图 · 实时', registered_scan_accumulation: '配准帧累计 · 实时', 'map.pcd': '已保存地图 · 记录预览'};
+  $('cloudSource').textContent = sources[map?.source] || (scan ? '当前配准帧' : '等待地图');
+  $('mapEmpty').hidden = !!((map?.count || 0) + (scan?.count || 0));
+  if (state.panel === 'map') $('mapFrame').textContent = map?.frame || scan?.frame || 'camera_init';
+}
+
+function updateSceneCommand() {
+  const key = $('sceneSelect').value;
+  const scene = state.data?.scene_info?.choices?.find(value => value.key === key);
+  $('sceneDescription').textContent = scene?.description || '';
+  const mode=$('captureMode').value;
+  const next=buildSceneCommand(state.data,key,mode);
+  // Reassigning an unchanged textarea value clears a manual-copy selection.
+  if ($('sceneCommand').value!==next) $('sceneCommand').value=next;
+  $('copySceneCommand').disabled=!next;$('downloadSceneScript').hidden=!next;
+  $('downloadSceneScript').href=`/api/launch.sh?scene=${encodeURIComponent(key)}&mode=${mode}`;
+  $('commandModeHelp').textContent=mode==='teleop' ? '手动模式：在终端启动后，回到网页点击“起飞”。' : '自动航线：启动后自动起飞并执行航线；网页没有手动起飞按钮。';
+}
+
+function renderTelemetry(data) {
+  const latest = lastOf(data.samples), teleop = data.teleop || {}, settings = data.settings || {};
   $('runName').textContent = data.run;
-  $('sceneName').textContent = settings.world_source ? lastOf(settings.world_source.split('/')) : '场景未就绪';
-  $('simTime').textContent = last ? `仿真时间 ${(last.sim_time_ns / 1e9).toFixed(1)} s` : '仿真时间 —';
-  $('flightMode').textContent = settings.interactive ? (teleop.state || '等待控制器') :
-    (settings.flight_pattern || '等待仿真');
-  $('gpsStatus').textContent = last ? (last.detector_status === 'alarm' ? '报警' :
-    last.detector_status === 'normal' ? '正常' : '初始化') : '等待 GPS';
-  $('gpsStatus').style.color = last && last.detector_status === 'alarm' ? '#f47c7f' : '#e6f0f5';
-  $('position').textContent = last ? `${format(last.east_m)} / ${format(last.north_m)} / ${format(last.up_m)} m` : '—';
-  $('occlusion').textContent = last && Number.isFinite(last.sky_blocked_fraction) ?
-    `${(last.sky_blocked_fraction * 100).toFixed(0)} %` : '—';
-  $('noiseScale').textContent = last && Number.isFinite(last.environment_noise_scale) ?
-    `${last.environment_noise_scale.toFixed(2)} ×` : '—';
-  $('cloudCount').textContent = String((live.cloud && live.cloud.length) || 0);
-  $('controls').hidden = !settings.interactive;
-  const liveStatus = !!last && !data.complete;
-  $('connectionDot').className = `dot${liveStatus ? ' live' : ''}`;
-  $('connection').textContent = data.complete ? '实验已完成' : liveStatus ? '实时采集' : '等待数据';
-  drawScene(); drawMap();
+  $('sceneName').textContent = data.scene_info?.name || '自定义场景';
+  $('simTime').textContent = `仿真时间 ${latest ? format(latest.sim_time_ns / 1e9) : '—'} s`;
+  $('modeBadge').textContent = data.complete ? '记录预览' : settings.interactive ? '网页手动飞行' : '自动航线 · 自动起飞';
+  $('flightMode').textContent = teleop.mode || settings.flight_pattern || '—';
+  $('gpsStatus').textContent = latest ? ({normal: '正常', alarm: '报警'}[latest.detector_status] || '初始化') : '等待 GPS';
+  $('gpsStatus').style.color = latest?.detector_status === 'alarm' ? '#ef8e86' : '#c7dae7';
+  $('position').textContent = latest ? `${format(latest.east_m)} / ${format(latest.north_m)} / ${format(latest.up_m)} m` : '—';
+  $('occlusion').textContent = latest && Number.isFinite(latest.sky_blocked_fraction) ? `${format(latest.sky_blocked_fraction * 100, 0)} %` : '—';
+  $('noiseScale').textContent = Number.isFinite(latest?.environment_noise_scale) ? `${format(latest.environment_noise_scale, 2)} ×` : '—';
+  $('controls').hidden = !data.control_available;
+  $('teleopState').textContent = ({ready:'已准备',taking_off:'起飞中',flying:'飞行中',landing:'降落中',landed:'已降落'}[teleop.state] || teleop.state || '等待飞控');
+  $('downloadMap').hidden = !data.map_saved;
+  $('connectionDot').className = data.complete ? 'dot' : 'dot live';
+  $('connection').textContent = data.complete ? '记录已加载' : '实时采集';
+  $('looseAvailability').textContent = data.live?.loose?.length ? '有数据' : '无此结果';
+  if (teleop.finish_requested) {$('commandStatus').textContent = '正在降落，完成后保存数据。';$('finish').disabled = true;}
+  updateCoordinates(data);
 }
 
-async function refresh() {
+async function refreshState() {
+  if (state.fetching) return;state.fetching = true;
   try {
     const response = await fetch('/api/state', {cache: 'no-store'});
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    view.data = await response.json(); render();
+    const data = await response.json();state.connected = true;
+    if (state.data?.run !== data.run) {
+      clearKeys();state.revisions = {};state.metadata = {};state.sceneInitialized = false;state.sceneModelsPromise=null;state.sceneModelStatus='';
+      mapView?.reset();sceneView?.reset();$('finish').disabled = false;$('exportResult').hidden=true;
+      if (['simple', 'complex_urban', 'industrial_yard', 'ksql_airport'].includes(data.scene_info?.key))
+        $('sceneSelect').value = data.scene_info.key;
+      $('captureMode').value = data.settings?.interactive ? 'teleop' : 'route';
+      $('height').value = Number.isFinite(data.settings?.teleop_takeoff_height_m) ? data.settings.teleop_takeoff_height_m : 5;
+      $('speed').value = Number.isFinite(data.settings?.teleop_speed_mps) ? data.settings.teleop_speed_mps : 2;
+    }
+    state.data = data;renderTelemetry(data);renderGeometry(data);updateSceneCommand();
   } catch (error) {
+    state.connected = false;activeKeys.clear();
     $('connectionDot').className = 'dot error';
-    $('connection').textContent = '连接中断';
+    $('connection').textContent = state.data ? '服务已停止 · 保留最后画面' : '连接中断';
+    if (state.data) $('commandStatus').textContent = '采集服务已停止。';
     console.error('仿真状态读取失败', error);
-  }
+  } finally {state.fetching = false;}
 }
 
-async function command(value) {
+async function refreshClouds() {
+  if (!mapView || state.paused || state.fetchingCloud) return;state.fetchingCloud = true;
   try {
-    const response = await fetch('/api/teleop/command', {
-      method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(value),
-    });
-    const result = await response.json();
-    if (!response.ok) throw new Error(result.error || '指令失败');
-    $('commandStatus').textContent = '';
-  } catch (error) {
-    $('commandStatus').textContent = error.message;
-  }
+    await Promise.all(['map', 'current'].map(async key => {
+      const response = await fetch(`/api/cloud?layer=${key}&revision=${encodeURIComponent(state.revisions[key] || '')}`, {cache: 'no-store'});
+      if (response.status === 204) return;
+      if (!response.ok) throw new Error(`点云 HTTP ${response.status}`);
+      const buffer = await response.arrayBuffer(), number = Number(response.headers.get('X-Point-Count'));
+      if (buffer.byteLength !== number * 12 || number > 90000) throw new Error('点云数据长度不匹配');
+      const frame = response.headers.get('X-Cloud-Frame');
+      if (frame !== 'camera_init') throw new Error(`点云坐标系不匹配：${frame}`);
+      const values = new Float32Array(buffer);
+      if (!values.every(Number.isFinite)) throw new Error('点云包含无效坐标');
+      state.revisions[key] = response.headers.get('X-Cloud-Revision');
+      state.metadata[key] = {count: number, total: Number(response.headers.get('X-Point-Total')), frame,
+        source: response.headers.get('X-Cloud-Source')};
+      mapView.setCloud(key, values);layerVisibility();
+    }));
+    updateCloudLabels();
+  } catch (error) {$('cloudSource').textContent = error.message;console.error(error);}
+  finally {state.fetchingCloud = false;}
 }
 
-function clearKeys(hold = false) {
-  activeKeys.clear();
-  document.querySelectorAll('[data-key]').forEach(button => button.classList.remove('active'));
-  if (isInteractive()) command({op: hold ? 'hold' : 'keys', keys: []});
+let fetchingPoses=false;
+async function refreshPoses() {
+  if (fetchingPoses || state.paused || !state.connected || !state.data?.streaming) return;
+  fetchingPoses=true;
+  try {
+    const response=await fetch('/api/poses',{cache:'no-store'});if (!response.ok) return;
+    const data=await response.json();
+    if (data.pose?.truth) sceneView?.setPose(data.pose.truth);
+    if (data.pose?.lio && data.frames?.lio==='camera_init') mapView?.setPose(data.pose.lio);
+  } catch(_) {} finally {fetchingPoses=false;}
 }
 
-function setupControls() {
-  document.querySelectorAll('[data-op]').forEach(button => button.addEventListener('click', () => {
-    const op = button.dataset.op;
-    command(op === 'takeoff' ? {op, height_m: Number($('height').value)} : {op});
+async function sendCommand(value) {
+  if (!interactive()) return;
+  const abort=new AbortController(), timer=setTimeout(()=>abort.abort(),1200), started=performance.now();
+  try {
+    const response=await fetch('/api/teleop/command',{method:'POST',signal:abort.signal,
+      headers:{'Content-Type':'application/json'},body:JSON.stringify(value)});
+    const result=await response.json();if (!response.ok) throw new Error(result.error || '指令失败');
+    $('commandLatency').textContent=`指令往返 ${Math.round(performance.now()-started)} ms`;
+    $('commandStatus').textContent=value.op==='finish' ? '正在降落，完成后保存数据。' : '';
+  } finally {clearTimeout(timer);}
+}
+const commandQueue=new CommandQueue(sendCommand,error=>{
+  flightInput.clear();activeKeys.clear();syncKeys();
+  $('commandStatus').textContent=`控制连接异常：${error.message}。已停止按键续发。`;
+});
+function command(value) {if (interactive()) return commandQueue.push(value);}
+function syncKeys() {
+  activeKeys.clear();for (const key of flightInput.keys()) activeKeys.add(key);
+  document.querySelectorAll('[data-key]').forEach(button=>button.classList.toggle('active',activeKeys.has(button.dataset.key)));
+  $('inputHint').textContent=activeKeys.size ? `正在操纵：${[...activeKeys].join(' / ').toUpperCase()}` : '↑↓←→ 或 W/A/S/D 平移，R/F 升降，Q/E 转向。';
+}
+function clearKeys(hold=false) {
+  flightInput.clear();syncKeys();
+  if (interactive()) command(hold ? {op:'hold'} : {op:'keys',keys:[]});
+}
+function enableKeyboard() {
+  currentView()?.renderer.domElement.focus({preventScroll:true});
+  $('inputHint').textContent='键盘已启用：方向键或 W/A/S/D 移动；空格悬停。';
+}
+function setupFlightControls() {
+  $('enableKeyboard').addEventListener('click',enableKeyboard);
+  document.querySelectorAll('[data-op]').forEach(button=>button.addEventListener('click',()=>{
+    clearKeys();const op=button.dataset.op;enableKeyboard();
+    command(op==='takeoff' ? {op,height_m:Number($('height').value)} : {op});
   }));
-  $('finish').addEventListener('click', () => {
-    if (confirm('降落并结束本次采集？')) command({op: 'finish'});
+  $('finish').addEventListener('click',()=>{clearKeys();command({op:'finish'});});
+  $('speed').addEventListener('change',()=>command({op:'speed',value:Number($('speed').value)}));
+  for (const id of ['height','speed']) $(id).addEventListener('keydown',event=>{
+    if (event.key==='Enter') {event.preventDefault();event.target.blur();enableKeyboard();}
   });
-  $('speed').addEventListener('change', () => command({op: 'speed', value: Number($('speed').value)}));
   for (const button of document.querySelectorAll('[data-key]')) {
-    const key = button.dataset.key;
-    button.addEventListener('pointerdown', event => {
-      button.setPointerCapture(event.pointerId); activeKeys.add(key); button.classList.add('active');
+    const key=button.dataset.key;
+    button.addEventListener('pointerdown',event=>{
+      if (!interactive()) return;
+      event.preventDefault();enableKeyboard();button.setPointerCapture(event.pointerId);
+      flightInput.press(`pointer:${event.pointerId}`,key);syncKeys();command({op:'keys',keys:[...activeKeys]});
     });
-    const release = () => {
-      activeKeys.delete(key); button.classList.remove('active');
-      command(activeKeys.size ? {op: 'keys', keys: [...activeKeys]} : {op: 'hold'});
+    const release=event=>{
+      if (!flightInput.release(`pointer:${event.pointerId}`)) return;
+      syncKeys();command(activeKeys.size ? {op:'keys',keys:[...activeKeys]} : {op:'hold'});
     };
-    button.addEventListener('pointerup', release);
-    button.addEventListener('pointercancel', release);
+    button.addEventListener('pointerup',release);button.addEventListener('pointercancel',release);
+    button.addEventListener('lostpointercapture',release);
   }
-  document.addEventListener('keydown', event => {
-    if (!isInteractive() || ['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
-    const key = event.key.toLowerCase();
-    if ('wasdrfqe'.includes(key) && key.length === 1) {
-      event.preventDefault(); activeKeys.add(key);
-      const button = document.querySelector(`[data-key="${key}"]`);
-      if (button) button.classList.add('active');
-    } else if (key === ' ' || key === 'escape') {event.preventDefault(); clearKeys(true);}
-    else if (key === 't') command({op: 'takeoff', height_m: Number($('height').value)});
-    else if (key === 'l') command({op: 'land'});
+  document.addEventListener('keydown',event=>{
+    if (!interactive()) return;
+    if (event.key==='Escape') {event.preventDefault();clearKeys(true);enableKeyboard();return;}
+    if (['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)) {
+      if (movementKey(event.key)) $('inputHint').textContent='正在编辑设置，飞行按键暂停。按 Enter 或点击“启用键盘”。';
+      return;
+    }
+    const key=movementKey(event.key);
+    if (key) {
+      event.preventDefault();const wasActive=activeKeys.has(key);
+      flightInput.press(`keyboard:${event.code || event.key}`,key);syncKeys();
+      if (!wasActive) command({op:'keys',keys:[...activeKeys]});
+    } else if (event.key===' ') {event.preventDefault();clearKeys(true);}
+    else if (event.key.toLowerCase()==='t' && !event.repeat) command({op:'takeoff',height_m:Number($('height').value)});
+    else if (event.key.toLowerCase()==='l' && !event.repeat) command({op:'land'});
   });
-  document.addEventListener('keyup', event => {
-    const key = event.key.toLowerCase();
-    if (activeKeys.delete(key)) {
-      const button = document.querySelector(`[data-key="${key}"]`);
-      if (button) button.classList.remove('active');
-      command(activeKeys.size ? {op: 'keys', keys: [...activeKeys]} : {op: 'hold'});
+  document.addEventListener('keyup',event=>{
+    if (flightInput.release(`keyboard:${event.code || event.key}`)) {
+      syncKeys();command(activeKeys.size ? {op:'keys',keys:[...activeKeys]} : {op:'hold'});
     }
   });
-  addEventListener('blur', () => clearKeys(true));
-  document.addEventListener('visibilitychange', () => {if (document.hidden) clearKeys(true);});
-  setInterval(() => {
-    if (isInteractive() && !document.hidden && activeKeys.size)
-      command({op: 'keys', keys: [...activeKeys]});
-  }, 150);
+  // Clearing the velocity snapshot stops movement without cancelling a takeoff.
+  // An explicit Hold/Esc remains available when the pilot wants to abort climbing.
+  addEventListener('blur',()=>{clearKeys();$('inputHint').textContent='页面失焦，方向输入已停止；点击“启用键盘”继续操纵。';});
+  document.addEventListener('visibilitychange',()=>{if (document.hidden) clearKeys();});
+  document.addEventListener('focusin',event=>{
+    if (['INPUT','SELECT','TEXTAREA'].includes(event.target.tagName)) {clearKeys();$('inputHint').textContent='正在编辑设置，按 Enter 或点击“启用键盘”返回操纵。';}
+  });
+  setInterval(()=>{if (interactive() && !document.hidden && activeKeys.size) command({op:'keys',keys:[...activeKeys]});},80);
 }
 
-function setupView() {
-  const canvas = $('scene');
-  canvas.addEventListener('pointerdown', event => {
-    view.pointer = [event.clientX, event.clientY]; canvas.setPointerCapture(event.pointerId);
-    canvas.classList.add('dragging');
+function setupDisplayControls() {
+  $('mapTab').addEventListener('click', () => selectPanel('map'));
+  $('sceneTab').addEventListener('click', () => selectPanel('scene'));
+  $('sceneLocalView').addEventListener('click',()=>sceneView?.fitSceneContext());
+  $('sceneWholeView').addEventListener('click',()=>sceneView?.fitSceneContext(true));
+  $('sceneShowModels').addEventListener('change',()=>{if(sceneView)sceneView.modelGroup.visible=$('sceneShowModels').checked;});
+  document.querySelectorAll('[data-view]').forEach(button => button.addEventListener('click', () => currentView()?.setView(button.dataset.view)));
+  $('fitView').addEventListener('click', () => currentView()?.fit());
+  $('followPose').addEventListener('change', () => currentView()?.setFollow($('followPose').checked));
+  $('pauseView').addEventListener('click', () => {
+    state.paused = !state.paused;$('pauseBanner').hidden = !state.paused;
+    $('pauseView').textContent = state.paused ? '继续显示' : '暂停显示';
+    if (!state.paused) {if (state.data) renderGeometry(state.data);refreshClouds();}
   });
-  canvas.addEventListener('pointermove', event => {
-    if (!view.pointer) return;
-    view.yaw += (event.clientX - view.pointer[0]) * .008;
-    view.elevation = Math.max(.12, Math.min(1.35,
-      view.elevation + (event.clientY - view.pointer[1]) * .006));
-    view.pointer = [event.clientX, event.clientY]; drawScene();
+  $('exportImage').addEventListener('click', async () => {
+    const view=currentView();if (!view) return;
+    $('exportImage').disabled=true;
+    try {
+      const blob=await view.exportPng();
+      const response=await fetch('/api/export/png',{method:'POST',headers:{'Content-Type':'image/png'},body:blob});
+      const result=await response.json();if (!response.ok) throw new Error(result.error || '保存失败');
+      const link=$('exportResult');link.href=result.url;link.download=`msim-${state.panel}-${state.data?.run || 'view'}.png`;
+      link.textContent='PNG 已保存 · 点击下载';link.hidden=false;
+    } catch(error) {$('dataDescription').textContent=`图片导出失败：${error.message}`;}
+    finally {$('exportImage').disabled=false;}
   });
-  const release = () => {view.pointer = null; canvas.classList.remove('dragging');};
-  canvas.addEventListener('pointerup', release);
-  canvas.addEventListener('pointercancel', release);
-  canvas.addEventListener('wheel', event => {
-    event.preventDefault(); view.zoom = Math.max(.3, Math.min(5, view.zoom * Math.exp(-event.deltaY * .001)));
-    drawScene();
-  }, {passive: false});
-  const reset = () => {view.yaw = -.72; view.elevation = .64; view.zoom = 1; drawScene();};
-  canvas.addEventListener('dblclick', reset); $('resetView').addEventListener('click', reset);
-  addEventListener('resize', render);
+  $('fullscreen').addEventListener('click', async () => {
+    try {if (document.fullscreenElement) await document.exitFullscreen();else await document.querySelector('.workspace-main').requestFullscreen();}
+    catch (error) {$('dataDescription').textContent = `无法进入全屏：${error.message}`;}
+  });
+  document.querySelectorAll('[data-layer]').forEach(input => input.addEventListener('change', layerVisibility));
+  $('pointSize').addEventListener('input', () => {mapView?.setPointSize(Number($('pointSize').value));$('pointSizeValue').textContent = `${Number($('pointSize').value).toFixed(1)} px`;});
+  $('colorMode').addEventListener('change', () => mapView?.setColorMode($('colorMode').value));
+  $('pointBudget').addEventListener('change', () => {mapView?.setBudget(Number($('pointBudget').value));updateCloudLabels();});
+  $('sceneSelect').addEventListener('change', updateSceneCommand);$('captureMode').addEventListener('change', updateSceneCommand);
+  $('copySceneCommand').addEventListener('click', async () => {
+    const copied=await copyCommand($('sceneCommand').value,navigator.clipboard,
+      ()=>{$('sceneCommand').focus();$('sceneCommand').select();},()=>document.execCommand('copy'));
+    $('sceneCommandStatus').textContent=copied ? '已尝试复制，命令保持选中。请到终端粘贴并按 Enter；若粘贴为空，在此按 Ctrl+C 再粘贴，或下载启动脚本。复制本身不会启动仿真。' : '浏览器未允许复制。命令已选中，请按 Ctrl+C 再粘贴，或下载启动脚本。';
+  });
 }
 
-setupControls(); setupView(); refresh(); setInterval(refresh, 1000);
+initializeViewers();setupFlightControls();setupDisplayControls();refreshState();refreshClouds();
+setInterval(refreshState, 1000);setInterval(refreshClouds, 700);
+setInterval(refreshPoses,100);
+setInterval(() => {if (mapView) $('fps').textContent = `${mapView.fps} FPS`;}, 1000);

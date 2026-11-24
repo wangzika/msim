@@ -9,7 +9,7 @@ import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'adapters/ros1_noetic/msim_sensors'))
-from sensor_profiles import resolve, validate, LIDARS, MID360_PATTERN
+from sensor_profiles import resolve, validate, LIDARS, MID360_PATTERN, DEFAULT_GPS
 
 spec = importlib.util.spec_from_file_location('assets', ROOT / 'adapters/ros1_noetic/fast_glio_uav/prepare_px4_assets.py')
 assets = importlib.util.module_from_spec(spec)
@@ -68,7 +68,7 @@ class SensorProfilesTest(unittest.TestCase):
             self.skipTest('PX4 dependencies not installed')
         with tempfile.TemporaryDirectory() as tmp:
             target = Path(tmp)/'vehicle.sdf'
-            assets.prepare_model(source, target, online_gnss=True, sensor_profile=resolve(lidar='hdl32'))
+            assets.prepare_model(source, target, online_gnss=True, sensor_profile=resolve(lidar='hdl32',gps='standalone'))
             model = ET.parse(target).getroot().find('model')
             self.assertIsNone(model.find("include[name='gps0']"))
             gps = model.find("model[@name='gps0']")
@@ -82,6 +82,45 @@ class SensorProfilesTest(unittest.TestCase):
             self.assertEqual(scanner.findtext('vertical_samples'), '32')
             self.assertEqual(scanner.findtext('timing'), 'rolling')
             self.assertIsNone(model.find(".//sensor[@name='msim_lidar']"))
+
+    def test_reference_gps_has_derived_covariance_and_documented_scope(self):
+        p=resolve();g=p['gps']
+        self.assertEqual(p['models']['gps'],DEFAULT_GPS)
+        self.assertFalse(g['native_noise']);self.assertFalse(g['adaptive_environment'])
+        self.assertEqual(g['position_sigma_enu_m'],[.03,0.,.02])
+        self.assertEqual(g['bias_tau_enu_s'],[128.51,65.6,95.31])
+        for actual,expected in zip(g['reported_variance_enu_m2'],[.0809,.08,.1804]):self.assertAlmostEqual(actual,expected)
+        self.assertIn('ideal',p['gps_reference']['implementation_scope']['velocity'])
+        self.assertEqual(p['gps_reference']['source']['report_number'],'NCST-UCR-RR-23-13')
+        # Results and global presets must not share mutable ENU arrays.
+        p['gps']['bias_tau_enu_s'][0]=1.
+        self.assertEqual(resolve()['gps']['bias_tau_enu_s'][0],128.51)
+
+    def test_reference_gps_rejects_double_noise_and_false_reported_covariance(self):
+        for key,value in [('native_noise',True),('adaptive_environment',True),('bias_tau_enu_s',[0,1,1]),
+                          ('position_sigma_enu_m',[.1,.2]),('reported_variance_enu_m2',[1,1,5])]:
+            p=resolve();p['gps'][key]=value
+            with self.assertRaises(ValueError):validate(p)
+
+    def test_custom_reference_changes_recompute_variance_and_are_not_called_published_fit(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            p=resolve();p['gps']['position_sigma_enu_m'][0]=.06
+            path=Path(tmp)/'custom.json';path.write_text(json.dumps(p));custom=resolve(path)
+            self.assertAlmostEqual(custom['gps']['reported_variance_enu_m2'][0],.0836)
+            self.assertEqual(custom['gps_reference']['classification'],'user_modified_from_published_fit')
+            self.assertIn('position_sigma_enu_m',custom['gps_reference']['parameter_overrides'])
+
+    def test_reference_gps_sdf_preserves_axis_order_and_disables_native_noise(self):
+        source=ROOT/'build/deps/PX4-Autopilot/Tools/simulation/gazebo-classic/sitl_gazebo-classic/models/iris/iris.sdf'
+        if not source.exists():self.skipTest('PX4 dependencies not installed')
+        with tempfile.TemporaryDirectory() as tmp:
+            target=Path(tmp)/'vehicle.sdf';assets.prepare_model(source,target,online_gnss=True,sensor_profile=resolve())
+            model=ET.parse(target).getroot().find('model');relay=model.find("plugin[@name='msim_gps_relay']")
+            self.assertEqual(model.findtext("model[@name='gps0']//plugin/gpsNoise"),'false')
+            self.assertEqual(relay.findtext('position_sigma_enu_m'),'0.03 0.0 0.02')
+            self.assertEqual(relay.findtext('adaptive_environment'),'false')
+            self.assertEqual(relay.findtext('position_error_model_id'),DEFAULT_GPS)
+            self.assertEqual(relay.findtext('environment_model'),'disabled')
 
 
 if __name__ == '__main__':

@@ -4,17 +4,16 @@ import json
 import math
 import os
 from pathlib import Path
-import queue
 import signal
 import threading
 import time
 
-from teleop_controls import KeyInput, MOVEMENT_KEYS, body_velocity
+from teleop_controls import CommandBuffer, KeyInput, MOVEMENT_KEYS, body_velocity
 
 
 class Controller:
     def __init__(self):
-        self.commands = queue.Queue()
+        self.commands = CommandBuffer()
         self.status = dict(state='connecting', armed=False, mode='等待 PX4', error=None)
         self.running = True
         self.finished = False
@@ -37,7 +36,7 @@ class Controller:
                 self.command(value)
             except (ValueError, TypeError) as error:
                 rospy.logwarn('Invalid teleop command: %s', error)
-        subscriber = rospy.Subscriber('/msim/teleop/command', String, receive, queue_size=20)
+        subscriber = rospy.Subscriber('/msim/teleop/command', String, receive, queue_size=5, tcp_nodelay=True)
         master = mavutil.mavlink_connection('udpin:0.0.0.0:14540', source_system=255)
         keys = KeyInput()
         speed = float(os.environ.get('MSIM_TELEOP_SPEED_MPS', '2'))
@@ -92,12 +91,11 @@ class Controller:
                         origin = position; set_hold(); state = 'ready'
                         (self.run/'teleop-ready.json').write_text(json.dumps(dict(ready=True))+'\n')
                         print('手动控制就绪：T 起飞，W/S/A/D 平移，R/F 升降，Q/E 转向，空格悬停，L 降落。', flush=True)
-                    while not self.commands.empty():
-                        command = self.commands.get_nowait()
+                    for command,received_at in self.commands.drain():
                         op = command.get('op')
                         try:
                             if op == 'keys':
-                                keys.update(command.get('keys', []), now)
+                                keys.update(command.get('keys', []), received_at)
                             elif op == 'speed':
                                 value = float(command['value'])
                                 if not math.isfinite(value) or not .2 <= value <= 8:
@@ -181,7 +179,7 @@ class Controller:
                         temporary = self.run/'teleop-status.json.tmp'
                         temporary.write_text(payload+'\n'); temporary.replace(self.run/'teleop-status.json')
                         last_report = now
-                    time.sleep(.05)
+                    time.sleep(.02)
         except Exception as error:
             self.status = dict(self.status, error=str(error), state='error')
             print(f'手动控制失败：{error}', flush=True)
@@ -212,7 +210,7 @@ def panel(controller):
             self.speed = QtWidgets.QDoubleSpinBox(); self.speed.setRange(.2, 8); self.speed.setSingleStep(.2); self.speed.setValue(float(os.environ.get('MSIM_TELEOP_SPEED_MPS', '2'))); self.speed.setSuffix(' m/s')
             self.speed.valueChanged.connect(lambda v: controller.command(dict(op='speed', value=v)))
             form.addRow('起飞相对高度', self.height); form.addRow('水平速度', self.speed); layout.addLayout(form)
-            layout.addWidget(QtWidgets.QLabel('W/S：前后　A/D：左右　R/F：升降\nQ/E：左转/右转　空格：悬停\n前后左右以机头朝向为准。\nT：起飞　L：降落　松键自动悬停\n请点击此窗口后操纵；切换窗口会悬停。'))
+            layout.addWidget(QtWidgets.QLabel('↑↓ / W/S：前后　←→ / A/D：左右　R/F：升降\nQ/E：左转/右转　空格：悬停\n前后左右以机头朝向为准。\nT：起飞　L：降落　松键自动悬停\n请点击此窗口后操纵；切换窗口会悬停。'))
             row = QtWidgets.QHBoxLayout()
             for text, op in [('起飞 (T)', 'takeoff'), ('悬停', 'hold'), ('降落 (L)', 'land')]:
                 button = QtWidgets.QPushButton(text); button.setFocusPolicy(QtCore.Qt.NoFocus)
@@ -230,16 +228,17 @@ def panel(controller):
 
         def keyPressEvent(self, event):
             if event.isAutoRepeat():return
-            key = event.text().lower()
+            key = {QtCore.Qt.Key_Up:'w',QtCore.Qt.Key_Down:'s',QtCore.Qt.Key_Left:'a',QtCore.Qt.Key_Right:'d'}.get(event.key(),event.text().lower())
             if key in MOVEMENT_KEYS:
                 self.keys.add(key)
+                controller.command(dict(op='keys',keys=sorted(self.keys)))
             elif key == 't':self.action('takeoff')
             elif key == 'l':self.action('land')
             elif event.key() in (QtCore.Qt.Key_Space, QtCore.Qt.Key_Escape):self.action('hold')
 
         def keyReleaseEvent(self, event):
             if event.isAutoRepeat():return
-            key = event.text().lower()
+            key = {QtCore.Qt.Key_Up:'w',QtCore.Qt.Key_Down:'s',QtCore.Qt.Key_Left:'a',QtCore.Qt.Key_Right:'d'}.get(event.key(),event.text().lower())
             if key in self.keys:
                 self.keys.discard(key)
                 controller.command(dict(op='keys', keys=sorted(self.keys)))

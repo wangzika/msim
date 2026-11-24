@@ -1,7 +1,28 @@
 """Keyboard velocity conversion and input expiry, independent of ROS and Qt."""
 import math
+from collections import deque
+import threading
+import time
 
 MOVEMENT_KEYS = frozenset('wasdqerf')
+
+
+class CommandBuffer:
+    """Coalesce pending movement snapshots without dropping discrete actions."""
+    def __init__(self):
+        self.pending=deque();self.lock=threading.Lock()
+
+    def put(self,command):
+        item=(dict(command),time.monotonic())
+        with self.lock:
+            if command.get('op') in ('keys','hold') and self.pending and self.pending[-1][0].get('op') in ('keys','hold'):
+                self.pending[-1]=item
+            else:self.pending.append(item)
+
+    def drain(self):
+        with self.lock:
+            items=list(self.pending);self.pending.clear()
+        return items
 
 
 def body_velocity(keys, yaw, speed=2., vertical=.8, turn=math.pi/6):

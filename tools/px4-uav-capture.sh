@@ -9,6 +9,7 @@ scene_profile=""
 sensor_args=()
 scene=simple
 world_input=""
+custom_world=false
 frontend=auto
 point_filter_num=auto
 fusion_delay_s=0.65
@@ -54,9 +55,10 @@ while (($#)); do
     --scene-profile) scene_profile="$2"; shift 2;;
     --list-sensors) /usr/bin/python3 "$MSIM_ROOT/tools/sensor-config.py" --list; exit 0;;
     --lidar-model|--imu-model|--gps-model|--lidar-timing) sensor_args+=("$1" "$2"); shift 2;;
-    --help) echo 'px4-uav-capture.sh [--web [--web-port 8766] [--teleop]] [--fastglio-live --flight-pattern route] [--duration-s 60] [--scene simple|complex_urban|industrial_yard|ksql_airport] [--scene-profile file.json] [--lidar-model vlp16|hdl32|os1-64|mid360] [--imu-model mems-baseline|low-noise] [--gps-model standalone|native|ideal] [--lidar-timing rolling|snapshot] [--list-sensors]'; exit 0;;
+    --help) echo 'px4-uav-capture.sh [--web [--web-port 8766] [--teleop]] [--fastglio-live --flight-pattern route] [--duration-s 60] [--scene simple|complex_urban|industrial_yard|ksql_airport] [--scene-profile file.json] [--lidar-model vlp16|hdl32|os1-64|mid360] [--imu-model mems-baseline|low-noise] [--gps-model f9p-dgnss-ucr(default)|standalone(uncalibrated)|native|ideal] [--lidar-timing rolling|snapshot] [--list-sensors] [--list-scenes]'; exit 0;;
     --scene) scene="$2"; shift 2;;
-    --world) world_input="$2"; shift 2;;
+    --list-scenes) /usr/bin/python3 "$MSIM_ROOT/tools/scene-list.py"; exit 0;;
+    --world) world_input="$2"; custom_world=true; shift 2;;
     --fastglio-frontend) frontend="$2"; shift 2;;
     --point-filter-num) point_filter_num="$2"; shift 2;;
     --fusion-delay-s) fusion_delay_s="$2"; shift 2;;
@@ -80,6 +82,14 @@ if $web_console; then
   if [[ ! "$web_port" =~ ^[0-9]+$ ]] || ((web_port<1024 || web_port>65535)); then
     echo '--web-port 须为 1024～65535 的端口。' >&2; exit 2
   fi
+  /usr/bin/python3 - "$web_port" <<'PY'
+import socket,sys
+port=int(sys.argv[1])
+with socket.socket() as listener:
+    listener.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)
+    try:listener.bind(('127.0.0.1',port))
+    except OSError:raise SystemExit(f'网页端口 {port} 已被占用。请先结束旧采集或旧预览，再启动新命令；同一套 PX4/ROS 不能重复启动。')
+PY
 fi
 if $teleop; then
   if $postprocess; then echo '--teleop 与 --postprocess-only 不能同时使用。' >&2; exit 2; fi
@@ -140,9 +150,11 @@ if $gazebo_viz; then
 fi
 if $headless; then gui=false; fi
 if [[ -z "$run" ]]; then
-  run="$MSIM_ROOT/runs/uav-px4-$(date +%Y%m%d-%H%M%S)"
+  recording_root=$(/usr/bin/python3 "$MSIM_ROOT/adapters/ros1_noetic/fast_glio_uav/run_storage.py" root "$MSIM_ROOT")
+  run="$recording_root/uav-px4-$(date +%Y%m%d-%H%M%S)"
 fi
 run="$(realpath -m "$run")"
+/usr/bin/python3 "$MSIM_ROOT/adapters/ros1_noetic/fast_glio_uav/run_storage.py" link "$MSIM_ROOT" "$run"
 if ! $postprocess; then
   if [[ ! -x "$PX4_ROOT/build/px4_sitl_default/bin/px4" ]]; then
     echo "PX4 SITL not built: $PX4_ROOT/build/px4_sitl_default/bin/px4" >&2
@@ -163,8 +175,21 @@ if ! $postprocess; then
   export PX4_ROOT
   export PYTHONPATH="$MSIM_ROOT/build/px4-pydeps${PYTHONPATH:+:$PYTHONPATH}"
   export ROS_PACKAGE_PATH="$MSIM_ROOT/adapters/ros1_noetic:$PX4_ROOT:$PX4_ROOT/Tools/simulation/gazebo-classic:${ROS_PACKAGE_PATH:-}"
-  export ROS_LOG_DIR="$run/roslogs"
-  export ROS_HOME="$run/ros-home"
+  runtime_dir=$(/usr/bin/python3 "$MSIM_ROOT/adapters/ros1_noetic/fast_glio_uav/run_storage.py" runtime "$run")
+  export ROS_LOG_DIR="$runtime_dir/roslogs"
+  export ROS_HOME="$runtime_dir/ros-home"
+  if [[ "$runtime_dir" != "$run" ]]; then
+    export MSIM_RUNTIME_DIR="$runtime_dir"
+    finish_runtime_storage() {
+      capture_exit_code=$?
+      trap - EXIT
+      /usr/bin/python3 "$MSIM_ROOT/adapters/ros1_noetic/fast_glio_uav/run_storage.py" archive "$runtime_dir" "$run" --cleanup || echo "运行日志仍保留在 $runtime_dir，请检查归档。" >&2
+      exit "$capture_exit_code"
+    }
+    trap finish_runtime_storage EXIT
+  else
+    unset MSIM_RUNTIME_DIR
+  fi
   assets="$MSIM_ROOT/build/px4-assets/$scene-${run##*/}"
   scene_args=()
   if [[ -n "$scene_profile" ]]; then scene_args+=(--profile "$(realpath "$scene_profile")"); fi
@@ -214,6 +239,8 @@ PY
   model="$assets/iris_msim.sdf"
   if $online_gnss; then model="$assets/iris_msim_online_gnss.sdf"; fi
   export MSIM_WORLD_SOURCE="$assets/urban_canyon_msim.world" MSIM_MODEL_SOURCE="$model"
+  export MSIM_SCENE_KEY="$scene"
+  if $custom_world; then export MSIM_SCENE_KEY=custom; fi
   export MSIM_FASTGLIO_FRONTEND="$frontend"
   export MSIM_FUSION_DELAY_S="$fusion_delay_s"
   if $teleop; then

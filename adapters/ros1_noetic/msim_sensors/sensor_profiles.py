@@ -9,6 +9,8 @@ import hashlib
 from pathlib import Path
 
 BASE = Path(__file__).parent / 'config/sensor_profile.json'
+DEFAULT_GPS = 'f9p-dgnss-ucr'
+GPS_REFERENCE = json.loads((BASE.parent/'gps_references/f9p_dgnss_ucr_2023.json').read_text())
 MID360_PATTERN = Path(__file__).resolve().parents[2] / 'gazebo_classic/data/livox/mid360.csv'
 MID360_SHA256 = 'aa1fc08b6a4400608dbd6ee832b7ea3a9c3c37197e734f60f58fe5abf762269a'
 LIDARS = {
@@ -25,6 +27,14 @@ LIDARS = {
 }
 IMUS = ('mems-baseline', 'low-noise')
 GPS = {
+    DEFAULT_GPS: dict(position_sigma_xy_m=0., position_sigma_z_m=0.,
+                     position_sigma_enu_m=[GPS_REFERENCE['table'][axis]['white_sigma_m'] for axis in ('east','north','down')],
+                     bias_sigma_enu_m=[math.sqrt(GPS_REFERENCE['table'][axis]['bias_variance_m2']) for axis in ('east','north','down')],
+                     bias_tau_enu_s=[GPS_REFERENCE['table'][axis]['correlation_time_s'] for axis in ('east','north','down')],
+                     velocity_sigma_xy_mps=0., velocity_sigma_z_mps=0.,
+                     reported_variance_mode='model_marginal',
+                     native_noise=False, adaptive_environment=False,
+                     environment_range_m=80., environment_noise_gain=0.),
     'standalone': dict(position_sigma_xy_m=.1, position_sigma_z_m=.15,
                        bias_sigma_xy_m=.7, bias_sigma_z_m=2., bias_tau_s=120.,
                        velocity_sigma_xy_mps=.05, velocity_sigma_z_mps=.1,
@@ -49,7 +59,7 @@ def resolve(base=None, lidar=None, imu=None, gps=None, timing=None):
     models = p.setdefault('models', {})
     # Custom profiles retain their own settings unless explicitly overridden.
     if base is None:
-        lidar, imu, gps, timing = lidar or 'vlp16', imu or 'mems-baseline', gps or 'standalone', timing or 'rolling'
+        lidar, imu, gps, timing = lidar or 'vlp16', imu or 'mems-baseline', gps or DEFAULT_GPS, timing or 'rolling'
     if lidar:
         for key in ('pattern_file','pattern_sha256','point_rate_hz','scan_pattern'):
             p['lidar'].pop(key, None)
@@ -68,7 +78,10 @@ def resolve(base=None, lidar=None, imu=None, gps=None, timing=None):
                     p['imu_px4'][key] *= .2
         models['imu'] = imu
     if gps:
-        p['gps'] = dict(GPS[gps]); models['gps'] = gps
+        p['gps'] = copy.deepcopy(GPS[gps]); models['gps'] = gps
+        p['gps_reference'] = (copy.deepcopy(GPS_REFERENCE) if gps==DEFAULT_GPS else
+                              dict(id=gps,classification='uncalibrated_experimental' if gps=='standalone' else 'simulation_control',
+                                   environment_model='uncalibrated_sky_fraction' if GPS[gps]['adaptive_environment'] else 'disabled'))
     p.setdefault('gps', dict(GPS['standalone']))
     p['gps'].setdefault('seed', 20261119)
     p['gps'].setdefault('bias_sigma_xy_m', 0.)
@@ -78,6 +91,15 @@ def resolve(base=None, lidar=None, imu=None, gps=None, timing=None):
     p['gps'].setdefault('adaptive_environment', False)
     p['gps'].setdefault('environment_range_m', 80.)
     p['gps'].setdefault('environment_noise_gain', 3.)
+    p['gps'].setdefault('reported_variance_mode', 'explicit_experimental')
+    if p['gps']['reported_variance_mode']=='model_marginal':
+        g=p['gps']
+        for key in ('position_sigma_enu_m','bias_sigma_enu_m'):
+            if not isinstance(g.get(key),list) or len(g[key])!=3 or any(isinstance(v,bool) or not isinstance(v,(int,float)) or not math.isfinite(v) or v<0 for v in g[key]):
+                raise ValueError('GPS ENU parameters require three finite nonnegative numbers: '+key)
+        variance=[a*a+b*b for a,b in zip(g['position_sigma_enu_m'],g['bias_sigma_enu_m'])]
+        g['reported_variance_enu_m2']=variance
+        g['reported_variance_xy_m2']=max(variance[:2]);g['reported_variance_z_m2']=variance[2]
     p['lidar'].setdefault('vertical_min_deg', -15.)
     p['lidar'].setdefault('vertical_max_deg', 15.)
     p['lidar'].setdefault('seed', 20261119)
@@ -89,6 +111,11 @@ def resolve(base=None, lidar=None, imu=None, gps=None, timing=None):
                        if p['lidar']['scan_pattern']=='livox_csv' else
                        'Research parameter presets; uniform beam elevations, not vendor-calibrated firing schedules.')
     validate(p)
+    reference=p.get('gps_reference',{})
+    if reference.get('id')==DEFAULT_GPS:
+        changed={k:p['gps'].get(k) for k,value in GPS[DEFAULT_GPS].items() if p['gps'].get(k)!=value}
+        reference['parameter_overrides']=changed
+        reference['classification']='user_modified_from_published_fit' if changed else GPS_REFERENCE['classification']
     return p
 
 
@@ -119,7 +146,13 @@ def validate(p):
         if l['vertical_samples']!=4 or not math.isclose(l['point_rate_hz'],l['horizontal_samples']*4*l['rate_hz']):
             raise ValueError('Mid-360 point rate must match samples per frame and frame rate')
     for key, value in g.items():
-        if key in ('native_noise', 'spoof_velocity_consistent', 'adaptive_environment'):
+        if key=='reported_variance_mode':
+            if value not in ('explicit_experimental','model_marginal'):raise ValueError('invalid GPS variance mode')
+        elif key in ('position_sigma_enu_m','bias_sigma_enu_m','bias_tau_enu_s','reported_variance_enu_m2'):
+            if not isinstance(value,list) or len(value)!=3 or any(isinstance(v,bool) or not isinstance(v,(float,int)) or not math.isfinite(v) or v<0 for v in value):
+                raise ValueError('GPS ENU parameters require three finite nonnegative numbers: '+key)
+            if key=='bias_tau_enu_s' and min(value)<=0:raise ValueError('GPS correlation times must be positive')
+        elif key in ('native_noise', 'spoof_velocity_consistent', 'adaptive_environment'):
             if not isinstance(value, bool):
                 raise ValueError('GPS flag must be boolean: ' + key)
         elif isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or value < 0:
@@ -128,3 +161,13 @@ def validate(p):
         raise ValueError('invalid GPS seed or reported variance')
     if not 1 <= g['environment_range_m'] <= 500 or g['environment_noise_gain'] > 20:
         raise ValueError('invalid GPS environment model parameters')
+    axes=('position_sigma_enu_m','bias_sigma_enu_m','bias_tau_enu_s')
+    if any(k in g for k in axes) and not all(k in g for k in axes):raise ValueError('GPS ENU error parameters must be provided together')
+    if g.get('reported_variance_mode')=='model_marginal':
+        if not all(k in g for k in axes) or g['native_noise'] or g['adaptive_environment']:
+            raise ValueError('Model-matched GPS variance requires ENU parameters, native_noise=false and adaptive_environment=false')
+        expected=[a*a+b*b for a,b in zip(g['position_sigma_enu_m'],g['bias_sigma_enu_m'])]
+        if 'reported_variance_enu_m2' not in g or any(not math.isclose(a,b,rel_tol=1e-10) for a,b in zip(expected,g['reported_variance_enu_m2'])):
+            raise ValueError('GPS reported covariance differs from the generated position error model')
+        if not math.isclose(g['reported_variance_xy_m2'],max(expected[:2])) or not math.isclose(g['reported_variance_z_m2'],expected[2]):
+            raise ValueError('GPS scalar accuracy differs from the ENU covariance')

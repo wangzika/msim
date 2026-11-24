@@ -8,11 +8,23 @@ import numpy as np
 
 ROOT=Path(__file__).resolve().parents[2]
 sys.path.insert(0,str(ROOT/'adapters/ros1_noetic/fast_glio_uav'))
-from teleop_controls import KeyInput,body_velocity,trajectory_window
+from teleop_controls import CommandBuffer,KeyInput,body_velocity,trajectory_window
 from lio_map_recorder import VoxelMap
 
 
 class TeleopControlsTest(unittest.TestCase):
+    def test_pending_movement_uses_latest_state_and_preserves_actions(self):
+        buffer=CommandBuffer()
+        for command in [dict(op='keys',keys=['w']),dict(op='keys',keys=['d']),
+                        dict(op='hold'),dict(op='takeoff'),dict(op='keys',keys=['a']),dict(op='finish')]:
+            buffer.put(command)
+        items=buffer.drain()
+        self.assertEqual([value['op'] for value,received in items],['hold','takeoff','keys','finish'])
+        self.assertEqual(items[2][0]['keys'],['a'])
+        self.assertEqual(buffer.drain(),[])
+        keys=KeyInput();keys.update(['w'],items[0][1])
+        self.assertFalse(keys.active(items[0][1]+.36),'Queue dwell must not renew an expired input')
+
     def test_body_directions_follow_yaw_and_up_is_negative_ned(self):
         np.testing.assert_allclose(body_velocity({'w'},0),[2,0,0,0])
         np.testing.assert_allclose(body_velocity({'w'},math.pi/2),[0,2,0,0],atol=1e-12)
