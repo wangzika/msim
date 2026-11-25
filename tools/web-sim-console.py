@@ -58,15 +58,21 @@ def numbers(text, count):
     return values if len(values) >= count and all(math.isfinite(v) for v in values) else None
 
 
-def launch_script(run, key, mode):
+def launch_script(run, key, mode, goal=None, speed=2., radius=2.):
     selected=next((scene for scene in SCENES if scene['key']==key),None)
-    if selected is None or mode not in ('teleop','route'):raise ValueError('Invalid scene or capture mode')
+    if selected is None or mode not in ('teleop','route','autonomy','explore'):raise ValueError('Invalid scene or capture mode')
     settings=read_json(run/'capture-settings.json',{})
     info=scene_metadata(run,settings);models=info['sensor_models']
     arguments=[str(ROOT/'tools/px4-uav-capture.sh'),'--web']
-    if mode=='teleop':
+    if mode=='explore':
+        goal=goal if goal is not None else settings.get('goal_relative_enu_m') or [0,300,12]
+        if len(goal)!=3 or any(not isinstance(v,(int,float)) or not math.isfinite(v) for v in goal) or not 5<=math.hypot(*goal[:2])<=1000 or not 3<=goal[2]<=30 or not math.isfinite(speed) or not .3<=speed<=3:raise ValueError('Invalid mission goal')
+        if not math.isfinite(radius) or not .5<=radius<=30 or radius>=math.hypot(*goal[:2])/2:raise ValueError('Invalid goal region')
+        arguments+=['--goal-enu',*[str(v) for v in goal],'--mission-speed-mps',str(speed),'--goal-radius-m',str(radius),'--autonomy-timeout-s','900']
+    elif mode in ('teleop','autonomy'):
         height=settings.get('teleop_takeoff_height_m') if key==info['key'] else None
-        arguments+=['--teleop','--teleop-height-m',str(height or selected['suggested_takeoff_height_m'])]
+        arguments+=['--'+mode,'--teleop-height-m',str(height or (5 if mode=='autonomy' and key=='simple' else selected['suggested_takeoff_height_m']))]
+        if mode=='autonomy':arguments+=['--return-after-s','40']
     else:arguments+=['--duration-s','300','--flight-pattern','route','--route-clock','sim','--skip-signalsim']
     arguments+=['--scene',key]
     for option,field,allowed,default in (
@@ -156,9 +162,25 @@ def read_json(path, fallback):
         return fallback
 
 
+LOG_FILES=('navigation-events.jsonl','px4-events.jsonl','controller.log','fastglio-live.log','launch.log','injector.log','record.log')
+
+
+def log_tail(run, name):
+    if name not in LOG_FILES:raise ValueError('Unknown log')
+    path=run/name
+    if not path.is_file():return dict(name=name,text='日志尚未生成。',available=False)
+    # Refuse symlinks outside this capture and bound every response/read.
+    if not path.resolve().is_relative_to(run.resolve()):raise ValueError('Invalid log path')
+    with path.open('rb') as stream:
+        size=os.fstat(stream.fileno()).st_size
+        stream.seek(max(0,size-65536));raw=stream.read(65536)
+    if size>65536:raw=raw.partition(b'\n')[2]
+    return dict(name=name,text=raw.decode('utf-8',errors='replace'),available=True,truncated=size>65536,size_bytes=size)
+
+
 def validate_command(value):
     if not isinstance(value, dict) or value.get('op') not in (
-            'keys', 'takeoff', 'hold', 'land', 'finish', 'speed'):
+            'keys', 'takeoff', 'hold', 'land', 'finish', 'speed', 'return_home'):
         raise ValueError('Unknown teleoperation command')
     op = value['op']
     if op == 'keys':
@@ -327,6 +349,10 @@ def make_handler(run, ros=None):
                 self.send_error(403)
                 return
             url=urlsplit(self.path);path=unquote(url.path)
+            if path=='/api/logs':
+                try:self.respond(log_tail(run,parse_qs(url.query).get('name',['navigation-events.jsonl'])[0]))
+                except ValueError:self.respond(dict(error='Unknown log'),code=400)
+                return
             if path=='/api/poses':
                 snapshot=ros.pose_snapshot() if ros else read_json(run/'web-lio-state.json',{})
                 self.respond(dict(pose=snapshot.get('pose',{}),frames=snapshot.get('frames',{})))
@@ -344,7 +370,9 @@ def make_handler(run, ros=None):
                 self.respond(resources.materialized.get(token) or asset.read_bytes(),mime);return
             if path=='/api/launch.sh':
                 query=parse_qs(url.query);key=query.get('scene',[''])[0];mode=query.get('mode',[''])[0]
-                try:payload=launch_script(run,key,mode)
+                try:
+                    goal=[float(v) for v in query['goal'][0].split(',')] if 'goal' in query else None
+                    payload=launch_script(run,key,mode,goal,float(query.get('speed',['2'])[0]),float(query.get('radius',['2'])[0]))
                 except ValueError:
                     self.respond(dict(error='Invalid scene or mode'),code=400);return
                 self.send_response(200);self.send_header('Content-Type','text/x-shellscript; charset=utf-8')
@@ -397,6 +425,9 @@ def make_handler(run, ros=None):
                                   scene_info=scene_metadata(run,settings),
                                   map_saved=(run/'map.pcd').is_file(),
                                   mapping=read_json(run/'mapping-report.json',{}),
+                                  navigation=read_json(run/'navigation-status.json',{}),
+                                  status_age_s=max(0.,time.time()-(run/'teleop-status.json').stat().st_mtime) if (run/'teleop-status.json').is_file() else None,
+                                  log_directory=str(run),log_files=LOG_FILES,
                                   live=ros.snapshot() if ros else read_json(run/'web-lio-state.json',{})))
             else:
                 self.send_error(404)

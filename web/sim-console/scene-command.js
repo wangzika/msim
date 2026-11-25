@@ -1,6 +1,6 @@
 const quote=value=>/^[A-Za-z0-9_./-]+$/.test(value) ? value : "'"+value.replace(/'/g,"'\\''")+"'";
 
-export function buildSceneCommand(data,sceneKey,mode) {
+export function buildSceneCommand(data,sceneKey,mode,mission=null) {
   const info=data && data.scene_info || {}, settings=data && data.settings || {};
   const choices=info.choices || [];
   if (!choices.some(scene=>scene.key===sceneKey)) return '';
@@ -12,8 +12,13 @@ export function buildSceneCommand(data,sceneKey,mode) {
   const filter=Number.isInteger(settings.point_filter_num) && settings.point_filter_num>0 && settings.point_filter_num<=100 ? settings.point_filter_num : 2;
   const executable=quote(info.command_path || '/home/wzb/msim/tools/px4-uav-capture.sh');
   const selected=choices.find(scene=>scene.key===sceneKey);
-  const height=sceneKey===info.key && Number.isFinite(settings.teleop_takeoff_height_m) ? settings.teleop_takeoff_height_m : selected.suggested_takeoff_height_m || 8;
-  const flags=mode==='teleop' ? `--web --teleop --teleop-height-m ${height}` : '--web --duration-s 300 --flight-pattern route --route-clock sim --skip-signalsim';
+  const height=sceneKey===info.key && Number.isFinite(settings.teleop_takeoff_height_m) ? settings.teleop_takeoff_height_m : mode==='autonomy' && sceneKey==='simple' ? 5 : selected.suggested_takeoff_height_m || 8;
+  let flags=mode==='autonomy' ? `--web --autonomy --teleop-height-m ${height} --return-after-s 40` : mode==='teleop' ? `--web --teleop --teleop-height-m ${height}` : '--web --duration-s 300 --flight-pattern route --route-clock sim --skip-signalsim';
+  if(mode==='explore') {
+    const goal=mission?.goal || settings.goal_relative_enu_m || [0,300,12], speed=mission?.speed ?? 2, radius=mission?.radius ?? 2;
+    if(goal.length!==3 || !goal.every(Number.isFinite) || Math.hypot(...goal.slice(0,2))<5 || Math.hypot(...goal.slice(0,2))>1000 || goal[2]<3 || goal[2]>30 || !Number.isFinite(speed) || speed<.3 || speed>3 || !Number.isFinite(radius) || radius<.5 || radius>30 || radius>=Math.hypot(...goal.slice(0,2))/2) return '';
+    flags=`--web --goal-enu ${goal.join(' ')} --mission-speed-mps ${speed} --goal-radius-m ${radius} --autonomy-timeout-s 900`;
+  }
   return `${executable} ${flags} --scene ${sceneKey} --lidar-model ${lidar} --imu-model ${imu} --gps-model ${gps} --lidar-timing ${timing} --point-filter-num ${filter}`;
 }
 

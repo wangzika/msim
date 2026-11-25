@@ -95,6 +95,12 @@ def capture(args):
     (run/'capture-settings.json').write_text(json.dumps(dict(
         duration_s=args.duration_s,route_clock=os.environ.get('MSIM_ROUTE_CLOCK','wall'),
         interactive=args.interactive, mapping_only=args.mapping_only,
+        autonomy=os.environ.get('MSIM_AUTONOMY')=='1',
+        localization_map=os.environ.get('MSIM_LOCALIZATION_MAP') or None,
+        goal_relative_enu_m=[float(x) for x in os.environ['MSIM_GOAL_ENU'].split(',')] if os.environ.get('MSIM_GOAL_ENU') else None,
+        mission_speed_mps=float(os.environ.get('MSIM_MISSION_SPEED_MPS','2')) if os.environ.get('MSIM_GOAL_ENU') else None,
+        goal_radius_m=float(os.environ.get('MSIM_GOAL_RADIUS_M','2')) if os.environ.get('MSIM_GOAL_ENU') else None,
+        autonomy_timeout_s=float(os.environ.get('MSIM_AUTONOMY_TIMEOUT_S','150')) if os.environ.get('MSIM_AUTONOMY')=='1' else None,
         teleop_takeoff_height_m=float(os.environ.get('MSIM_TELEOP_HEIGHT_M','5')) if args.interactive else None,
         teleop_speed_mps=float(os.environ.get('MSIM_TELEOP_SPEED_MPS','2')) if args.interactive else None,
         flight_pattern=os.environ.get('MSIM_PX4_FLIGHT_PATTERN'),
@@ -281,6 +287,8 @@ def capture(args):
         if args.interactive:
             record_topics.extend(['/msim/teleop/command', '/msim/teleop/status',
                                   '/cloud_registered', '/msim/lio_map/status'])
+            if os.environ.get('MSIM_AUTONOMY')=='1':
+                record_topics.extend(['/msim/navigation/status','/msim/return_path','/msim/localized_odom','/msim/planned_path'])
         record = subprocess.Popen(['rosbag', 'record', '-O', str(run / 'sensors.bag'), *record_topics],
             stdout=record_log, stderr=subprocess.STDOUT, start_new_session=True)
         if args.controller_script:
@@ -359,8 +367,11 @@ def capture(args):
         raise RuntimeError('sensors.bag missing or empty')
     if args.interactive:
         reason = stop_requested['reason'] or ('teleop_finish' if stop_file.exists() else 'duration_limit')
+        autonomous=os.environ.get('MSIM_AUTONOMY')=='1'
+        if autonomous and stop_file.exists():
+            reason=json.loads(stop_file.read_text()).get('reason',reason)
         (run/'capture-session.json').write_text(json.dumps(dict(
-            mode='teleop', stop_reason=reason, requested_duration_s=args.duration_s,
+            mode='autonomy' if autonomous else 'teleop', stop_reason=reason, requested_duration_s=args.duration_s,
             recording_complete=True, raw_bag=str(bag)), indent=2)+'\n')
     if args.fastglio_launch:
         required = (('/Odometry', '/path', '/cloud_registered') if args.mapping_only else

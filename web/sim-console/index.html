@@ -36,9 +36,18 @@
           <div class="viewport-hud"><span id="sceneGeometry">等待场景</span><span>白：真值 · 蓝：GPS · 黄：航线</span></div>
         </div></div>
         <div class="viewer-footer"><span>左键旋转 · 右键 / Shift 拖动平移 · 滚轮缩放 · 双击取景</span><a id="exportResult" class="export-result" hidden>PNG 已保存 · 点击下载</a><span id="viewCoordinates">X —　Y —　Z —</span></div>
-        <div class="map-legend" id="mapLegend"><span><i class="height-swatch"></i>按高度着色</span><span><i class="swatch current"></i>当前帧</span><span><i class="swatch lio"></i>LiDAR / IMU</span><span><i class="swatch loose"></i>GPS 松组合</span><span class="legend-note" id="frameNote">算法坐标系与 Gazebo ENU 分开显示。</span></div>
+        <div class="map-legend" id="mapLegend"><span><i class="height-swatch"></i>按高度着色</span><span><i class="swatch current"></i>当前帧</span><span><i class="swatch lio"></i>LiDAR / IMU</span><span><i class="swatch loose"></i>GPS 松组合</span><span><i class="swatch" style="background:#94e49c"></i>返航路线</span><span><i class="swatch" style="background:#d9a5ff"></i>规划 / 目标</span><span class="legend-note" id="frameNote">算法坐标系与 Gazebo ENU 分开显示。</span></div>
       </section>
       <aside class="sidebar">
+        <section class="panel" id="navigationPanel" hidden>
+          <div class="section-title"><h2>自主导航</h2><span class="small-tag" id="navigationState">等待定位</span></div>
+          <p id="navigationDetails" class="help" role="status"></p>
+          <div class="telemetry-grid"><div><span>解锁 / 状态更新</span><strong id="navHealth">—</strong></div><div><span>实际速度</span><strong id="navSpeed">—</strong></div><div><span>气压相对高度</span><strong id="navHeight">—</strong></div><div><span>LIO 数据年龄</span><strong id="navLio">—</strong></div></div>
+          <p id="navReason" class="navigation-alert" role="status"></p><p id="navEvent" class="help"></p>
+          <div class="button-row"><button data-op="return_home">立即返航</button><button data-op="hold">悬停</button><button data-op="land">降落</button></div>
+          <p class="help">独立 LIO 水平定位，气压高度；固定气压巡航高度、水平绕障；不支持自主升高翻越建筑。返航沿记录路线引导并重规划。</p>
+        </section>
+
         <section class="panel layers-panel" id="layersPanel">
           <div class="section-title"><h2>显示图层</h2><span class="small-tag">LAYERS</span></div>
           <label class="layer-row"><span><input type="checkbox" data-layer="map" checked><i class="height-swatch"></i>累计点云</span><small id="mapCount">—</small></label>
@@ -49,18 +58,24 @@
           <div class="display-settings"><label>点大小 <output id="pointSizeValue">2.0 px</output><input id="pointSize" type="range" min="1" max="5" step="0.25" value="2"></label><div class="field-pair"><label>点云配色<select id="colorMode"><option value="height">高度渐变</option><option value="solid">统一颜色</option></select></label><label>显示预算<select id="pointBudget"><option value="30000">3 万点</option><option value="60000">6 万点</option><option value="90000" selected>9 万点</option></select></label></div></div>
           <a id="downloadMap" class="secondary-link" href="/api/map.pcd" download hidden>下载已保存的完整地图 PCD ↗</a>
         </section>
-        <section class="panel telemetry-panel"><div class="section-title"><h2>实时状态</h2><span class="small-tag">TELEMETRY</span></div><div class="telemetry-grid"><div><span>飞控模式</span><strong id="flightMode">—</strong></div><div><span>GPS 检测</span><strong id="gpsStatus">—</strong></div><div class="full-field"><span>真值 E / N / U</span><strong id="position">—</strong></div><div><span>天空遮挡</span><strong id="occlusion">—</strong></div><div><span>噪声倍率</span><strong id="noiseScale">—</strong></div></div></section>
+        <section class="panel telemetry-panel"><div class="section-title"><h2>实时状态</h2><span class="small-tag">TELEMETRY</span></div><div class="telemetry-grid"><div><span>飞控模式</span><strong id="flightMode">—</strong></div><div><span>GPS 检测</span><strong id="gpsStatus">—</strong></div><div><span>解锁与连接</span><strong id="flightHealth">—</strong></div><div><span>实测速度 / 相对高度</span><strong id="flightMotion">—</strong></div><div class="full-field"><span>真值 E / N / U</span><strong id="position">—</strong></div><div><span>天空遮挡</span><strong id="occlusion">—</strong></div><div><span>噪声倍率</span><strong id="noiseScale">—</strong></div></div></section>
         <section class="panel controls" id="controls" hidden>
           <div class="section-title"><h2>手动飞行</h2><span class="small-tag" id="teleopState">等待飞控</span></div>
           <button id="enableKeyboard" class="keyboard-enable">启用键盘 ↑↓←→ / WASD</button><p id="inputHint" class="input-hint" role="status">点击“启用键盘”后使用方向键操纵。</p>
           <div class="field-pair"><label>起飞高度 / m<input id="height" type="number" min="0.5" max="30" step="0.5" value="5"></label><label>速度 / m/s<input id="speed" type="number" min="0.2" max="8" step="0.2" value="2"></label></div>
           <div class="button-row"><button data-op="takeoff">起飞 T</button><button data-op="hold">悬停</button><button data-op="land">降落 L</button></div>
           <div class="key-grid"><button data-key="q">左转 Q</button><button data-key="w">前进 W</button><button data-key="e">右转 E</button><button data-key="a">左移 A</button><button data-key="s">后退 S</button><button data-key="d">右移 D</button><button data-key="r">上升 R</button><button data-key="f">下降 F</button></div>
-          <button id="finish" class="finish">降落并保存</button><p class="help">按住移动，松开或切出页面悬停；前后左右以机头为准。<span id="commandLatency"></span></p><p id="commandStatus" class="command-status" role="status"></p>
+          <button id="finish" class="finish">降落并保存</button><p class="help"><span id="controlHelp">按住移动，松开或切出页面悬停；前后左右以机头为准。</span><span id="commandLatency"></span></p><p id="commandStatus" class="command-status" role="status"></p>
+        </section>
+        <section class="panel log-panel"><div class="section-title"><h2>运行日志</h2><span id="logHealth" class="small-tag">只读</span></div>
+          <label>日志来源<select id="logSource"><option value="navigation-events.jsonl">导航阶段与异常</option><option value="px4-events.jsonl">PX4 飞控消息</option><option value="controller.log">飞行控制器</option><option value="fastglio-live.log">FAST_GLIO 定位与建图</option><option value="launch.log">仿真启动</option><option value="record.log">录包与采集</option><option value="injector.log">GPS 注入</option></select></label>
+          <label class="log-auto"><input id="logAuto" type="checkbox" checked>每 2 秒刷新</label><button id="refreshLogs">刷新日志</button>
+          <pre id="logText" tabindex="0" aria-label="运行日志">等待读取</pre><a id="downloadLog" class="secondary-link" download="msim-log.txt">下载当前日志片段</a><p id="logPath" class="help"></p>
         </section>
         <section class="panel scene-switch"><div class="section-title"><h2>切换场景</h2><span class="small-tag">SCENES</span></div>
           <label>下次启动的场景<select id="sceneSelect"><option value="simple">城市走廊</option><option value="complex_urban">复杂街区</option><option value="industrial_yard">工业场地</option><option value="ksql_airport">KSQL 机场</option></select></label>
-          <p id="sceneDescription" class="help"></p><label>采集方式<select id="captureMode"><option value="teleop">网页手动飞行</option><option value="route">自动航线（自动起飞）</option></select></label>
+          <p id="sceneDescription" class="help"></p><label>采集方式<select id="captureMode"><option value="teleop">网页手动飞行</option><option value="route">自动航线（自动起飞）</option><option value="autonomy">自主返航实验（自动起飞）</option><option value="explore">目标点自主探索并返航</option></select></label>
+          <div id="goalInputs" hidden><p class="help">相对起飞点的目标中心，米；U 为固定巡航高度。允许区域内到达安全位置即可，中心被障碍占据时不强求飞到中心。</p><label>目标东 E<input id="goalEast" type="number" value="0" step="1"></label><label>目标北 N<input id="goalNorth" type="number" value="300" step="1"></label><label>高度 U<input id="goalUp" type="number" value="12" min="3" max="30" step="1"></label><label>目标允许半径 / m<input id="goalRadius" type="number" value="5" min="0.5" max="30" step="0.5"></label><label>巡航速度 m/s<input id="missionSpeed" type="number" value="2" min="0.3" max="3" step="0.1"></label></div>
           <p id="commandModeHelp" class="help"></p><textarea id="sceneCommand" rows="4" readonly aria-label="场景启动命令"></textarea><button id="copySceneCommand" disabled>复制命令到终端</button>
           <a id="downloadSceneScript" class="secondary-link" download>下载启动脚本 .sh ↗</a><p class="help">先结束并保存当前采集，再在终端运行新命令。下载的脚本可在终端用 bash 运行；网页不会直接启动新仿真。</p><p id="sceneCommandStatus" role="status" class="command-status"></p>
         </section>

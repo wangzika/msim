@@ -31,6 +31,60 @@ def request(handler, path, method='GET', value=None):
 
 
 class WebConsoleTest(unittest.TestCase):
+    def test_log_tail_is_bounded_whitelisted_and_refuses_outside_symlinks(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp);(root/'controller.log').write_bytes(b'x'*100000+b'\nlast event\n')
+            handler=web.make_handler(root)
+            status,_,body=request(handler,'/api/logs?name=controller.log')
+            result=json.loads(body)
+            self.assertEqual(status,200);self.assertTrue(result['truncated'])
+            self.assertLessEqual(len(result['text']),65536);self.assertIn('last event',result['text'])
+            self.assertEqual(request(handler,'/api/logs?name=../../README.md')[0],400)
+            (root/'px4-events.jsonl').symlink_to('/etc/passwd')
+            self.assertEqual(request(handler,'/api/logs?name=px4-events.jsonl')[0],400)
+            result=json.loads(request(handler,'/api/logs?name=navigation-events.jsonl')[2])
+            self.assertFalse(result['available'])
+
+    def test_goal_radius_is_preserved_and_rejects_oversized_or_nonfinite(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            handler=web.make_handler(Path(tmp))
+            status,_,body=request(handler,'/api/launch.sh?scene=ksql_airport&mode=explore&goal=100,300,12&radius=8')
+            self.assertEqual(status,200);self.assertIn(b'--goal-radius-m 8.0',body)
+            for radius in ('nan','31','0','3'):
+                goal='5,0,12' if radius=='3' else '100,300,12'
+                self.assertEqual(request(handler,f'/api/launch.sh?scene=ksql_airport&mode=explore&goal={goal}&radius={radius}')[0],400)
+
+    def test_goal_mission_download_validates_coordinates_and_speed(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            handler=web.make_handler(Path(tmp))
+            status,_,code=request(handler,'/api/launch.sh?scene=ksql_airport&mode=explore&goal=-20,300,12&speed=1.5')
+            self.assertEqual(status,200);self.assertIn(b'--goal-enu -20.0 300.0 12.0',code)
+            self.assertIn(b'--mission-speed-mps 1.5',code)
+            self.assertEqual(request(handler,'/api/launch.sh?scene=ksql_airport&mode=explore&goal=0,300,nan')[0],400)
+            self.assertEqual(request(handler,'/api/launch.sh?scene=ksql_airport&mode=explore&speed=99')[0],400)
+
+    def test_autonomy_launch_is_explicit_and_uses_baseline_without_map(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            code=web.launch_script(Path(tmp),'simple','autonomy')
+            self.assertIn(b'--autonomy --teleop-height-m 5 --return-after-s 40',code)
+            self.assertNotIn(b'--localization-map',code)
+            self.assertNotIn(b'--teleop ',code)
+
+    def test_autonomy_status_and_return_command(self):
+        commands=[]
+        bridge=SimpleNamespace(command=lambda value:commands.append(value),snapshot=lambda:{})
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)
+            (root/'capture-settings.json').write_text('{"interactive":true,"autonomy":true}')
+            (root/'navigation-status.json').write_text('{"state":"returning","armed":true,"return_path_lio":[[1,2,3]]}')
+            handler=web.make_handler(root,bridge)
+            status,_,body=request(handler,'/api/state')
+            self.assertEqual(status,200);self.assertEqual(json.loads(body)['navigation']['return_path_lio'],[[1,2,3]])
+            self.assertEqual(request(handler,'/api/teleop/command','POST',{'op':'return_home'})[0],200)
+            self.assertEqual(commands,[{'op':'return_home'}])
+            (root/'capture-report.json').write_text('{}')
+            self.assertEqual(request(handler,'/api/teleop/command','POST',{'op':'return_home'})[0],409)
+
     def test_launch_script_keeps_reference_gps_preset(self):
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp)

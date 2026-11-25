@@ -1,0 +1,11 @@
+{
+  "pass_sampled_clearance": true,
+  "sample_period_s": 0.2,
+  "truth_samples": 1914,
+  "relevant_triangles": 54,
+  "minimum_centre_clearance_lower_bound_m": 3.0,
+  "search_cap_m": 3.0,
+  "samples_below_0_6_m": 0,
+  "evaluation_only_truth": true,
+  "caveat": "Sampled point-to-mesh distance, capped at 3 m; not continuous swept-volume collision certification."
+}

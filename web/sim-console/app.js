@@ -85,6 +85,9 @@ function layerVisibility() {
 function renderGeometry(data) {
   if (!mapView || state.paused) return;
   const live = data.live || {};
+  mapView.setTrack('return',data.navigation?.return_path_lio || []);
+  mapView.setTrack('planned',data.navigation?.planner?.path || []);
+  mapView.setGoal(data.navigation?.goal_lio || null,data.navigation?.goal_radius_m || 0);
   for (const key of ['lio', 'loose']) {
     const frame = live.frames?.[key] || live.cloud_frame || 'camera_init';
     mapView.setTrack(key, frame === 'camera_init' ? (live[key] || []) : []);
@@ -126,20 +129,26 @@ function updateSceneCommand() {
   const scene = state.data?.scene_info?.choices?.find(value => value.key === key);
   $('sceneDescription').textContent = scene?.description || '';
   const mode=$('captureMode').value;
-  const next=buildSceneCommand(state.data,key,mode);
+  $('goalInputs').hidden=mode!=='explore';
+  const mission={goal:[$('goalEast').valueAsNumber,$('goalNorth').valueAsNumber,$('goalUp').valueAsNumber],speed:$('missionSpeed').valueAsNumber,radius:$('goalRadius').valueAsNumber};
+  const next=buildSceneCommand(state.data,key,mode,mission);
   // Reassigning an unchanged textarea value clears a manual-copy selection.
   if ($('sceneCommand').value!==next) $('sceneCommand').value=next;
   $('copySceneCommand').disabled=!next;$('downloadSceneScript').hidden=!next;
-  $('downloadSceneScript').href=`/api/launch.sh?scene=${encodeURIComponent(key)}&mode=${mode}`;
-  $('commandModeHelp').textContent=mode==='teleop' ? '手动模式：在终端启动后，回到网页点击“起飞”。' : '自动航线：启动后自动起飞并执行航线；网页没有手动起飞按钮。';
+  $('downloadSceneScript').href=`/api/launch.sh?scene=${encodeURIComponent(key)}&mode=${mode}${mode==='explore' ? `&goal=${encodeURIComponent(mission.goal.join(','))}&speed=${mission.speed}&radius=${mission.radius}` : ''}`;
+  $('commandModeHelp').textContent=mode==='explore' ? '目标任务：启动后自动起飞，实时点云规划，到达允许区域内的安全位置后返航。半径 0.5～30 m 且小于目标距离的一半。目标水平距离 5～1000 m、高度 3～30 m；无法通行时任务可能中止。' : mode==='autonomy' ? '自主返航实验：启动后自动起飞、短距出航并返航。生成的是无先验地图基线；重定位需在命令后添加 --localization-map 地图目录。先在城市走廊测试。' : mode==='teleop' ? '手动模式：在终端启动后，回到网页点击“起飞”。' : '自动航线：启动后自动起飞并执行航线；网页没有手动起飞按钮。';
 }
 
 function renderTelemetry(data) {
   const latest = lastOf(data.samples), teleop = data.teleop || {}, settings = data.settings || {};
   $('runName').textContent = data.run;
   $('sceneName').textContent = data.scene_info?.name || '自定义场景';
-  $('simTime').textContent = `仿真时间 ${latest ? format(latest.sim_time_ns / 1e9) : '—'} s`;
-  $('modeBadge').textContent = data.complete ? '记录预览' : settings.interactive ? '网页手动飞行' : '自动航线 · 自动起飞';
+  $('simTime').textContent = `仿真时间 ${Number.isFinite(data.navigation?.sim_time_ns) ? format(data.navigation.sim_time_ns/1e9) : latest ? format(latest.sim_time_ns / 1e9) : '—'} s`;
+  $('modeBadge').textContent = data.complete ? '记录预览' : settings.autonomy ? '自主导航 · 自动返航' : settings.interactive ? '网页手动飞行' : '自动航线 · 自动起飞';
+  const motionSpeed=teleop.measured_speed_mps ?? (settings.autonomy ? teleop.speed_mps : null);
+  const motionHeight=teleop.barometric_relative_height_m ?? teleop.relative_height_m;
+  $('flightHealth').textContent=`${teleop.armed ? '已解锁' : '未解锁'} · ${data.complete ? '记录预览' : data.status_age_s===null || data.status_age_s>3 ? '状态过期' : teleop.connected===false ? '失联' : '实时'}`;
+  $('flightMotion').textContent=`${Number.isFinite(motionSpeed) ? format(motionSpeed,2)+' m/s' : '速度未提供'} / ${Number.isFinite(motionHeight) ? format(motionHeight)+' m' : '高度未提供'}`;
   $('flightMode').textContent = teleop.mode || settings.flight_pattern || '—';
   $('gpsStatus').textContent = latest ? ({normal: '正常', alarm: '报警'}[latest.detector_status] || '初始化') : '等待 GPS';
   $('gpsStatus').style.color = latest?.detector_status === 'alarm' ? '#ef8e86' : '#c7dae7';
@@ -147,7 +156,32 @@ function renderTelemetry(data) {
   $('occlusion').textContent = latest && Number.isFinite(latest.sky_blocked_fraction) ? `${format(latest.sky_blocked_fraction * 100, 0)} %` : '—';
   $('noiseScale').textContent = Number.isFinite(latest?.environment_noise_scale) ? `${format(latest.environment_noise_scale, 2)} ×` : '—';
   $('controls').hidden = !data.control_available;
-  $('teleopState').textContent = ({ready:'已准备',taking_off:'起飞中',flying:'飞行中',landing:'降落中',landed:'已降落'}[teleop.state] || teleop.state || '等待飞控');
+  const navigation=data.navigation || {};
+  $('navigationPanel').hidden=!settings.autonomy;
+  $('navigationState').textContent=({waiting_lio:'等待 LIO',warming_up:'定位初始化',arming:'正在解锁',taking_off:'起飞中',outbound:'出航中',returning:'返航中',holding:'悬停等待',failed:'任务未完成',landing:'降落中',landed:'已降落'}[navigation.state] || navigation.state || '等待定位');
+  const reasonText={startup:'等待传感器与飞控',external_position_initialization:'外部定位初始化',ready:'准备起飞',armed_with_external_position:'已解锁，正在起飞',takeoff_reached:'已到巡航高度',replanned:'航路已更新',planning_wait:'等待安全航路',obstacle_or_unknown_cloud:'前方障碍或观测不足，已停止移动',localization_unconfirmed:'地图重定位尚未确认',goal_reached:'已到达目标允许区域，正在返航',operator_hold:'人工请求悬停',operator_return:'人工请求返航',operator_land:'人工请求降落',home_reached:'已回到起飞区域',hold_timeout:'持续受阻，执行就地降落',exploration_stalled:'探索长时间无进展，尝试返航',lio_timeout:'定位数据超时，执行降落',flight_envelope:'超出任务边界',outbound_time_budget:'出航时间预算耗尽，正在返航',gnss_alarm_return:'GPS 检测报警，正在返航',mission_timeout:'任务总时间超时',goal_not_reached:'本轮未到达目标区域'};
+  const plannerText={exploring_frontier:'探索可达边界',goal_path:'返航航路可用',goal_region_path:navigation.return_remaining>0 ? '返航引导航路可用' : '目标允许区域内安全航路可用',goal_occupied:'引导点位于障碍安全区',goal_region_unreachable:'尚无可达的目标区域',no_reachable_frontier:'未找到可达探索边界',recovering_clearance:'进入障碍安全边界，正在低速退回',current_cell_blocked:'当前位置进入障碍安全边界',unsafe_recovery_start:'当前位置过近，无法验证安全退路',no_safe_retreat:'未找到安全退路，保持悬停'};
+  const goalDistance=navigation.goal_distance_horizontal_m ?? (navigation.goal_lio && data.live?.lio?.length ? Math.hypot(...navigation.goal_lio.slice(0,2).map((v,i)=>v-lastOf(data.live.lio)[i])) : null);
+  const planningActive=['outbound','returning','holding'].includes(navigation.state);
+  $('navigationDetails').textContent=navigation.mission_type==='goal_exploration'
+    ? `${navigation.goal_reached ? '已到达目标区域' : goalDistance!==null ? `距目标中心 ${format(goalDistance)} m` : '前往目标区域'} · 允许半径 ${navigation.goal_radius_m ?? settings.goal_radius_m ?? 2} m · ${planningActive && navigation.planner?.goal_centre_blocked ? (navigation.return_remaining>0 ? '引导点中心在障碍安全区 · ' : '目标中心在障碍安全区，寻找范围内安全点 · ') : ''}${planningActive ? (plannerText[navigation.planner?.reason] || navigation.planner?.reason || '等待规划') : navigation.state==='landed' ? '已返航降落，任务完成' : navigation.state==='landing' ? '正在降落，规划已停止' : navigation.state==='failed' ? '任务未完成，请查看原因与日志' : '等待进入巡航阶段'}`
+    : `${navigation.localization?.reason || '无先验地图'} · 外部定位 ${navigation.external_pose_messages || 0} 帧`;
+  const stale=!data.complete && (data.status_age_s===null || data.status_age_s>3);
+  $('navHealth').textContent=`${navigation.armed ? '已解锁' : '未解锁'} · ${data.complete ? '记录预览' : stale ? '状态过期' : navigation.connected===false ? '飞控失联' : '实时'}`;
+  $('navSpeed').textContent=Number.isFinite(navigation.speed_mps) ? `${format(navigation.speed_mps,2)} m/s` : '未提供';
+  $('navHeight').textContent=Number.isFinite(navigation.barometric_relative_height_m) ? `${format(navigation.barometric_relative_height_m)} / ${navigation.cruise_height_m} m` : '未提供';
+  $('navLio').textContent=Number.isFinite(navigation.lio_age_s) ? `${format(navigation.lio_age_s*1000,0)} ms · ${navigation.lio_fresh ? '有效' : '超时'}` : '等待数据';
+  $('navReason').textContent=stale ? '状态未更新，请检查控制器日志。' : `${reasonText[navigation.reason] || navigation.reason || '等待导航状态'}${navigation.error ? ` · 异常：${reasonText[navigation.error] || navigation.error}` : ''}`;
+  $('navReason').classList.toggle('is-warning',stale || !!navigation.error || ['holding','failed'].includes(navigation.state));
+  const event=lastOf(navigation.recent_events);
+  $('navEvent').textContent=event ? `最近事件 ${format(event.sim_time_s)} s：${reasonText[event.reason] || event.reason}` : '阶段事件可在下方“运行日志”查看。';
+  $('navigationPanel').querySelectorAll('button').forEach(button=>button.disabled=!data.control_available || !navigation.armed);
+  $('enableKeyboard').disabled=!!settings.autonomy;
+  $('controlHelp').textContent=settings.autonomy ? '自主任务由控制器自动执行；可在此悬停或降落。' : '按住移动，松开或切出页面悬停；前后左右以机头为准。';
+  $('controls').classList.toggle('autonomous',!!settings.autonomy);
+  $('controls').querySelector('h2').textContent=settings.autonomy ? '任务控制' : '手动飞行';
+  document.querySelectorAll('[data-key], [data-op="takeoff"]').forEach(button=>button.disabled=!!settings.autonomy);
+  $('teleopState').textContent = ({ready:'已准备',taking_off:'起飞中',flying:'飞行中',outbound:'出航中',returning:'返航中',holding:'悬停等待',failed:'任务未完成',landing:'降落中',landed:'已降落'}[teleop.state] || teleop.state || '等待飞控');
   $('downloadMap').hidden = !data.map_saved;
   $('connectionDot').className = data.complete ? 'dot' : 'dot live';
   $('connection').textContent = data.complete ? '记录已加载' : '实时采集';
@@ -167,7 +201,9 @@ async function refreshState() {
       mapView?.reset();sceneView?.reset();$('finish').disabled = false;$('exportResult').hidden=true;
       if (['simple', 'complex_urban', 'industrial_yard', 'ksql_airport'].includes(data.scene_info?.key))
         $('sceneSelect').value = data.scene_info.key;
-      $('captureMode').value = data.settings?.interactive ? 'teleop' : 'route';
+      $('captureMode').value = data.settings?.goal_relative_enu_m ? 'explore' : data.settings?.autonomy ? 'autonomy' : data.settings?.interactive ? 'teleop' : 'route';
+      if(Number.isFinite(data.settings?.goal_radius_m)) $('goalRadius').value=data.settings.goal_radius_m;
+      if(data.settings?.goal_relative_enu_m) ['goalEast','goalNorth','goalUp'].forEach((id,i)=>$(id).value=data.settings.goal_relative_enu_m[i]);
       $('height').value = Number.isFinite(data.settings?.teleop_takeoff_height_m) ? data.settings.teleop_takeoff_height_m : 5;
       $('speed').value = Number.isFinite(data.settings?.teleop_speed_mps) ? data.settings.teleop_speed_mps : 2;
     }
@@ -179,6 +215,22 @@ async function refreshState() {
     if (state.data) $('commandStatus').textContent = '采集服务已停止。';
     console.error('仿真状态读取失败', error);
   } finally {state.fetching = false;}
+}
+
+let logBusy=false,logUrl=null;
+async function refreshLogs() {
+  if(logBusy)return;logBusy=true;
+  try {
+    const name=$('logSource').value,response=await fetch(`/api/logs?name=${encodeURIComponent(name)}`,{cache:'no-store'});
+    if(!response.ok)throw new Error(`HTTP ${response.status}`);
+    const data=await response.json();
+    $('logText').textContent=data.text || '暂无日志内容';$('logText').scrollTop=$('logText').scrollHeight;
+    $('logHealth').textContent=data.truncated ? '末尾 64 KB' : data.available ? '已更新' : '尚未生成';
+    $('logPath').textContent=state.data?.log_directory ? `${state.data.log_directory}/${name}` : '';
+    if(logUrl)URL.revokeObjectURL(logUrl);logUrl=URL.createObjectURL(new Blob([data.text || ''],{type:'text/plain;charset=utf-8'}));
+    $('downloadLog').href=logUrl;$('downloadLog').download=name+'.txt';
+  } catch(error){$('logHealth').textContent='读取失败';$('logText').textContent=error.message;}
+  finally{logBusy=false;}
 }
 
 async function refreshClouds() {
@@ -336,6 +388,12 @@ function setupDisplayControls() {
   $('colorMode').addEventListener('change', () => mapView?.setColorMode($('colorMode').value));
   $('pointBudget').addEventListener('change', () => {mapView?.setBudget(Number($('pointBudget').value));updateCloudLabels();});
   $('sceneSelect').addEventListener('change', updateSceneCommand);$('captureMode').addEventListener('change', updateSceneCommand);
+  ['goalEast','goalNorth','goalUp','missionSpeed','goalRadius'].forEach(id=>{
+    $(id).addEventListener('input',updateSceneCommand);
+    $(id).addEventListener('wheel',()=>$(id).blur(),{passive:true});
+  });
+  $('logSource').addEventListener('change',refreshLogs);$('refreshLogs').addEventListener('click',refreshLogs);
+  setInterval(()=>{if($('logAuto').checked)refreshLogs();},2000);refreshLogs();
   $('copySceneCommand').addEventListener('click', async () => {
     const copied=await copyCommand($('sceneCommand').value,navigator.clipboard,
       ()=>{$('sceneCommand').focus();$('sceneCommand').select();},()=>document.execCommand('copy'));

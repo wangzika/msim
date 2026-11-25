@@ -58,6 +58,24 @@ Visualization Manager:
       Line Style: Lines
       Line Width: 0.1
       Buffer Length: 1
+    - Class: rviz/Path
+      Name: 自主返航路线
+      Enabled: true
+      Topic: /msim/return_path
+      Queue Size: 1
+      Color: 148; 228; 156
+      Line Style: Lines
+      Line Width: 0.1
+      Buffer Length: 1
+    - Class: rviz/Path
+      Name: 实时探索规划
+      Enabled: true
+      Topic: /msim/planned_path
+      Queue Size: 1
+      Color: 217; 165; 255
+      Line Style: Lines
+      Line Width: 0.15
+      Buffer Length: 1
     - Class: rviz/Odometry
       Name: 当前估计位姿
       Enabled: true

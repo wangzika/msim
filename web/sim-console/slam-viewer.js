@@ -4,7 +4,7 @@ import {ColladaLoader} from '/vendor/three/loaders/ColladaLoader.js';
 import {STLLoader} from '/vendor/three/loaders/STLLoader.js';
 
 THREE.Object3D.DEFAULT_UP.set(0, 0, 1);
-const palette = {lio: 0x49d6e9, loose: 0xf6a86d, truth: 0xe7edf4, gps: 0x65bfff, route: 0xf2d26f};
+const palette = {lio: 0x49d6e9, loose: 0xf6a86d, truth: 0xe7edf4, gps: 0x65bfff, route: 0xf2d26f, return: 0x94e49c, planned: 0xd9a5ff, goalBoundary: 0xd9a5ff};
 
 function finitePoint(point) {return point && point.length >= 3 && point.slice(0, 3).every(Number.isFinite);}
 
@@ -44,6 +44,8 @@ export class SlamViewer {
     this.robot.add(body);
     const arrow = new THREE.ArrowHelper(new THREE.Vector3(1, 0, 0), new THREE.Vector3(), 2.2, 0x49d6e9, .6, .4);
     this.robot.add(arrow, new THREE.AxesHelper(1.1));this.robot.visible = false; this.scene.add(this.robot);
+    this.goalMarker=new THREE.Mesh(new THREE.SphereGeometry(.8,12,8),new THREE.MeshBasicMaterial({color:0xd9a5ff,depthTest:false}));
+    this.goalMarker.visible=false;this.goalMarker.renderOrder=9;this.scene.add(this.goalMarker);
     if (sceneMode) {
       this.poseLabel=document.createElement('div');this.poseLabel.className='aircraft-label';
       this.poseLabel.textContent='无人机真值';this.poseLabel.hidden=true;container.append(this.poseLabel);
@@ -169,6 +171,13 @@ export class SlamViewer {
     if (key === 'robot') this.robotEnabled = value;
     const object = this.layers[key] || this.lines[key] || this[key];
     if (object) object.visible = value;
+  }
+
+  setGoal(point, radius=0) {
+    this.goalMarker.visible=finitePoint(point);
+    if(this.goalMarker.visible)this.goalMarker.position.set(...point.slice(0,3));
+    const ring=finitePoint(point) && radius>0 ? Array.from({length:97},(_,i)=>[point[0]+radius*Math.cos(i*Math.PI/48),point[1]+radius*Math.sin(i*Math.PI/48),point[2]]) : [];
+    this.setTrack('goalBoundary',ring);
   }
 
   setTrack(key, values) {
@@ -308,6 +317,7 @@ export class SlamViewer {
     this.clearModels();this.setBoxes([]);
     this.sceneExtent='local';
     this.fitted = false; this.bounds = null; this.pose = null; this.robot.visible = false;
+    this.setGoal(null);
     this.userInteracted = false;this.follow = false;
     for (const key of Object.keys(this.raw)) this.setCloud(key, new Float32Array());
     for (const key of Object.keys(this.lines)) this.setTrack(key, []);

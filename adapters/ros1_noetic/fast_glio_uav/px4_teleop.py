@@ -42,7 +42,7 @@ class Controller:
         speed = float(os.environ.get('MSIM_TELEOP_SPEED_MPS', '2'))
         height = float(os.environ.get('MSIM_TELEOP_HEIGHT_M', '5'))
         state = 'connecting'; hold = None; origin = None
-        position = None; yaw = 0.; armed = False; mode = '等待 PX4'
+        position = None; measured_velocity = None; yaw = 0.; armed = False; mode = '等待 PX4'
         heartbeat_at = position_at = -math.inf
         arm_begin = None; next_action = 0.; finish_requested = False
         last_velocity = False; last_report = 0.
@@ -84,6 +84,11 @@ class Controller:
                             mode = mavutil.mode_string_v10(msg)
                         elif kind == 'LOCAL_POSITION_NED':
                             position = (msg.x, msg.y, msg.z); position_at = now
+                            measured_velocity=(msg.vx,msg.vy,msg.vz)
+                        elif kind == 'STATUSTEXT':
+                            text=msg.text.decode(errors='replace') if isinstance(msg.text,bytes) else msg.text
+                            row=dict(source='PX4',severity=int(msg.severity),text=text.rstrip('\0'),sim_time_s=rospy.Time.now().to_sec())
+                            with (self.run/'px4-events.jsonl').open('a') as stream:stream.write(json.dumps(row)+'\n')
                         elif kind == 'ATTITUDE':
                             yaw = msg.yaw
                     connected = position is not None and now-heartbeat_at < 3 and now-position_at < 2
@@ -170,7 +175,9 @@ class Controller:
                             position_mask, *hold[:3], 0, 0, 0, 0, 0, 0, hold[3], 0)
                     self.status = dict(state=state, armed=armed, mode=mode, connected=connected,
                                        position_ned_m=position, relative_height_m=origin[2]-position[2] if origin and position else None,
-                                       yaw_deg=math.degrees(yaw), speed_mps=speed, keys=sorted(active),
+                                       yaw_deg=math.degrees(yaw), speed_mps=speed,
+                                       measured_velocity_ned_mps=measured_velocity,
+                                       measured_speed_mps=math.sqrt(sum(v*v for v in measured_velocity)) if measured_velocity is not None else None, keys=sorted(active),
                                        velocity_ned_mps=list(velocity[:3]), yaw_rate_radps=velocity[3],
                                        finish_requested=finish_requested, sim_time_ns=rospy.Time.now().to_nsec(), error=None)
                     if now-last_report >= .2:

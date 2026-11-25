@@ -1,0 +1,42 @@
+{
+  "pass_all": true,
+  "run": "/media/wzb/Elements/msim/runs/uav-px4-20261125-153145",
+  "evaluation_only_truth": true,
+  "truth_samples": 48828,
+  "landing_horizontal_error_m": 0.4431756730108927,
+  "final_displacement_enu_m": [
+    -0.24819139189312978,
+    -0.36715897120839713,
+    0.0008331518393867032
+  ],
+  "maximum_climb_m": 12.541307329514616,
+  "maximum_horizontal_excursion_m": 312.43651534755946,
+  "goal_relative_enu_m": [
+    100.0,
+    300.0,
+    12.0
+  ],
+  "goal_truth_enu_m": [
+    -111.67179435089778,
+    535.5067064586393,
+    10.588909151721516
+  ],
+  "goal_error_at_arrival_m": 4.794351035246581,
+  "minimum_truth_distance_to_goal_m": 3.79388867650028,
+  "goal_radius_m": 5.0,
+  "goal_horizontal_error_at_arrival_m": 4.79422394140027,
+  "goal_vertical_error_at_arrival_m": 0.03490915172876896,
+  "goal_horizontal_truth_tolerance_m": 8.0,
+  "goal_vertical_truth_tolerance_m": 3.0,
+  "landing_tolerance_m": 3.0,
+  "airborne_ekf_flag_samples": 482,
+  "ev_horizontal_active_fraction": 1.0,
+  "barometric_height_active_fraction": 1.0,
+  "gnss_active_in_air": false,
+  "landed_disarmed_in_ulog": true,
+  "prior_map_confirmed": false,
+  "confirmed_map_status_messages": 0,
+  "attack_active_epochs": 0,
+  "maximum_injected_east_offset_m": 0,
+  "errors": []
+}

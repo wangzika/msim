@@ -1,0 +1,38 @@
+{
+  "pass_all": true,
+  "run": "/media/wzb/Elements/msim/runs/uav-px4-20261125-110517",
+  "evaluation_only_truth": true,
+  "truth_samples": 44026,
+  "landing_horizontal_error_m": 0.25594138843079195,
+  "final_displacement_enu_m": [
+    -0.06492861843210562,
+    0.24756871535066693,
+    0.000993949056383947
+  ],
+  "maximum_climb_m": 12.233270545511807,
+  "maximum_horizontal_excursion_m": 301.2654636429311,
+  "goal_relative_enu_m": [
+    0.0,
+    300.0,
+    12.0
+  ],
+  "goal_truth_enu_m": [
+    -208.34653499082134,
+    538.5239702470499,
+    10.676373805863253
+  ],
+  "goal_error_at_arrival_m": 2.219816595194072,
+  "minimum_truth_distance_to_goal_m": 0.38484567922151136,
+  "goal_truth_tolerance_m": 5.0,
+  "landing_tolerance_m": 3.0,
+  "airborne_ekf_flag_samples": 434,
+  "ev_horizontal_active_fraction": 1.0,
+  "barometric_height_active_fraction": 1.0,
+  "gnss_active_in_air": false,
+  "landed_disarmed_in_ulog": true,
+  "prior_map_confirmed": false,
+  "confirmed_map_status_messages": 0,
+  "attack_active_epochs": 0,
+  "maximum_injected_east_offset_m": 0,
+  "errors": []
+}

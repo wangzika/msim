@@ -1,0 +1,677 @@
+{
+  "completed": true,
+  "landed_disarmed": true,
+  "reason": "home_reached",
+  "events": [
+    {
+      "state": "warming_up",
+      "reason": "external_position_initialization",
+      "sim_time_s": 2.512
+    },
+    {
+      "state": "arming",
+      "reason": "ready",
+      "sim_time_s": 6.524
+    },
+    {
+      "state": "taking_off",
+      "reason": "armed_with_external_position",
+      "sim_time_s": 7.208
+    },
+    {
+      "state": "outbound",
+      "reason": "takeoff_reached",
+      "sim_time_s": 25.332
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 25.332
+    },
+    {
+      "state": "outbound",
+      "reason": "replanned",
+      "sim_time_s": 25.548000000000002
+    },
+    {
+      "state": "returning",
+      "reason": "goal_reached",
+      "sim_time_s": 188.036
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 188.036
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 188.582
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 193.996
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 194.616
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 198.594
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 198.616
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 198.616
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 199.104
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 203.316
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 203.564
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 207.524
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 208.112
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 212.448
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 213.068
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 217.02
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 217.53
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 221.814
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 222.03
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 225.966
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 226.576
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 230.722
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 231.074
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 234.814
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 235.08
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 239.132
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 239.574
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 243.464
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 244.082
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 248.06
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 248.574
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 252.518
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 253.11
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 257.126
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 257.574
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 262.568
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 263.076
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 267.718
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 268.056
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 271.814
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 272.03
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 276.12
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 276.544
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 280.534
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 281.006
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 285.028
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 285.55
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 289.32
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 290.044
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 294.91
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 295.582
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 300.226
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 300.556
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 304.454
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 305.086
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 309.216
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 309.538
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 314.234
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 314.572
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 319.23
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 319.588
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 323.518
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 324.06
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 328.126
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 328.596
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 332.526
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 333.082
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 337.722
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 338.072
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 342.132
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 342.574
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 346.634
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 347.094
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 351.22
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 351.58
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 356.018
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 356.574
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 360.462
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 361.074
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 365.212
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 365.6
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 370.124
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 370.612
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 375.318
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 375.566
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 379.466
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 380.09
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 384.82
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 385.074
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 389.12
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 389.61
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 394.226
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 394.584
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 399.456
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 400.074
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 403.822
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 404.548
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 408.616
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 409.102
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 413.83
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 414.068
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 417.974
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 418.58
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 422.622
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 423.072
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 426.83
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 427.564
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 431.732
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 432.09
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 436.834
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 437.586
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 441.832
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 442.578
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 447.216
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 447.57
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 452.122
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 452.58
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 456.332
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 456.568
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 460.732
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 461.09
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 465.732
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 466.096
+    },
+    {
+      "state": "landing",
+      "reason": "home_reached",
+      "sim_time_s": 469.126
+    }
+  ],
+  "failures": [],
+  "external_pose_messages": 4814,
+  "gnss_fusion_enabled": false,
+  "prior_map": null,
+  "prior_map_confirmed": false,
+  "home_lio": [
+    -0.00037191010991166656,
+    0.006918557098814913,
+    0.008540889553452972
+  ],
+  "truth_used_for_control": false,
+  "mission_type": "goal_exploration",
+  "goal_relative_enu_m": [
+    100.0,
+    300.0,
+    12.0
+  ],
+  "goal_reached": true,
+  "goal_reached_sim_time_s": 188.036,
+  "goal_radius_m": 5.0
+}

@@ -1,7 +1,17 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-MSIM_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+MSIM_ROOT="${MSIM_CAPTURE_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
+# Bash streams long scripts. Run a private copy so editing the repository
+# during a flight cannot shift the reader's offset near post-processing.
+if [[ "${MSIM_CAPTURE_SNAPSHOT:-}" != "${BASH_SOURCE[0]}" ]]; then
+  capture_snapshot=$(mktemp /tmp/msim-px4-capture.XXXXXX.sh)
+  cp -- "${BASH_SOURCE[0]}" "$capture_snapshot"
+  export MSIM_CAPTURE_ROOT="$MSIM_ROOT" MSIM_CAPTURE_SNAPSHOT="$capture_snapshot"
+  exec bash "$capture_snapshot" "$@"
+fi
+cleanup_capture_snapshot() { rm -f -- "$MSIM_CAPTURE_SNAPSHOT"; }
+trap cleanup_capture_snapshot EXIT
 FAST_GLIO_ROOT="${FAST_GLIO_ROOT:-/home/wzb/FAST_GLIO}"
 PX4_ROOT="${PX4_ROOT:-$MSIM_ROOT/build/deps/PX4-Autopilot}"
 sensor_profile=""
@@ -17,6 +27,15 @@ route_clock=wall
 duration=300
 duration_supplied=false
 teleop=false
+autonomy=false
+localization_map=""
+autonomy_distance=8
+return_after_s=30
+autonomy_timeout=150
+goal_enu=""
+mission_speed=2.0
+goal_radius=2.0
+autonomy_timeout_supplied=false
 teleop_speed=2.0
 teleop_height=5.0
 gui=false
@@ -41,6 +60,14 @@ while (($#)); do
   case "$1" in
     --duration-s) duration="$2"; duration_supplied=true; shift 2;;
     --teleop) teleop=true; shift;;
+    --autonomy) autonomy=true; shift;;
+    --localization-map) localization_map="$2"; shift 2;;
+    --autonomy-distance-m) autonomy_distance="$2"; shift 2;;
+    --return-after-s) return_after_s="$2"; shift 2;;
+    --autonomy-timeout-s) autonomy_timeout="$2"; autonomy_timeout_supplied=true; shift 2;;
+    --goal-enu) goal_enu="$2,$3,$4"; autonomy=true; teleop_height="$4"; shift 4;;
+    --mission-speed-mps) mission_speed="$2"; shift 2;;
+    --goal-radius-m) goal_radius="$2"; shift 2;;
     --teleop-speed-mps) teleop_speed="$2"; shift 2;;
     --teleop-height-m) teleop_height="$2"; shift 2;;
     --gui) gui=true; shift;;
@@ -55,7 +82,7 @@ while (($#)); do
     --scene-profile) scene_profile="$2"; shift 2;;
     --list-sensors) /usr/bin/python3 "$MSIM_ROOT/tools/sensor-config.py" --list; exit 0;;
     --lidar-model|--imu-model|--gps-model|--lidar-timing) sensor_args+=("$1" "$2"); shift 2;;
-    --help) echo 'px4-uav-capture.sh [--web [--web-port 8766] [--teleop]] [--fastglio-live --flight-pattern route] [--duration-s 60] [--scene simple|complex_urban|industrial_yard|ksql_airport] [--scene-profile file.json] [--lidar-model vlp16|hdl32|os1-64|mid360] [--imu-model mems-baseline|low-noise] [--gps-model f9p-dgnss-ucr(default)|standalone(uncalibrated)|native|ideal] [--lidar-timing rolling|snapshot] [--list-sensors] [--list-scenes]'; exit 0;;
+    --help) echo 'px4-uav-capture.sh [--web [--web-port 8766] [--teleop]] [--goal-enu E N U --mission-speed-mps 2 --goal-radius-m 2] [--autonomy [--localization-map directory] [--autonomy-distance-m 8] [--return-after-s 30] [--autonomy-timeout-s 150] [--teleop-height-m 5]] [--fastglio-live --flight-pattern route] [--duration-s 60] [--scene simple|complex_urban|industrial_yard|ksql_airport] [--scene-profile file.json] [--lidar-model vlp16|hdl32|os1-64|mid360] [--imu-model mems-baseline|low-noise] [--gps-model f9p-dgnss-ucr(default)|standalone(uncalibrated)|native|ideal] [--lidar-timing rolling|snapshot] [--list-sensors] [--list-scenes]'; exit 0;;
     --scene) scene="$2"; shift 2;;
     --list-scenes) /usr/bin/python3 "$MSIM_ROOT/tools/scene-list.py"; exit 0;;
     --world) world_input="$2"; custom_world=true; shift 2;;
@@ -75,6 +102,33 @@ while (($#)); do
     *) echo "Unknown argument: $1" >&2; exit 2;;
   esac
 done
+if $autonomy; then
+  teleop=true
+  if [[ -n "$goal_enu" ]]; then teleop_height="${goal_enu##*,}"; fi
+  fusion_delay_s=0
+  if [[ -n "$goal_enu" ]] && ! $autonomy_timeout_supplied; then autonomy_timeout=900; fi
+  /usr/bin/python3 - "$autonomy_distance" "$return_after_s" "$autonomy_timeout" "$localization_map" "$scene" "$custom_world" "$goal_enu" "$mission_speed" "$goal_radius" <<'PY'
+import hashlib,json,math,sys
+from pathlib import Path
+distance,after,timeout=map(float,sys.argv[1:4])
+goal=sys.argv[7]
+if not all(math.isfinite(v) for v in (distance,after,timeout)) or not 2<=distance<=30 or not 15<=after<=120 or not after+20<=timeout<=(3600 if goal else 300):
+    raise SystemExit('自主模式距离须为 2～30 m，返航时间为 15～120 s，总超时至少再加 20 s；短距模式最多 300 s，目标任务最多 3600 s。')
+speed,radius=map(float,sys.argv[8:10])
+if not math.isfinite(speed) or not .3<=speed<=3 or not math.isfinite(radius) or not .5<=radius<=30:raise SystemExit('任务速度须为 0.3～3 m/s，目标区域半径须为 0.5～30 m。')
+if goal:
+    e,n,u=map(float,goal.split(','))
+    if radius>=math.hypot(e,n)/2:raise SystemExit('目标区域半径须小于目标水平距离的一半。')
+    if not all(math.isfinite(v) for v in (e,n,u)) or not 5<=math.hypot(e,n)<=1000 or not 3<=u<=30:raise SystemExit('目标须为距起飞点 5～1000 m，高度 3～30 m 的相对坐标。')
+if sys.argv[4] and not (Path(sys.argv[4])/'map.json').is_file():raise SystemExit('缺少先验地图包 map.json')
+if sys.argv[4]:
+    path=Path(sys.argv[4]);info=json.loads((path/'map.json').read_text())
+    if info.get('scene')!=('custom' if sys.argv[6]=='true' else sys.argv[5]):raise SystemExit('先验地图与当前场景不一致；拒绝启动。')
+    if not (path/'map.npz').is_file() or info.get('sha256')!=hashlib.sha256((path/'map.npz').read_bytes()).hexdigest():raise SystemExit('先验地图校验失败；拒绝启动。')
+PY
+elif [[ -n "$localization_map" ]]; then
+  echo '--localization-map 须与 --autonomy 同时使用。' >&2; exit 2
+fi
 if $web_console; then
   headless=true
   fastglio_live=true
@@ -184,6 +238,7 @@ if ! $postprocess; then
       capture_exit_code=$?
       trap - EXIT
       /usr/bin/python3 "$MSIM_ROOT/adapters/ros1_noetic/fast_glio_uav/run_storage.py" archive "$runtime_dir" "$run" --cleanup || echo "运行日志仍保留在 $runtime_dir，请检查归档。" >&2
+      cleanup_capture_snapshot
       exit "$capture_exit_code"
     }
     trap finish_runtime_storage EXIT
@@ -243,6 +298,7 @@ PY
   if $custom_world; then export MSIM_SCENE_KEY=custom; fi
   export MSIM_FASTGLIO_FRONTEND="$frontend"
   export MSIM_FUSION_DELAY_S="$fusion_delay_s"
+  export MSIM_AUTONOMY=0 MSIM_GOAL_ENU="" MSIM_LOCALIZATION_MAP=""
   if $teleop; then
     export MSIM_TELEOP_RUN="$run" MSIM_TELEOP_STOP_FILE="$run/capture-stop.json"
     export DISABLE_ROS1_EOL_WARNINGS=1
@@ -250,6 +306,12 @@ PY
     export MSIM_TELEOP_HEADLESS=0
     if $headless; then export MSIM_TELEOP_HEADLESS=1; fi
     export MSIM_PX4_FLIGHT_PATTERN=teleop
+    if $autonomy; then
+      export MSIM_AUTONOMY=1 MSIM_AUTONOMY_DISTANCE_M="$autonomy_distance" MSIM_RETURN_AFTER_S="$return_after_s" MSIM_AUTONOMY_TIMEOUT_S="$autonomy_timeout"
+      export MSIM_LOCALIZATION_MAP="$localization_map"
+      export MSIM_GOAL_ENU="$goal_enu" MSIM_MISSION_SPEED_MPS="$mission_speed" MSIM_GOAL_RADIUS_M="$goal_radius"
+      export MSIM_PX4_FLIGHT_PATTERN=autonomy
+    fi
   fi
   capture=(--run "$run" --duration-s "$duration" \
     --launch-file "$MSIM_ROOT/adapters/ros1_noetic/fast_glio_uav/px4_world.launch" \
@@ -308,7 +370,9 @@ PY
     fi
   fi
   if $teleop; then
-    capture+=(--controller-script "$MSIM_ROOT/adapters/ros1_noetic/fast_glio_uav/px4_teleop.py")
+    controller_script="$MSIM_ROOT/adapters/ros1_noetic/fast_glio_uav/px4_teleop.py"
+    if $autonomy; then controller_script="$MSIM_ROOT/adapters/ros1_noetic/fast_glio_uav/px4_autonomy.py"; fi
+    capture+=(--controller-script "$controller_script")
   elif ! $manual; then
     export MSIM_PX4_FLIGHT_PATTERN="$flight_pattern"
     export MSIM_ROUTE_CLOCK="$route_clock"
@@ -319,7 +383,13 @@ PY
   echo "PX4 SITL 城市无人机采集：$run"
   if $web_console; then echo "网页控制台：http://127.0.0.1:$web_port/"; fi
   if $teleop; then
-    if $headless; then
+    if $autonomy; then
+      if [[ -n "$goal_enu" ]]; then
+        echo "目标任务：相对起飞点 E/N/U=$goal_enu m，在线探索规划，到达后返航；自动起飞。"
+      else
+        echo '自主模式：自动起飞、出航并沿记录路线返航；使用独立 LIO 定位，GPS 不进入飞控定位。'
+      fi
+    elif $headless; then
       echo '后台手动采集：通过 /msim/teleop/command 控制；Ctrl+C 结束并保存。'
     else
       echo '手动采集：请在控制窗口起飞和操纵；点击“结束并保存”或 Ctrl+C 结束。'
@@ -354,6 +424,7 @@ PY
     mkdir -p "$MPLCONFIGDIR"
     if $teleop; then
       python "$MSIM_ROOT/tools/plot-teleop-trajectory.py" --run "$run"
+      if [[ -n "$goal_enu" ]]; then python "$MSIM_ROOT/tools/plot-goal-mission.py" --run "$run"; fi
     else
       python "$MSIM_ROOT/tools/plot-fastglio-live.py" --run "$run"
       python "$MSIM_ROOT/tools/plot-fastglio-enu-error.py" --run "$run"
@@ -361,6 +432,18 @@ PY
     python "$MSIM_ROOT/tools/evaluate-fastglio-replay.py" \
       --bag "$run/sensors.bag" \
       --output "$run/fastglio-live-lio-error.json"
+  fi
+  if $autonomy; then
+    if ! python "$MSIM_ROOT/tools/evaluate-autonomy.py" --run "$run"; then
+      verification_ok=false
+      echo '自主返航核验未通过，请检查 autonomy-verification.json 和 navigation-report.json。' >&2
+    fi
+    if [[ -n "$goal_enu" && "$scene" == ksql_airport && -f "$run/navigation-report.json" ]]; then
+      if ! python "$MSIM_ROOT/tools/evaluate-mesh-clearance.py" --run "$run"; then
+        verification_ok=false
+        echo '轨迹与场景网格的离线间距核验未通过，请检查 mesh-clearance-verification.json。' >&2
+      fi
+    fi
   fi
   if ! $verification_ok; then exit 1; fi
 fi

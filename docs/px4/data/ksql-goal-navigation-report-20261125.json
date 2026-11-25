@@ -1,0 +1,2156 @@
+{
+  "completed": true,
+  "landed_disarmed": true,
+  "reason": "home_reached",
+  "events": [
+    {
+      "state": "warming_up",
+      "reason": "external_position_initialization",
+      "sim_time_s": 2.5140000000000002
+    },
+    {
+      "state": "arming",
+      "reason": "ready",
+      "sim_time_s": 6.526
+    },
+    {
+      "state": "taking_off",
+      "reason": "armed_with_external_position",
+      "sim_time_s": 7.16
+    },
+    {
+      "state": "outbound",
+      "reason": "takeoff_reached",
+      "sim_time_s": 25.816
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 25.816
+    },
+    {
+      "state": "outbound",
+      "reason": "replanned",
+      "sim_time_s": 26.2
+    },
+    {
+      "state": "returning",
+      "reason": "goal_reached",
+      "sim_time_s": 197.218
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 197.218
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 197.664
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 204.434
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 204.672
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 205.334
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 205.68
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 206.324
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 206.678
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 207.438
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 207.68
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 208.642
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 209.176
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 209.532
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 210.188
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 210.924
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 211.166
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 212.148
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 212.664
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 213.218
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 213.782
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 214.424
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 214.87
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 215.624
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 215.87
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 216.718
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 216.866
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 217.734
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 218.288
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 218.622
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 218.79
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 219.762
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 220.264
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 220.752
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 221.282
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 221.836
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 222.27
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 222.92
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 223.272
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 224.128
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 224.302
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 225.134
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 225.278
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 226.128
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 226.278
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 227.026
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 227.272
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 227.92
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 228.29
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 228.828
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 229.286
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 229.82
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 230.276
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 230.914
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 231.302
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 232.03
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 232.258
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 233.242
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 233.794
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 234.126
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 234.292
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 235.262
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 235.786
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 236.258
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 236.782
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 237.416
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 237.798
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 238.618
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 238.778
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 239.744
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 240.274
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 240.628
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 240.786
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 241.82
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 242.27
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 242.82
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 243.272
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 243.93
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 244.272
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 245.022
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 245.298
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 246.118
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 246.29
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 247.244
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 247.79
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 248.126
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 248.264
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 249.272
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 249.772
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 250.262
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 250.792
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 251.328
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 251.788
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 252.428
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 252.772
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 253.516
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 253.786
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 254.616
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 254.782
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 255.538
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 255.822
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 256.522
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 256.816
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 257.53
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 257.792
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 258.53
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 258.8
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 259.632
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 260.266
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 260.622
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 260.798
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 261.822
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 262.278
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 262.812
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 263.298
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 263.912
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 264.284
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 265.034
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 265.254
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 266.12
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 266.294
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 267.118
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 267.278
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 268.014
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 268.296
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 269.012
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 269.246
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 269.91
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 270.27
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 270.83
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 271.262
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 271.93
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 272.272
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 273.018
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 273.262
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 274.126
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 274.764
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 275.222
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 275.724
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 276.624
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 276.734
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 277.824
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 278.246
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 278.814
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 279.23
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 280.014
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 280.214
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 281.014
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 281.238
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 282.13
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 282.234
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 283.018
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 283.234
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 284.016
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 284.21
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 284.926
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 285.248
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 285.818
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 286.212
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 286.828
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 287.236
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 287.912
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 288.234
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 288.92
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 289.25
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 290.012
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 290.27
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 291.032
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 291.258
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 292.016
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 292.28
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 293.026
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 293.272
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 294.032
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 294.27
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 295.016
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 295.278
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 296.114
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 296.286
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 297.024
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 297.258
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 298.024
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 298.268
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 299.012
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 299.278
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 300.016
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 300.294
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 301.116
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 301.274
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 302.012
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 302.286
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 303.026
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 303.252
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 303.93
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 304.286
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 304.92
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 305.262
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 306.024
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 306.29
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 307.114
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 307.276
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 308.28
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 308.788
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 309.122
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 309.288
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 310.266
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 310.796
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 311.28
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 311.772
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 312.328
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 312.79
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 313.534
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 313.774
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 314.63
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 314.79
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 315.616
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 315.772
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 316.618
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 317.27
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 317.516
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 317.778
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 318.622
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 318.772
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 319.62
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 319.76
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 320.522
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 320.764
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 321.42
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 321.802
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 322.428
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 322.766
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 323.528
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 323.768
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 324.522
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 324.782
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 325.63
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 325.796
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 326.614
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 326.774
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 327.618
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 327.786
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 328.53
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 328.794
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 329.512
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 329.778
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 330.52
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 330.788
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 331.526
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 331.772
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 332.526
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 332.782
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 333.524
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 333.762
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 334.628
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 335.276
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 335.624
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 336.282
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 336.918
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 337.26
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 338.32
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 338.778
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 339.428
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 339.772
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 340.532
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 340.784
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 341.618
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 341.76
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 342.614
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 342.772
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 343.526
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 343.778
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 344.518
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 344.782
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 345.528
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 345.77
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 346.524
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 346.758
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 347.518
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 347.78
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 348.53
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 348.75
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 349.52
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 349.75
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 350.53
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 350.768
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 351.416
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 351.746
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 352.418
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 352.758
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 353.424
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 353.77
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 354.426
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 354.758
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 355.53
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 355.748
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 356.524
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 356.752
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 357.424
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 357.77
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 358.426
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 358.762
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 359.522
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 359.756
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 360.51
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 360.768
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 361.528
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 361.766
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 362.528
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 362.756
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 363.518
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 363.784
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 364.514
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 364.78
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 365.52
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 365.784
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 366.52
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 366.772
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 367.42
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 367.776
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 368.426
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 368.782
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 369.412
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 369.782
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 370.418
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 370.756
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 371.526
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 371.746
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 372.53
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 372.768
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 373.512
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 373.77
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 374.516
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 374.78
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 375.514
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 375.786
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 376.62
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 376.782
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 377.516
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 377.764
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 378.416
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 378.758
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 379.42
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 379.76
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 380.418
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 380.788
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 381.53
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 381.768
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 382.616
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 382.762
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 383.616
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 383.782
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 384.63
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 385.256
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 385.524
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 385.772
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 386.736
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 387.28
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 387.82
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 388.27
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 389.024
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 389.258
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 390.12
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 390.274
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 391.118
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 391.278
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 392.126
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 392.75
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 393.114
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 393.274
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 394.27
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 394.784
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 395.332
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 395.774
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 396.434
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 396.762
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 397.626
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 397.788
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 398.736
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 399.272
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 399.624
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 399.782
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 400.746
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 401.282
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 401.734
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 402.268
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 402.818
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 403.262
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 404.024
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 404.254
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 405.126
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 405.766
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 406.118
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 406.278
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 407.322
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 407.762
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 408.322
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 408.766
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 409.426
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 409.784
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 410.526
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 410.766
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 411.622
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 411.78
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 412.622
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 412.79
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 413.532
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 413.78
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 414.416
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 414.792
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 415.414
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 415.782
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 416.52
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 416.796
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 417.516
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 417.778
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 418.624
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 419.272
+    },
+    {
+      "state": "holding",
+      "reason": "planning_wait",
+      "sim_time_s": 419.624
+    },
+    {
+      "state": "returning",
+      "reason": "replanned",
+      "sim_time_s": 419.784
+    },
+    {
+      "state": "landing",
+      "reason": "home_reached",
+      "sim_time_s": 420.766
+    }
+  ],
+  "failures": [],
+  "external_pose_messages": 4340,
+  "gnss_fusion_enabled": false,
+  "prior_map": null,
+  "prior_map_confirmed": false,
+  "home_lio": [
+    -0.0003151155211650475,
+    0.002348759347404206,
+    -0.0022575729588891293
+  ],
+  "truth_used_for_control": false,
+  "mission_type": "goal_exploration",
+  "goal_relative_enu_m": [
+    0.0,
+    300.0,
+    12.0
+  ],
+  "goal_reached": true,
+  "goal_reached_sim_time_s": 197.218
+}

@@ -25,3 +25,11 @@ main{max-width:2000px;padding:22px 28px 16px;margin:auto}.workspace-heading{disp
 .keyboard-enable{width:100%;background:#16414d;border-color:#32717d;color:#91e7ed;font-size:12px}.input-hint{font-size:11px;color:#9fc8d7;line-height:1.6;margin:9px 0}#commandLatency{display:block;color:#94b6ca;margin-top:4px}
 .scene-model-tools{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:9px 13px;border-top:1px solid #24364a;font-size:12px;color:#a1bdcf}.scene-model-tools button{font-size:12px;padding:6px 9px}.scene-model-tools span{margin-left:auto;color:#64869d;font-size:11px}
 .aircraft-label{position:absolute;left:0;top:0;pointer-events:none;background:#102e3cdd;border:1px solid #65dce4;border-radius:5px;padding:4px 7px;color:#b8faff;font-size:12px;white-space:nowrap}
+
+.navigation-alert{padding:9px;border-left:3px solid #e6b56b;background:#213041;color:#ffe0ad;line-height:1.6;font-size:13px}.log-panel pre{max-height:220px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;background:#09131f;padding:10px;font-size:11px;line-height:1.5;color:#c6deed}.log-panel .help{overflow-wrap:anywhere}.log-auto{margin:10px 0;display:block}
+
+#navigationPanel{order:-4}.log-panel{order:-2}.telemetry-panel{order:-3}.controls.autonomous .keyboard-enable,.controls.autonomous .input-hint,.controls.autonomous .field-pair,.controls.autonomous .key-grid,.controls.autonomous [data-op=takeoff]{display:none}
+
+#navigationPanel .telemetry-grid strong{font-size:15px}#navigationPanel .telemetry-grid span{font-size:11px}.navigation-alert{font-size:14px}
+
+.navigation-alert{border-color:#4bd4d9;background:#142e39;color:#b4edef}.navigation-alert.is-warning{border-color:#e6b56b;background:#213041;color:#ffe0ad}
