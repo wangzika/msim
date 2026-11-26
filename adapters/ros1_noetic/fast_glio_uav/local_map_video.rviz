@@ -1,0 +1,80 @@
+Panels:
+  - Class: rviz/Displays
+    Name: Displays
+  - Class: rviz/Views
+    Name: Views
+Visualization Manager:
+  Class: ""
+  Displays:
+    - Class: rviz/Grid
+      Name: Grid
+      Enabled: true
+      Cell Size: 5
+      Plane Cell Count: 20
+      Reference Frame: <Fixed Frame>
+      Color: 60; 75; 90
+    - Class: rviz/PointCloud2
+      Name: 当前帧（红）
+      Enabled: true
+      Topic: /cloud_registered
+      Queue Size: 5
+      Decay Time: 0
+      Color Transformer: FlatColor
+      Color: 255; 80; 80
+      Position Transformer: XYZ
+      Style: Points
+      Size (Pixels): 3
+      Alpha: 1
+    - Class: rviz/PointCloud2
+      Name: 历史显示（紫，非内部地图）
+      Enabled: true
+      Topic: /cloud_registered
+      Queue Size: 100
+      Decay Time: 1000
+      Color Transformer: FlatColor
+      Color: 185; 100; 235
+      Position Transformer: XYZ
+      Style: Points
+      Size (Pixels): 1
+      Alpha: 0.5
+    - Class: rviz/Path
+      Name: LiDAR-IMU轨迹
+      Enabled: true
+      Topic: /path
+      Buffer Length: 1
+      Color: 50; 220; 240
+      Line Style: Lines
+      Line Width: 0.08
+    - Class: rviz/Odometry
+      Name: 当前位姿
+      Enabled: true
+      Topic: /Odometry
+      Keep: 1
+      Position Tolerance: 0.01
+      Angle Tolerance: 0.01
+      Shape:
+        Value: Axes
+        Axes Length: 1
+        Axes Radius: 0.06
+  Global Options:
+    Background Color: 8; 14; 22
+    Fixed Frame: camera_init
+    Frame Rate: 30
+  Tools:
+    - Class: rviz/Interact
+    - Class: rviz/MoveCamera
+    - Class: rviz/Select
+  Views:
+    Current:
+      Class: rviz/Orbit
+      Distance: 70
+      Pitch: 0.7
+      Yaw: 0.8
+      Focal Point:
+        X: 0
+        Y: 12
+        Z: 5
+      Target Frame: <Fixed Frame>
+Window Geometry:
+  Width: 1400
+  Height: 900
