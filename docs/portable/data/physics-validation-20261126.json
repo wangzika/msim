@@ -1,0 +1,323 @@
+{
+  "date": "2026-11-26",
+  "branch": "codex/portable-replay-core",
+  "default_backend": "gazebo",
+  "user_priority": "preserve flight control, mapping, sensors and web; replace dependencies incrementally",
+  "actual_platform": "Linux x86_64; Bullet Python 3.10; existing ROS/PX4 environment unchanged",
+  "scope": "New Bullet backend is diagnostic physical sensor generation, not PX4/FAST-LIO/autonomous-navigation equivalence",
+  "original_full_stack": {
+    "run": "physics-gazebo-reference-20261126",
+    "flight": {
+      "pass_flight_gate": true,
+      "armed": true,
+      "offboard": true,
+      "max_displacement_m": 17.16712092842474,
+      "max_climb_m": 8.114008903503418,
+      "px4_gps_samples": 35,
+      "max_px4_gps_satellites": 10,
+      "online_gnss": true,
+      "injection_match_fraction": 1.0,
+      "lidar_alignment": {
+        "lidar_epoch_count": 112,
+        "lidar_matched_epochs": 112,
+        "lidar_sync_fraction": 1.0,
+        "lidar_max_age_ms": 84.0,
+        "lidar_mean_age_ms": 80.73214285714286
+      },
+      "pass_lidar_sync_gate": true,
+      "px4_ulog": "/home/wzb/msim/build/physics-gazebo-reference-20261126/ros-home/log/2026-11-26/03_53_28.ulg"
+    },
+    "live_lio_loose": {
+      "topic_counts": {
+        "/msim/spoofed_gnss_odom": 106,
+        "/Odometry": 316,
+        "/path": 31,
+        "/loose_odom": 315,
+        "/loose_path": 31,
+        "/rtk_path": 315,
+        "/gnss_loose/diagnostics": 316
+      },
+      "gnss_alignment_reached": true,
+      "gnss_updates_accepted": 315,
+      "pass_live_loose_gate": true
+    },
+    "capture": {
+      "origin_lla_deg_m": [
+        30.5312,
+        114.3601,
+        50.0
+      ],
+      "first_truth_ns": 2590000000,
+      "last_truth_ns": 34160000000,
+      "gnss_origin_sim_time_ns": 3600000000,
+      "duration_s": 30,
+      "sensor_counts": {
+        "/clock": 15793,
+        "/imu/data": 5264,
+        "/ground_truth/state": 3158,
+        "/velodyne_points": 316
+      },
+      "interpolated_truth_samples": 0,
+      "max_raw_truth_gap_ms": 10.0
+    }
+  },
+  "bullet_real_time": {
+    "backend": "bullet",
+    "status": "completed",
+    "simulated_duration_s": 40.0,
+    "wall_time_s": 40.010776292998344,
+    "counts": {
+      "imu": 8001,
+      "truth": 4001,
+      "lidar": 400,
+      "gnss_normal": 201,
+      "gnss": 201
+    },
+    "lidar_frames": 400,
+    "contact_steps": 123,
+    "max_pacing_lag_s": 0.01880102400900796,
+    "final_position_enu_m": [
+      -3.2951957058352357,
+      -5.371249556614774,
+      4.7215291984818
+    ],
+    "final_target_enu_m": [
+      0.0,
+      -5.0,
+      5.08
+    ],
+    "final_tracking_error_m": 3.335362392391979,
+    "max_tracking_error_m": 5.025945777131658,
+    "reference_control_source": "gnss",
+    "scope": "Experimental physical sensor backend. Not PX4/FAST-LIO or Gazebo-equivalent navigation."
+  },
+  "paired_gnss_test": {
+    "normal": {
+      "backend": "bullet",
+      "status": "completed",
+      "simulated_duration_s": 25.0,
+      "wall_time_s": 13.13642664499639,
+      "counts": {
+        "imu": 5001,
+        "truth": 2501,
+        "lidar": 250,
+        "gnss_normal": 126,
+        "gnss": 126
+      },
+      "lidar_frames": 250,
+      "contact_steps": 123,
+      "max_pacing_lag_s": 0.0,
+      "final_position_enu_m": [
+        0.17170084840930425,
+        -20.10982168805267,
+        4.768744676121156
+      ],
+      "final_target_enu_m": [
+        0.0,
+        -20.0,
+        5.08
+      ],
+      "final_tracking_error_m": 0.3720508851677908,
+      "max_tracking_error_m": 5.025945777131658,
+      "reference_control_source": "gnss",
+      "scope": "Experimental physical sensor backend. Not PX4/FAST-LIO or Gazebo-equivalent navigation."
+    },
+    "spoof": {
+      "backend": "bullet",
+      "status": "completed",
+      "simulated_duration_s": 25.0,
+      "wall_time_s": 13.384301176003646,
+      "counts": {
+        "imu": 5001,
+        "truth": 2501,
+        "lidar": 250,
+        "gnss_normal": 126,
+        "gnss": 126
+      },
+      "lidar_frames": 250,
+      "contact_steps": 123,
+      "max_pacing_lag_s": 0.0,
+      "final_position_enu_m": [
+        -2.123638565782781,
+        -20.111295811509763,
+        4.769361424874541
+      ],
+      "final_target_enu_m": [
+        0.0,
+        -20.0,
+        5.08
+      ],
+      "final_tracking_error_m": 2.1491216438572156,
+      "max_tracking_error_m": 5.025945777131658,
+      "reference_control_source": "gnss",
+      "scope": "Experimental physical sensor backend. Not PX4/FAST-LIO or Gazebo-equivalent navigation."
+    },
+    "spoof_start_s": 12,
+    "spoof_rate_enu_mps": [
+      0.18,
+      0,
+      0
+    ],
+    "seed_shared": true,
+    "pre_attack_log_pairs": 240,
+    "pre_attack_max_position_difference_m": 0.0,
+    "final_position_difference_spoof_minus_normal_m": [
+      -2.2953394141920853,
+      -0.0014741234570934125,
+      0.0006167487533845772
+    ]
+  },
+  "sensor_switch_smokes": {
+    "hdl32": {
+      "backend": "bullet",
+      "status": "completed",
+      "simulated_duration_s": 1.0,
+      "wall_time_s": 0.79978221100464,
+      "counts": {
+        "imu": 201,
+        "truth": 101,
+        "lidar": 10,
+        "gnss_normal": 6,
+        "gnss": 6
+      },
+      "lidar_frames": 10,
+      "contact_steps": 0,
+      "max_pacing_lag_s": 0.0,
+      "final_position_enu_m": [
+        -5.697356028216853e-16,
+        -20.0,
+        1.2897124382034095
+      ],
+      "final_target_enu_m": [
+        0.0,
+        -20.0,
+        5.08
+      ],
+      "final_tracking_error_m": 3.7902875617965908,
+      "max_tracking_error_m": 5.005351833821047,
+      "reference_control_source": "ideal",
+      "scope": "Experimental physical sensor backend. Not PX4/FAST-LIO or Gazebo-equivalent navigation."
+    },
+    "os1-64": {
+      "backend": "bullet",
+      "status": "completed",
+      "simulated_duration_s": 1.0,
+      "wall_time_s": 0.9570915450021857,
+      "counts": {
+        "imu": 201,
+        "truth": 101,
+        "lidar": 10,
+        "gnss_normal": 6,
+        "gnss": 6
+      },
+      "lidar_frames": 10,
+      "contact_steps": 0,
+      "max_pacing_lag_s": 0.0,
+      "final_position_enu_m": [
+        -5.697356028216853e-16,
+        -20.0,
+        1.2897124382034095
+      ],
+      "final_target_enu_m": [
+        0.0,
+        -20.0,
+        5.08
+      ],
+      "final_tracking_error_m": 3.7902875617965908,
+      "max_tracking_error_m": 5.005351833821047,
+      "reference_control_source": "ideal",
+      "scope": "Experimental physical sensor backend. Not PX4/FAST-LIO or Gazebo-equivalent navigation."
+    },
+    "mid360": {
+      "backend": "bullet",
+      "status": "completed",
+      "simulated_duration_s": 1.0,
+      "wall_time_s": 0.3435887689993251,
+      "counts": {
+        "imu": 201,
+        "truth": 101,
+        "lidar": 10,
+        "gnss_normal": 6,
+        "gnss": 6
+      },
+      "lidar_frames": 10,
+      "contact_steps": 0,
+      "max_pacing_lag_s": 0.0,
+      "final_position_enu_m": [
+        -5.697356028216853e-16,
+        -20.0,
+        1.2897124382034095
+      ],
+      "final_target_enu_m": [
+        0.0,
+        -20.0,
+        5.08
+      ],
+      "final_tracking_error_m": 3.7902875617965908,
+      "max_tracking_error_m": 5.005351833821047,
+      "reference_control_source": "ideal",
+      "scope": "Experimental physical sensor backend. Not PX4/FAST-LIO or Gazebo-equivalent navigation."
+    }
+  },
+  "ksql_physical_smoke": {
+    "backend": "bullet",
+    "status": "completed",
+    "simulated_duration_s": 3.0,
+    "wall_time_s": 1.2443401330092456,
+    "counts": {
+      "imu": 601,
+      "truth": 301,
+      "lidar": 30,
+      "gnss_normal": 16,
+      "gnss": 16
+    },
+    "lidar_frames": 30,
+    "contact_steps": 0,
+    "max_pacing_lag_s": 0.0,
+    "final_position_enu_m": [
+      -210.0,
+      240.0,
+      7.661706015159825
+    ],
+    "final_target_enu_m": [
+      -210.0,
+      240.0,
+      10.58
+    ],
+    "final_tracking_error_m": 2.918293984840175,
+    "max_tracking_error_m": 12.005351779990288,
+    "reference_control_source": "ideal",
+    "scope": "Experimental physical sensor backend. Not PX4/FAST-LIO or Gazebo-equivalent navigation."
+  },
+  "verification": {
+    "legacy_tests_passed": 95,
+    "portable_total_tests_passed": 30,
+    "includes_stage1_tests": 13,
+    "new_physics_contract_export_tests": 17,
+    "wheel": "msim_portable-0.2.0-py3-none-any.whl",
+    "isolated_install_verified": true,
+    "no_runtime_imports": [
+      "rospy",
+      "rosbag",
+      "rclpy",
+      "scipy",
+      "matplotlib"
+    ],
+    "png_save_and_download_link_verified": true,
+    "physics_checks": [
+      "freefall analytical velocity and discrete position",
+      "force-based hover",
+      "motor time constant",
+      "actual wall contact",
+      "east position bias induces west compensation",
+      "rolling scan ground consistency at acquisition times",
+      "IMU gravity and freefall",
+      "KSQL parser and ray-height agreement"
+    ],
+    "platforms_not_physically_verified": [
+      "Windows",
+      "macOS"
+    ],
+    "wheel_isolated_recording": "build/physics-wheel-final"
+  }
+}

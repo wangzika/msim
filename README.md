@@ -2,6 +2,28 @@
 
 基于 **Gazebo Classic、PX4 SITL、ROS 1 Noetic 和 FAST-LIO2**，用于多传感器采集、GPS 欺骗与定位组合对比，以及无人工方向控制的目标探索、重定位和返航实验。网页和 RViz 显示实时点云、轨迹与运行状态；飞行结束后可独立核验真值误差和飞控定位源。
 
+## 轻量版回放入口（第一阶段）
+
+新增无 ROS/Gazebo/PX4 的独立 Python 核心，支持已有传感器数据回放、IMU/GPS 检测、ENU 误差评价和单文件三维 HTML 报告。这里只回放已记录的位姿，尚未迁移 FAST-LIO 实时解算、物理引擎或飞控闭环；原有完整仿真入口保留。
+
+```bash
+python -m pip install .
+python -m msim demo --output build/portable-demo
+python -m msim replay --input build/portable-demo --output build/portable-result
+```
+
+直接打开 `build/portable-result/report.html`。安装 `python -m pip install ".[bag]"` 后可通过 `python -m msim import-bag` 转换现有录包，无需安装 ROS。[安装、实际机场录包验证和跨平台边界](docs/portable/README.md)。
+
+新增统一的实时后端入口。为完整保留飞控、建图、传感器和网页功能，默认仍使用原有 Gazebo/PX4/FAST-LIO，`--` 后参数原样转交：
+
+```bash
+python -m msim simulate --backend gazebo -- \
+  --web --teleop --scene ksql_airport \
+  --teleop-height-m 12 --lidar-model vlp16 --point-filter-num 2
+```
+
+另有 `--backend bullet` 的独立实时刚体/碰撞/传感器试验入口，支持分时 LiDAR、共享 IMU 误差、GPS 注入和三维预览。它尚未接入 PX4、FAST-LIO 或自主返航，保持为试验后端，不能作为原有完整功能的等价替代。[运行、模型边界和实际验收](docs/portable/PHYSICS.md)。
+
 ## 当前能力
 
 | 能力 | 当前实现 |

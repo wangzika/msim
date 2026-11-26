@@ -1,0 +1,109 @@
+{
+  "date": "2026-11-26",
+  "scope": "portable replay stage 1; not native physics/FAST-LIO/PX4 migration",
+  "actual_platform": "Linux x86_64, Python 3.12",
+  "windows_macos": "CI matrix configured; not executed locally",
+  "source_run": "uav-px4-20261125-153145",
+  "source_window_s": 25,
+  "events": 7332,
+  "counts": {
+    "gnss_normal": 83,
+    "gnss": 83,
+    "imu": 4166,
+    "truth": 2500,
+    "lio": 250,
+    "lidar": 250
+  },
+  "evaluation": {
+    "position": {
+      "lio": {
+        "matched_pairs": 249,
+        "rmse_enu_m": [
+          0.017602410980730107,
+          0.028697027650761604,
+          0.12097214788977591
+        ],
+        "rmse_3d_m": 0.12556920336367877,
+        "maximum_3d_error_m": 0.19886213064763558,
+        "final_enu_error_m": [
+          0.02004822282478358,
+          -0.031286734566776886,
+          -0.1377944842101062
+        ],
+        "maximum_match_delta_ms": 4.0,
+        "translation_m": [
+          -209.99844835394393,
+          239.99454901157773,
+          -1.4423873303949954
+        ],
+        "source_frame": "camera_init",
+        "evaluation_frame": "enu",
+        "alignment": "first matched translation; axes assumed aligned"
+      },
+      "gnss_normal": {
+        "matched_pairs": 82,
+        "rmse_enu_m": [
+          0.9326528606056277,
+          0.18073506144029053,
+          0.11783788571060325
+        ],
+        "rmse_3d_m": 0.9572838075191866,
+        "maximum_3d_error_m": 1.2241457647813954,
+        "final_enu_error_m": [
+          -0.8187484443369897,
+          -0.05741342644358838,
+          -0.07290600943813885
+        ],
+        "maximum_match_delta_ms": 4.0,
+        "translation_m": null,
+        "source_frame": "enu",
+        "evaluation_frame": "enu",
+        "alignment": "same frame; no fit"
+      },
+      "gnss": {
+        "matched_pairs": 82,
+        "rmse_enu_m": [
+          0.9326528606056277,
+          0.18073506144029053,
+          0.11783788571060325
+        ],
+        "rmse_3d_m": 0.9572838075191866,
+        "maximum_3d_error_m": 1.2241457647813954,
+        "final_enu_error_m": [
+          -0.8187484443369897,
+          -0.05741342644358838,
+          -0.07290600943813885
+        ],
+        "maximum_match_delta_ms": 4.0,
+        "translation_m": null,
+        "source_frame": "enu",
+        "evaluation_frame": "enu",
+        "alignment": "same frame; no fit"
+      }
+    },
+    "skipped": {
+      "truth_time_gap": 3
+    },
+    "truth_used_for_algorithm": false,
+    "truth_matching": "nearest timestamp within tolerance; ties prefer past; bounded buffer"
+  },
+  "detector": {
+    "algorithm": "legacy planar IMU/GNSS innovation baseline",
+    "gps_sigma_m": 0.7,
+    "acceleration_sigma_mps2": 0.25,
+    "valid_updates": 82,
+    "alarm_count": 0,
+    "first_alarm_stamp_ns": null,
+    "skipped": {
+      "no_past_imu_within_50ms": 1
+    },
+    "truth_used": false,
+    "labels_available": false,
+    "false_alarm_fraction": null,
+    "attack_alarm_fraction": null
+  },
+  "cloud_payloads_verified": true,
+  "wheel_isolation": "python -I imports installed site-packages/msim; no ROS/Gazebo/PX4/SciPy/matplotlib runtime",
+  "legacy_tests_passed": 95,
+  "portable_tests_passed": 13
+}

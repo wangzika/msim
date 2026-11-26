@@ -1,0 +1,153 @@
+{
+  "schema_version": 2,
+  "description": "Resolved research sensor profile; explicit model selections and timing below.",
+  "imu_ros": {
+    "rate_hz": 200.0,
+    "seed": 20261115,
+    "gyro_noise_density": 0.0008726646,
+    "accel_noise_density": 0.00637,
+    "gyro_turn_on_bias_sigma": 0.0017453293,
+    "accel_turn_on_bias_sigma": 0.02,
+    "gyro_bias_random_walk": 2e-05,
+    "accel_bias_random_walk": 0.0002,
+    "gyro_bias_correlation_time_s": 1000.0,
+    "accel_bias_correlation_time_s": 300.0,
+    "orientation_initial_sigma_rad": 0.0052359878,
+    "orientation_random_walk_rad_sqrt_s": 0.0003490659,
+    "orientation_white_sigma_rad": 0.0008726646
+  },
+  "imu_px4": {
+    "gyroscopeNoiseDensity": 0.0008726646,
+    "gyroscopeRandomWalk": 2e-05,
+    "gyroscopeBiasCorrelationTime": 1000.0,
+    "gyroscopeTurnOnBiasSigma": 0.0017453293,
+    "accelerometerNoiseDensity": 0.00637,
+    "accelerometerRandomWalk": 0.0002,
+    "accelerometerBiasCorrelationTime": 300.0,
+    "accelerometerTurnOnBiasSigma": 0.02
+  },
+  "lidar": {
+    "horizontal_samples": 1800,
+    "vertical_samples": 16,
+    "rate_hz": 10.0,
+    "range_min_m": 0.3,
+    "range_max_m": 100.0,
+    "range_resolution_m": 0.001,
+    "range_noise_sigma_m": 0.02,
+    "vertical_min_deg": -15.0,
+    "vertical_max_deg": 15.0,
+    "seed": 20261119,
+    "scan_pattern": "uniform",
+    "timing": "rolling"
+  },
+  "models": {
+    "lidar": "vlp16",
+    "imu": "mems-baseline",
+    "gps": "f9p-dgnss-ucr"
+  },
+  "gps": {
+    "position_sigma_xy_m": 0.0,
+    "position_sigma_z_m": 0.0,
+    "position_sigma_enu_m": [
+      0.03,
+      0.0,
+      0.02
+    ],
+    "bias_sigma_enu_m": [
+      0.282842712474619,
+      0.282842712474619,
+      0.4242640687119285
+    ],
+    "bias_tau_enu_s": [
+      128.51,
+      65.6,
+      95.31
+    ],
+    "velocity_sigma_xy_mps": 0.0,
+    "velocity_sigma_z_mps": 0.0,
+    "reported_variance_mode": "model_marginal",
+    "native_noise": false,
+    "adaptive_environment": false,
+    "environment_range_m": 80.0,
+    "environment_noise_gain": 0.0,
+    "seed": 20261119,
+    "bias_sigma_xy_m": 0.0,
+    "bias_sigma_z_m": 0.0,
+    "bias_tau_s": 120.0,
+    "spoof_velocity_consistent": true,
+    "reported_variance_enu_m2": [
+      0.0809,
+      0.08,
+      0.1804
+    ],
+    "reported_variance_xy_m2": 0.0809,
+    "reported_variance_z_m2": 0.1804
+  },
+  "gps_reference": {
+    "id": "f9p-dgnss-ucr",
+    "receiver": "u-blox ZED-F9P",
+    "mode": "single-frequency L1/E1/B1 code DGNSS with VN-DGNSS RTCM corrections",
+    "constellations": [
+      "GPS",
+      "Galileo",
+      "BeiDou"
+    ],
+    "classification": "published_position_error_fit_demeaned",
+    "source": {
+      "title": "Lane-Level Localization and Map Matching for Advanced Connected and Automated Vehicle (CAV) Applications",
+      "authors": [
+        "Jay A. Farrell",
+        "Guoyuan Wu",
+        "Wang Hu",
+        "David Oswald",
+        "Peng Hao"
+      ],
+      "year": 2023,
+      "report_number": "NCST-UCR-RR-23-13",
+      "doi": "10.7922/G25T3HSS",
+      "url": "https://rosap.ntl.bts.gov/view/dot/67203/dot_67203_DS1.pdf",
+      "pdf_sha256": "0766e1877633d9a59916739565fbb26279a9f86d80bcee4abeaaf647847a8bf6",
+      "alternate_url": "https://escholarship.org/content/qt1f7661b4/qt1f7661b4.pdf",
+      "location": "Appendix B, section 4, Table 1 (PDF page 57 in the 66-page USDOT copy)",
+      "experiment_date": "2021-07-02",
+      "sample_period_s": 1.0,
+      "duration_approx_s": 3600,
+      "conditions": "moving vehicle near UCR with a clear view of the sky; M8P fixed RTK reference",
+      "accessed": "2026-11-23"
+    },
+    "table_axes": "NED",
+    "table": {
+      "north": {
+        "mean_m": 0.41,
+        "alpha_1s": 0.9849,
+        "white_sigma_m": 0.0,
+        "bias_variance_m2": 0.08,
+        "correlation_time_s": 65.6
+      },
+      "east": {
+        "mean_m": -0.09,
+        "alpha_1s": 0.9922,
+        "white_sigma_m": 0.03,
+        "bias_variance_m2": 0.08,
+        "correlation_time_s": 128.51
+      },
+      "down": {
+        "mean_m": 1.49,
+        "alpha_1s": 0.9896,
+        "white_sigma_m": 0.02,
+        "bias_variance_m2": 0.18,
+        "correlation_time_s": 95.31
+      }
+    },
+    "implementation_scope": {
+      "mean": "zero; published finite-experiment means are recorded but not applied",
+      "white_sigma_rounding": "north 0.00 is the published rounded value, not proof of physically zero white noise",
+      "sample_rate": "native Gazebo cadence and delay retained; correlation time re-discretized at actual sample intervals; white sigma kept per sample, not a noise density",
+      "velocity": "ideal native velocity; no velocity-error calibration is provided by this position-only reference",
+      "environment_model": "disabled; no calibrated sky-obstruction law supplied by the reference",
+      "limits": "position-domain statistical reproduction; not raw GNSS/RTCM processing, vendor hardware emulation, RTK fixed performance, or an urban-canyon calibration"
+    },
+    "parameter_overrides": {}
+  },
+  "model_note": "Research parameter presets; uniform beam elevations, not vendor-calibrated firing schedules."
+}

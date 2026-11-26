@@ -1,0 +1,159 @@
+{
+  "source": "PX4 Gazebo Classic Iris iris.sdf",
+  "source_sha256": "67db5a2bd660e0beb0d92bb2ecce2ca2470a3fde8aed058803bb73e8498e7d61",
+  "links": [
+    {
+      "name": "base_link",
+      "mass_kg": 1.5,
+      "position_m": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "inertia_diagonal": [
+        0.029125,
+        0.029125,
+        0.055225
+      ]
+    },
+    {
+      "name": "/imu_link",
+      "mass_kg": 0.015,
+      "position_m": [
+        0.0,
+        0.0,
+        0.02
+      ],
+      "inertia_diagonal": [
+        1e-05,
+        1e-05,
+        1e-05
+      ]
+    },
+    {
+      "name": "rotor_0",
+      "mass_kg": 0.005,
+      "position_m": [
+        0.13,
+        -0.22,
+        0.023
+      ],
+      "inertia_diagonal": [
+        9.75e-07,
+        0.000273104,
+        0.000274004
+      ]
+    },
+    {
+      "name": "rotor_1",
+      "mass_kg": 0.005,
+      "position_m": [
+        -0.13,
+        0.2,
+        0.023
+      ],
+      "inertia_diagonal": [
+        9.75e-07,
+        0.000273104,
+        0.000274004
+      ]
+    },
+    {
+      "name": "rotor_2",
+      "mass_kg": 0.005,
+      "position_m": [
+        0.13,
+        0.22,
+        0.023
+      ],
+      "inertia_diagonal": [
+        9.75e-07,
+        0.000273104,
+        0.000274004
+      ]
+    },
+    {
+      "name": "rotor_3",
+      "mass_kg": 0.005,
+      "position_m": [
+        -0.13,
+        -0.2,
+        0.023
+      ],
+      "inertia_diagonal": [
+        9.75e-07,
+        0.000273104,
+        0.000274004
+      ]
+    }
+  ],
+  "rotors": [
+    {
+      "position_m": [
+        0.13,
+        -0.22,
+        0.023
+      ],
+      "spin": 1,
+      "timeConstantUp": 0.0125,
+      "timeConstantDown": 0.025,
+      "maxRotVelocity": 1100.0,
+      "motorConstant": 5.84e-06,
+      "momentConstant": 0.06,
+      "rotorDragCoefficient": 0.000175,
+      "rollingMomentCoefficient": 1e-06
+    },
+    {
+      "position_m": [
+        -0.13,
+        0.2,
+        0.023
+      ],
+      "spin": 1,
+      "timeConstantUp": 0.0125,
+      "timeConstantDown": 0.025,
+      "maxRotVelocity": 1100.0,
+      "motorConstant": 5.84e-06,
+      "momentConstant": 0.06,
+      "rotorDragCoefficient": 0.000175,
+      "rollingMomentCoefficient": 1e-06
+    },
+    {
+      "position_m": [
+        0.13,
+        0.22,
+        0.023
+      ],
+      "spin": -1,
+      "timeConstantUp": 0.0125,
+      "timeConstantDown": 0.025,
+      "maxRotVelocity": 1100.0,
+      "motorConstant": 5.84e-06,
+      "momentConstant": 0.06,
+      "rotorDragCoefficient": 0.000175,
+      "rollingMomentCoefficient": 1e-06
+    },
+    {
+      "position_m": [
+        -0.13,
+        -0.2,
+        0.023
+      ],
+      "spin": -1,
+      "timeConstantUp": 0.0125,
+      "timeConstantDown": 0.025,
+      "maxRotVelocity": 1100.0,
+      "motorConstant": 5.84e-06,
+      "momentConstant": 0.06,
+      "rotorDragCoefficient": 0.000175,
+      "rollingMomentCoefficient": 1e-06
+    }
+  ],
+  "collision_box_m": [
+    0.47,
+    0.47,
+    0.11
+  ],
+  "gravity_mps2": 9.80665,
+  "note": "Rigid aggregate of Iris links; no articulated propeller inertia or rotor gyroscopic simulation; compare before claiming Gazebo equivalence"
+}

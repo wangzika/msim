@@ -1,0 +1,38 @@
+{
+  "vlp16": {
+    "vertical_samples": 16,
+    "vertical_min_deg": -15.0,
+    "vertical_max_deg": 15.0,
+    "horizontal_samples": 1800,
+    "range_min_m": 0.3,
+    "range_max_m": 100.0
+  },
+  "hdl32": {
+    "vertical_samples": 32,
+    "vertical_min_deg": -30.67,
+    "vertical_max_deg": 10.67,
+    "horizontal_samples": 1800,
+    "range_min_m": 0.3,
+    "range_max_m": 100.0
+  },
+  "os1-64": {
+    "vertical_samples": 64,
+    "vertical_min_deg": -22.5,
+    "vertical_max_deg": 22.5,
+    "horizontal_samples": 1024,
+    "range_min_m": 0.3,
+    "range_max_m": 100.0
+  },
+  "mid360": {
+    "vertical_samples": 4,
+    "vertical_min_deg": -7.0,
+    "vertical_max_deg": 52.0,
+    "horizontal_samples": 5000,
+    "rate_hz": 10.0,
+    "range_min_m": 0.1,
+    "range_max_m": 40.0,
+    "scan_pattern": "livox_csv",
+    "point_rate_hz": 200000.0,
+    "pattern_sha256": "aa1fc08b6a4400608dbd6ee832b7ea3a9c3c37197e734f60f58fe5abf762269a"
+  }
+}

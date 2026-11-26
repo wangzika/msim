@@ -2,6 +2,9 @@
 /runs/
 __pycache__/
 *.pyc
+*.egg-info/
+/.venv/
+/dist/
 /scenes/ksql_airport.world
 /.chart-data-*/
 /.codex-build/
