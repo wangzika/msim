@@ -43,6 +43,14 @@ Toolbars:
 Visualization Manager:
   Class: ""
   Displays:
+    - Class: rviz/Path
+      Name: 真实轨迹（仅首帧平移对齐）
+      Enabled: true
+      Topic: /ground_truth/aligned_path
+      Buffer Length: 1
+      Color: 100; 245; 130
+      Line Style: Lines
+      Line Width: 0.12
     - Alpha: 1
       Cell Size: 1000
       Class: rviz/Grid

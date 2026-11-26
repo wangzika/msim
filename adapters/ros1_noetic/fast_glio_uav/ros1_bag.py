@@ -107,6 +107,9 @@ def capture(args):
         frontend=os.environ.get('MSIM_FASTGLIO_FRONTEND','marsim'),
         gnss_source=os.environ.get('MSIM_GNSS_SOURCE','legacy'),
         point_filter_num=args.fastglio_point_filter_num,
+        cube_side_length_m=args.fastglio_cube_side_length,
+        wait_for_recording=args.wait_for_recording,
+        local_map_demo=os.environ.get('MSIM_LOCAL_MAP_DEMO') or None,
         fusion_processing_delay_s=float(os.environ.get('MSIM_FUSION_DELAY_S', '0')),
         world_source=os.environ.get('MSIM_WORLD_SOURCE'),
         scene_key=os.environ.get('MSIM_SCENE_KEY',scene['name']),
@@ -120,7 +123,7 @@ def capture(args):
         route_copy.write_bytes(Path(os.environ.get('MSIM_ROUTE_PLAN',str(HERE / 'route_plan.json'))).read_bytes())
         os.environ['MSIM_ROUTE_PLAN'] = str(route_copy)
     Path(os.environ.get('ROS_LOG_DIR', str(run / 'roslogs'))).mkdir(parents=True, exist_ok=True)
-    launch = record = controller = injector = visualizer = fastglio = mapper = web_console = None
+    launch = record = controller = injector = visualizer = fastglio = mapper = web_console = comparison = None
     state = dict(clock=None, counts=Counter(), truth=None)
     stop_requested = dict(value=False, reason=None)
     stop_file = run/'capture-stop.json'
@@ -140,6 +143,7 @@ def capture(args):
     tile_log = (run / 'window-layout.log').open('w')
     map_log = (run / 'mapping.log').open('w')
     web_log = (run / 'web-console.log').open('w')
+    comparison_log = (run / 'truth-comparison.log').open('w')
     phase='starting_ros'
     try:
         launch_file = args.launch_file or HERE / 'uav_world.launch'
@@ -231,18 +235,26 @@ def capture(args):
             else:
                 raise RuntimeError('Gazebo visualizer did not start; see gazebo-viz.log')
         if args.fastglio_launch:
+            if args.wait_for_recording:
+                from std_srvs.srv import Empty
+                rospy.wait_for_service('/gazebo/pause_physics',timeout=10)
+                rospy.ServiceProxy('/gazebo/pause_physics',Empty)()
             phase='starting_fastglio'
             algorithm_args = [
                 'roslaunch', str(args.fastglio_launch),
                 'config_file:=' + str(args.fastglio_config),
                 'rviz_config:=' + str(args.fastglio_rviz_config),
                 'rviz:=' + ('true' if args.gui else 'false'),
-                'point_filter_num:=' + str(args.fastglio_point_filter_num)]
+                'point_filter_num:=' + str(args.fastglio_point_filter_num),
+                'cube_side_length:=' + str(args.fastglio_cube_side_length)]
             if args.mapping_only:
                 algorithm_args.append('mapping_only:=true')
             fastglio = subprocess.Popen(algorithm_args,
                 stdout=fastglio_log, stderr=subprocess.STDOUT,
                 start_new_session=True)
+            comparison=subprocess.Popen([sys.executable,str(HERE/'truth_comparison_node.py')],
+                stdout=comparison_log,stderr=subprocess.STDOUT,start_new_session=True,
+                env=dict(os.environ,MSIM_TRUTH_COMPARISON_REPORT=str(run/'truth-comparison.json')))
             fastglio_deadline = time.monotonic() + 45
             while time.monotonic() < fastglio_deadline:
                 raise_if_simulation_crashed(run/'launch.log')
@@ -284,6 +296,9 @@ def capture(args):
             record_topics.extend(['/Odometry', '/path', '/loose_odom', '/loose_path',
                                   '/rtk_path', '/gnss_loose/diagnostics'])
             record_topics.append('/msim/velodyne_points_annotated')
+            record_topics.extend(['/ground_truth/aligned_path','/ground_truth/aligned_odom','/msim/lio_world_odom'])
+            if args.wait_for_recording or os.environ.get('MSIM_LOCAL_MAP_DEMO'):
+                record_topics.append('/cloud_registered')
         if args.interactive:
             record_topics.extend(['/msim/teleop/command', '/msim/teleop/status',
                                   '/cloud_registered', '/msim/lio_map/status'])
@@ -291,6 +306,14 @@ def capture(args):
                 record_topics.extend(['/msim/navigation/status','/msim/return_path','/msim/localized_odom','/msim/planned_path'])
         record = subprocess.Popen(['rosbag', 'record', '-O', str(run / 'sensors.bag'), *record_topics],
             stdout=record_log, stderr=subprocess.STDOUT, start_new_session=True)
+        if args.wait_for_recording:
+            if not sys.stdin.isatty():raise RuntimeError('--wait-for-recording 需要交互终端；无窗口自动测试请省略此参数。')
+            label='Gazebo / RViz 窗口已就绪' if args.gui else '仿真节点已就绪（无窗口测试）'
+            print(label+'，物理仿真已暂停。开始录屏后，回此终端按 Enter 起飞。',flush=True)
+            input()
+            from std_srvs.srv import Empty
+            rospy.wait_for_service('/gazebo/unpause_physics',timeout=10)
+            rospy.ServiceProxy('/gazebo/unpause_physics',Empty)()
         if args.controller_script:
             controller = subprocess.Popen([sys.executable, str(args.controller_script)],
                 stdout=controller_log, stderr=subprocess.STDOUT, start_new_session=True)
@@ -317,6 +340,8 @@ def capture(args):
                     stop_requested.update(value=True, reason='mapping_window_closed')
                     break
                 raise RuntimeError('FAST_GLIO exited; see fastglio-live.log')
+            if comparison is not None and comparison.poll() is not None:
+                raise RuntimeError('真值显示节点退出；请检查 truth-comparison.log')
             if mapper is not None and mapper.poll() is not None:
                 raise RuntimeError('map recorder exited; see mapping.log')
             if web_console is not None and web_console.poll() is not None:
@@ -343,6 +368,7 @@ def capture(args):
         if not args.interactive:
             stop(controller)
         stop(fastglio)
+        stop(comparison)
         stop(mapper)
         stop(web_console)
         stop(visualizer)
@@ -360,6 +386,7 @@ def capture(args):
         tile_log.close()
         map_log.close()
         web_log.close()
+        comparison_log.close()
         if args.interactive:
             signal.signal(signal.SIGINT, previous_sigint)
     bag = run / 'sensors.bag'
@@ -881,6 +908,8 @@ def main():
                              help='Start live FAST_GLIO alongside Gazebo')
             cmd.add_argument('--fastglio-config', type=Path)
             cmd.add_argument('--fastglio-point-filter-num', type=int, default=2)
+            cmd.add_argument('--fastglio-cube-side-length',type=float,choices=(200.,1000.),default=1000.)
+            cmd.add_argument('--wait-for-recording',action='store_true')
             cmd.add_argument('--fastglio-rviz-config', type=Path)
             cmd.add_argument('--tile-windows-script', type=Path)
             cmd.add_argument('--flight-mode', default='patrol_s', choices=[

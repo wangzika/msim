@@ -69,6 +69,18 @@ class GazeboTrailTest(unittest.TestCase):
             self.update(second, 4.)
         self.assertFalse(any('_trail_' in name for name in self.active))
 
+    def test_lio_marker_keeps_estimated_height_and_rejects_stale_pose(self):
+        self.viz.latest_lio=(5_000_000_000,2.,4.,11.)
+        moves=[]
+        original=self.viz._put
+        def put(name,kind,position):
+            moves.append((kind,position));return original(name,kind,position)
+        self.viz._put=put
+        self.update(5,4.)
+        self.assertIn(('lio',(2.,4.,11.)),moves)
+        moves.clear();self.update(8,4.)
+        self.assertFalse(any(kind=='lio' for kind,_ in moves))
+
 
 if __name__ == '__main__':
     unittest.main()

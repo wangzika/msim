@@ -18,6 +18,7 @@ COLORS = {
     'truth': ('1 1 1', 0.11),
     'gnss': ('0.15 0.55 1', 0.12),
     'estimate': ('0.1 1 0.4', 0.10),
+    'lio': ('0.1 0.9 1', 0.10),
     'spoof_reference': ('1 0.1 1', 0.11),
     'alarm': ('1 0.08 0.08', 0.16),
 }
@@ -102,6 +103,7 @@ class GazeboSpoofViz:
         self.models = set()
         self.latest_truth = None
         self.latest_detection = None
+        self.latest_lio = None
         self.alarm_seen = False
         self.last_trail_ns = None
         self.trail_sequence = 0
@@ -126,6 +128,11 @@ class GazeboSpoofViz:
         except (ValueError, TypeError):
             rospy.logwarn_throttle(5, 'invalid /gnss/spoof_detection JSON')
 
+    def on_lio(self,msg):
+        if msg.header.frame_id!='world':return
+        p=msg.pose.pose.position
+        self.latest_lio=(msg.header.stamp.to_nsec(),p.x,p.y,p.z)
+
     def _put(self, name, kind, position):
         where = pose(*position)
         if name not in self.models:
@@ -135,6 +142,7 @@ class GazeboSpoofViz:
             if not response.success:
                 raise RuntimeError(f'Gazebo could not spawn {name}: {response.status_message}')
             self.models.add(name)
+            if kind=='lio':print('Gazebo cyan LIO marker ready: independent estimated X/Y/Z, translated to world',flush=True)
         else:
             state = ModelState()
             state.model_name = name
@@ -178,6 +186,10 @@ class GazeboSpoofViz:
             'gnss': (row['gps_east_m'], row['gps_north_m'], row.get('gps_up_m', display_z)),
             'estimate': (row['estimate_east_m'], row['estimate_north_m'], display_z),
         }
+        # Genuine 3D LIO height is preserved. Unlike the planar detector marker,
+        # this stream must not borrow truth altitude or predict past its stamp.
+        if self.latest_lio is not None and 0<=truth[0]-self.latest_lio[0]<=2_000_000_000:
+            positions['lio']=self.latest_lio[1:]
         if self.route_points is not None and row.get('attack_active'):
             # A visual reference for the injected displacement. The actual
             # GPS fed to PX4 is the blue marker, which can remain near the route
@@ -232,6 +244,7 @@ def main():
                         rospy.ServiceProxy('/gazebo/delete_model', DeleteModel))
     rospy.Subscriber('/ground_truth/state', Odometry, viz.on_truth, queue_size=5)
     rospy.Subscriber('/gnss/spoof_detection', String, viz.on_detection, queue_size=5)
+    rospy.Subscriber('/msim/lio_world_odom',Odometry,viz.on_lio,queue_size=5)
     ready_file = Path(os.environ['MSIM_GAZEBO_VIZ_READY'])
     rate = rospy.Rate(5)
     ready = False
@@ -243,6 +256,7 @@ def main():
                                                              'white': 'truth',
                                                              'blue': 'GNSS input',
                                                              'green': 'detector estimate',
+                                                             'cyan': 'LiDAR/IMU estimate (translated to world; own height)',
                                                              'purple': 'injected offset reference (not GPS input)',
                                                              'red': 'alarm'}}))
                 print('Gazebo markers ready: yellow=route, white=truth, blue=GNSS, green=estimate, purple=offset reference, red=alarm',

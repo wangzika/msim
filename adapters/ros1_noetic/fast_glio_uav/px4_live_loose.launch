@@ -4,12 +4,13 @@
   <arg name="rviz" default="true" />
   <arg name="point_filter_num" default="2" />
   <arg name="mapping_only" default="false" />
+  <arg name="cube_side_length" default="1000.0" />
   <param name="/use_sim_time" value="true" />
   <rosparam command="load" file="$(arg config_file)" />
   <param name="/point_filter_num" type="int" value="$(arg point_filter_num)" />
   <!-- FAST-LIO reads this through the global NodeHandle, not its private one.
        200 m with det_range=100 m repeatedly shifts and crops the local map. -->
-  <param name="/cube_side_length" type="double" value="1000.0" />
+  <param name="/cube_side_length" type="double" value="$(arg cube_side_length)" />
   <!-- The Gazebo IMU's bias is estimated online; freezing it caused
        roll/pitch and height drift in the corridor replay. -->
   <param name="/mapping/bias_freeze_en" value="false" />

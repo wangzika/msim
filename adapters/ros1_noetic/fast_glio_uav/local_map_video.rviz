@@ -38,6 +38,14 @@ Visualization Manager:
       Size (Pixels): 1
       Alpha: 0.5
     - Class: rviz/Path
+      Name: 真实轨迹（绿，仅首帧平移对齐）
+      Enabled: true
+      Topic: /ground_truth/aligned_path
+      Buffer Length: 1
+      Color: 100; 245; 130
+      Line Style: Lines
+      Line Width: 0.12
+    - Class: rviz/Path
       Name: LiDAR-IMU轨迹
       Enabled: true
       Topic: /path

@@ -22,6 +22,9 @@ world_input=""
 custom_world=false
 frontend=auto
 point_filter_num=auto
+local_map_demo=""
+wait_for_recording=false
+cube_side_length=1000
 fusion_delay_s=0.65
 route_clock=wall
 duration=300
@@ -82,12 +85,14 @@ while (($#)); do
     --scene-profile) scene_profile="$2"; shift 2;;
     --list-sensors) /usr/bin/python3 "$MSIM_ROOT/tools/sensor-config.py" --list; exit 0;;
     --lidar-model|--imu-model|--gps-model|--lidar-timing) sensor_args+=("$1" "$2"); shift 2;;
-    --help) echo 'px4-uav-capture.sh [--web [--web-port 8766] [--teleop]] [--goal-enu E N U --mission-speed-mps 2 --goal-radius-m 2] [--autonomy [--localization-map directory] [--autonomy-distance-m 8] [--return-after-s 30] [--autonomy-timeout-s 150] [--teleop-height-m 5]] [--fastglio-live --flight-pattern route] [--duration-s 60] [--scene simple|complex_urban|industrial_yard|ksql_airport] [--scene-profile file.json] [--lidar-model vlp16|hdl32|os1-64|mid360] [--imu-model mems-baseline|low-noise] [--gps-model f9p-dgnss-ucr(default)|standalone(uncalibrated)|native|ideal] [--lidar-timing rolling|snapshot] [--list-sensors] [--list-scenes]'; exit 0;;
+    --help) echo 'px4-uav-capture.sh [--web [--web-port 8766] [--teleop]] [--goal-enu E N U --mission-speed-mps 2 --goal-radius-m 2] [--autonomy [--localization-map directory] [--autonomy-distance-m 8] [--return-after-s 30] [--autonomy-timeout-s 150] [--teleop-height-m 5]] [--fastglio-live --flight-pattern route] [--duration-s 60] [--scene simple|complex_urban|industrial_yard|ksql_airport] [--scene-profile file.json] [--lidar-model vlp16|hdl32|os1-64|mid360] [--imu-model mems-baseline|low-noise] [--gps-model f9p-dgnss-ucr(default)|standalone(uncalibrated)|native|ideal] [--lidar-timing rolling|snapshot] [--list-sensors] [--list-scenes] [--local-map-demo before|after] [--wait-for-recording]'; exit 0;;
     --scene) scene="$2"; shift 2;;
     --list-scenes) /usr/bin/python3 "$MSIM_ROOT/tools/scene-list.py"; exit 0;;
     --world) world_input="$2"; custom_world=true; shift 2;;
     --fastglio-frontend) frontend="$2"; shift 2;;
     --point-filter-num) point_filter_num="$2"; shift 2;;
+    --local-map-demo) local_map_demo="$2"; shift 2;;
+    --wait-for-recording) wait_for_recording=true; shift;;
     --fusion-delay-s) fusion_delay_s="$2"; shift 2;;
     --route-clock) route_clock="$2"; shift 2;;
     --postprocess-only) postprocess=true; shift;;
@@ -102,6 +107,16 @@ while (($#)); do
     *) echo "Unknown argument: $1" >&2; exit 2;;
   esac
 done
+if [[ -n "$local_map_demo" ]]; then
+  case "$local_map_demo" in
+    before) cube_side_length=200;;
+    after) cube_side_length=1000;;
+    *) echo '--local-map-demo 只接受 before 或 after。' >&2; exit 2;;
+  esac
+  if $autonomy; then echo '局部地图问题展示使用 GPS 航线，不与依赖 LIO 的自主任务同时运行。' >&2; exit 2; fi
+  fastglio_live=true
+fi
+export MSIM_LOCAL_MAP_DEMO="$local_map_demo"
 if $autonomy; then
   teleop=true
   if [[ -n "$goal_enu" ]]; then teleop_height="${goal_enu##*,}"; fi
@@ -198,6 +213,9 @@ if [[ "$flight_pattern" != patrol && "$flight_pattern" != hover && "$flight_patt
   exit 2
 fi
 if $fastglio_live; then gazebo_viz=true; fi
+if $wait_for_recording && ! $fastglio_live; then
+  echo '--wait-for-recording 须与 --fastglio-live 或 --local-map-demo 一起使用。' >&2; exit 2
+fi
 if $gazebo_viz; then
   gui=true
   online_gnss=true
@@ -332,7 +350,7 @@ PY
     export MSIM_SPOOF_NORTH_RATE_MPS="$spoof_north_rate"
     capture+=(--injector-script "$MSIM_ROOT/adapters/ros1_noetic/fast_glio_uav/px4_online_gnss.py")
   fi
-  if $gazebo_viz && ! $headless; then
+  if $gazebo_viz && { ! $headless || [[ -n "$local_map_demo" ]]; }; then
     capture+=(--gazebo-viz-script \
       "$MSIM_ROOT/adapters/ros1_noetic/fast_glio_uav/gazebo_spoof_viz.py")
   fi
@@ -356,8 +374,13 @@ PY
       "$MSIM_ROOT/adapters/ros1_noetic/fast_glio_uav/px4_live_loose.launch" \
       --fastglio-config "$fastglio_config" \
       --fastglio-point-filter-num "$point_filter_num" \
+      --fastglio-cube-side-length "$cube_side_length" \
       --fastglio-rviz-config \
       "$MSIM_ROOT/adapters/ros1_noetic/fast_glio_uav/px4_live_loose.rviz")
+    if [[ -n "$local_map_demo" ]]; then
+      capture+=(--fastglio-rviz-config "$MSIM_ROOT/adapters/ros1_noetic/fast_glio_uav/local_map_video.rviz")
+    fi
+    if $wait_for_recording; then capture+=(--wait-for-recording); fi
     if ! $headless; then
       capture+=(--tile-windows-script \
         "$MSIM_ROOT/adapters/ros1_noetic/fast_glio_uav/tile_live_windows.py")

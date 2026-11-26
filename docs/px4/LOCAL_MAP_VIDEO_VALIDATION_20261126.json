@@ -1,0 +1,255 @@
+{
+  "date": "2026-11-26",
+  "scope": "Gazebo/PX4/LIO integration and display-data verification; GUI recording not performed",
+  "pause_gate_verified": {
+    "physics_paused": true,
+    "cube_side_length_m": 200,
+    "truth_node_ready": true
+  },
+  "display_verified": {
+    "truth_path_poses_at_probe": 158,
+    "truth_frame": "camera_init",
+    "lio_world_frame": "world",
+    "gazebo_truth_marker": true,
+    "gazebo_lio_marker": true
+  },
+  "unit_tests_passed": 99,
+  "runs": {
+    "before": {
+      "run": "build/gazebo-map-before-truth-validation",
+      "settings": {
+        "duration_s": 25,
+        "route_clock": "sim",
+        "interactive": false,
+        "mapping_only": false,
+        "autonomy": false,
+        "localization_map": null,
+        "goal_relative_enu_m": null,
+        "mission_speed_mps": null,
+        "goal_radius_m": null,
+        "autonomy_timeout_s": null,
+        "teleop_takeoff_height_m": null,
+        "teleop_speed_mps": null,
+        "flight_pattern": "route",
+        "frontend": "velodyne",
+        "gnss_source": "gazebo_plugin",
+        "point_filter_num": 1,
+        "cube_side_length_m": 200.0,
+        "wait_for_recording": true,
+        "local_map_demo": "before",
+        "fusion_processing_delay_s": 0.65,
+        "world_source": "/home/wzb/msim/build/px4-assets/simple-gazebo-map-before-truth-validation/urban_canyon_msim.world",
+        "scene_key": "simple",
+        "origin_lla_deg_m": [
+          30.5312,
+          114.3601,
+          50.0
+        ],
+        "spawn_enu_m": [
+          0.0,
+          -20.0,
+          0.0
+        ],
+        "flight_height_m": 8.0,
+        "spoof_start_s": "inf",
+        "spoof_east_rate_mps": "0"
+      },
+      "flight": {
+        "pass_flight_gate": true,
+        "armed": true,
+        "offboard": true,
+        "max_displacement_m": 12.528525810473742,
+        "max_climb_m": 8.102095603942871,
+        "px4_gps_samples": 31,
+        "max_px4_gps_satellites": 10,
+        "online_gnss": true,
+        "injection_match_fraction": 1.0,
+        "lidar_alignment": {
+          "lidar_epoch_count": 98,
+          "lidar_matched_epochs": 98,
+          "lidar_sync_fraction": 1.0,
+          "lidar_max_age_ms": 98.0,
+          "lidar_mean_age_ms": 94.87754081632653
+        },
+        "pass_lidar_sync_gate": true,
+        "px4_ulog": "/home/wzb/msim/build/gazebo-map-before-truth-validation/ros-home/log/2026-11-26/07_33_15.ulg"
+      },
+      "live_lio_loose": {
+        "topic_counts": {
+          "/msim/spoofed_gnss_odom": 90,
+          "/Odometry": 262,
+          "/path": 26,
+          "/loose_odom": 261,
+          "/loose_path": 26,
+          "/rtk_path": 261,
+          "/gnss_loose/diagnostics": 262
+        },
+        "gnss_alignment_reached": true,
+        "gnss_updates_accepted": 261,
+        "pass_live_loose_gate": true
+      },
+      "truth_display": {
+        "method": "first matched translation only; no rotation or scale fit",
+        "axes_assumed_aligned": true,
+        "truth_used_by_estimator": false,
+        "translation_truth_world_to_camera_init_m": [
+          -4.462097681194215e-05,
+          19.99617527962488,
+          -0.05487153969385143
+        ],
+        "anchor_stamp_ns": 2386000000,
+        "matched_pairs": 261,
+        "skipped": 0,
+        "matching_tolerance_ms": 50.0,
+        "maximum_match_delta_ms": 0.0,
+        "note": "Display/evaluation only. LIO output is not modified or fed back. Valid for aligned ENU/map axes."
+      },
+      "lio_error": {
+        "method": "first matched pose translation; no rotation or scale fit",
+        "odom_topic": "/Odometry",
+        "odometry_messages": 262,
+        "truth_messages": 2710,
+        "matched_pairs": 262,
+        "max_match_time_delta_ms": 0.0,
+        "east_rmse_m": 0.09373319837212012,
+        "north_rmse_m": 0.19437862579456236,
+        "up_rmse_m": 1.1899145246736187,
+        "horizontal_rmse_m": 0.21579843058476983,
+        "vertical_rmse_m": 1.1899145246736187,
+        "three_d_rmse_m": 1.2093244141553139,
+        "final_horizontal_error_m": 0.5566410138913561,
+        "final_three_d_error_m": 2.077222525223059,
+        "final_enu_error_m": [
+          0.06147244897580065,
+          -0.5532362572743352,
+          2.0012506591999077
+        ],
+        "first_matched_stamp_ns": 2386000000,
+        "last_matched_stamp_ns": 28486000000,
+        "gnss_diagnostic_status_counts": {
+          "1": 1,
+          "4": 261
+        },
+        "gnss_alignment_reached": true
+      }
+    },
+    "after": {
+      "run": "build/gazebo-map-after-truth-validation",
+      "settings": {
+        "duration_s": 25,
+        "route_clock": "sim",
+        "interactive": false,
+        "mapping_only": false,
+        "autonomy": false,
+        "localization_map": null,
+        "goal_relative_enu_m": null,
+        "mission_speed_mps": null,
+        "goal_radius_m": null,
+        "autonomy_timeout_s": null,
+        "teleop_takeoff_height_m": null,
+        "teleop_speed_mps": null,
+        "flight_pattern": "route",
+        "frontend": "velodyne",
+        "gnss_source": "gazebo_plugin",
+        "point_filter_num": 1,
+        "cube_side_length_m": 1000.0,
+        "wait_for_recording": false,
+        "local_map_demo": "after",
+        "fusion_processing_delay_s": 0.65,
+        "world_source": "/home/wzb/msim/build/px4-assets/simple-gazebo-map-after-truth-validation/urban_canyon_msim.world",
+        "scene_key": "simple",
+        "origin_lla_deg_m": [
+          30.5312,
+          114.3601,
+          50.0
+        ],
+        "spawn_enu_m": [
+          0.0,
+          -20.0,
+          0.0
+        ],
+        "flight_height_m": 8.0,
+        "spoof_start_s": "inf",
+        "spoof_east_rate_mps": "0"
+      },
+      "flight": {
+        "pass_flight_gate": true,
+        "armed": true,
+        "offboard": true,
+        "max_displacement_m": 12.531468354231034,
+        "max_climb_m": 8.112235069274902,
+        "px4_gps_samples": 32,
+        "max_px4_gps_satellites": 10,
+        "online_gnss": true,
+        "injection_match_fraction": 1.0,
+        "lidar_alignment": {
+          "lidar_epoch_count": 101,
+          "lidar_matched_epochs": 101,
+          "lidar_sync_fraction": 1.0,
+          "lidar_max_age_ms": 86.0,
+          "lidar_mean_age_ms": 82.91089108910892
+        },
+        "pass_lidar_sync_gate": true,
+        "px4_ulog": "/home/wzb/msim/build/gazebo-map-after-truth-validation/ros-home/log/2026-11-26/07_36_38.ulg"
+      },
+      "live_lio_loose": {
+        "topic_counts": {
+          "/msim/spoofed_gnss_odom": 89,
+          "/Odometry": 262,
+          "/path": 26,
+          "/loose_odom": 261,
+          "/loose_path": 26,
+          "/rtk_path": 261,
+          "/gnss_loose/diagnostics": 262
+        },
+        "gnss_alignment_reached": true,
+        "gnss_updates_accepted": 261,
+        "pass_live_loose_gate": true
+      },
+      "truth_display": {
+        "method": "first matched translation only; no rotation or scale fit",
+        "axes_assumed_aligned": true,
+        "truth_used_by_estimator": false,
+        "translation_truth_world_to_camera_init_m": [
+          -0.00018045423194180127,
+          19.99865624801939,
+          -0.0538242236612325
+        ],
+        "anchor_stamp_ns": 3298000000,
+        "matched_pairs": 266,
+        "skipped": 0,
+        "matching_tolerance_ms": 50.0,
+        "maximum_match_delta_ms": 0.0,
+        "note": "Display/evaluation only. LIO output is not modified or fed back. Valid for aligned ENU/map axes."
+      },
+      "lio_error": {
+        "method": "first matched pose translation; no rotation or scale fit",
+        "odom_topic": "/Odometry",
+        "odometry_messages": 262,
+        "truth_messages": 2664,
+        "matched_pairs": 261,
+        "max_match_time_delta_ms": 30.0,
+        "east_rmse_m": 0.09435330220421079,
+        "north_rmse_m": 0.17646276269909522,
+        "up_rmse_m": 0.4813910746727458,
+        "horizontal_rmse_m": 0.20010410354671973,
+        "vertical_rmse_m": 0.4813910746727458,
+        "three_d_rmse_m": 0.5213242935360076,
+        "final_horizontal_error_m": 0.2493782540701815,
+        "final_three_d_error_m": 0.6964801063720751,
+        "final_enu_error_m": [
+          -0.12663891800528282,
+          0.21483039368195378,
+          -0.6503037943676517
+        ],
+        "first_matched_stamp_ns": 3398000000,
+        "last_matched_stamp_ns": 29398000000,
+        "gnss_diagnostic_status_counts": {
+          "1": 1,
+          "4": 261
+        },
+        "gnss_alignment_reached": true
+      }
+    }
+  }
+}

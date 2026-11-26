@@ -2,6 +2,45 @@
 
 2026-11-26。
 
+## 首选：Gazebo 真实飞行、RViz 与真值同时显示
+
+需要同时录到飞机真实飞行和建图时，使用此入口：
+
+```bash
+bash /home/wzb/msim/tools/local-map-gazebo-video.sh before
+```
+
+它启动完整 Gazebo / PX4 / FAST-LIO 链路，自动安排 Gazebo 与 RViz 双窗口。默认城市走廊、VLP-16、60 秒无欺骗航线、保留全部输入点；仅把实际全局地图边长设为 200 m，复现旧参数条件。正常入口仍默认 1000 m。
+
+1. 等终端显示“Gazebo / RViz 窗口已就绪，物理仿真已暂停”。此时还没有开始飞行。
+2. 调整 Gazebo 与 RViz 视角，启动系统录屏。
+3. **回终端按 Enter**，物理仿真恢复，飞机沿自动航线起飞。这里使用 Enter；后面的离线回放才使用空格。
+4. Gazebo 显示真实飞机，以及白色真值、青色 LIO 三维估计。RViz 同时显示绿色真值轨迹、青色 LIO 轨迹、红色当前帧和紫色点云显示历史。
+5. 任务结束后关闭本次采集；再用下列命令录修正后的相同任务设置：
+
+```bash
+bash /home/wzb/msim/tools/local-map-gazebo-video.sh after
+```
+
+可在命令末尾添加 `--duration-s 120` 或 `--scene complex_urban`。为了清楚比较地图参数，建议先保持默认场景与航线。此入口不添加 `--web`，也不要添加会关闭窗口的 `--headless`。
+
+这里是两次新的闭环仿真，传感器实际采样和飞行过程可能略有不同，不能描述为同一录包的严格单变量对照。需要严格同录包比较时，使用后面的离线入口。
+
+### 真值坐标与保存
+
+- 真值来自 `/ground_truth/state`；首次匹配 LIO 与真值时间后只确定固定平移，不拟合旋转或尺度、不逐帧追随估计。
+- 假定本场景 `camera_init` 与 Gazebo ENU 轴向一致。该显示方法不适用于随意旋转初始地图轴的其他配置，不能靠改坐标系名称掩盖航向差。
+- `/ground_truth/aligned_path` 与 `/ground_truth/aligned_odom` 给 RViz；`/msim/lio_world_odom` 给 Gazebo 显示。它们不进入 PX4 定位、LIO 或 GPS 组合更新。
+- Gazebo 的 LIO 标记使用其自己估计的高度，没有把高度替换成真值；它仍带有实际算法处理延迟，没有向未来预测。
+- `truth-comparison.json` 保存固定平移、匹配数量和时间差；`capture-settings.json` 保存 before/after、实际地图边长和是否等待录制；bag 另外保存真值路径、世界坐标 LIO 与当前配准点云。
+- 运行目录仍按平台存储设置保存到外置硬盘。此脚本不自动录制桌面，视频由用户启动的录屏工具保存。
+
+本轮无窗口集成检查实际验证了 Gazebo 物理暂停、全局参数 200 m、真值显示节点就绪；按 Enter 后接收到真值路径和世界坐标 LIO，Gazebo 服务确认 `msim_truth_live` 与 `msim_lio_live` 两种标记存在。无窗口检查不作为双窗口录屏的视觉证据。
+
+两种模式各完成 25 秒飞行，飞行、LiDAR 同步和在线组合检查均通过，99 项回归测试通过。[本轮集成验证记录](LOCAL_MAP_VIDEO_VALIDATION_20261126.json)。两次是独立飞行，不以其误差差异替代之前的同录包参数因果验证。
+
+## 可选：只在 RViz 回放历史录包
+
 已提供一键入口，不需要切换 Git 历史、修改已修复的启动文件或启动 Gazebo/PX4。脚本在独立 ROS master 中重新运行纯 LiDAR/IMU，默认使用修复前四雷达实验里的 VLP-16 原始传感器包。
 
 ## 先明确视频展示什么
